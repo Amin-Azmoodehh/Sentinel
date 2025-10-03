@@ -69,7 +69,19 @@ export const buildTaskToolDefinition = (): ExperimentalTool => ({
     type: 'object',
     properties: {
       action: { type: 'string', enum: [...TASK_ACTIONS] },
-      payload: { type: 'object' },
+      payload: {
+        type: 'object',
+        properties: {
+          id: { type: 'number', description: 'Task ID' },
+          title: { type: 'string', description: 'Task title' },
+          description: { type: 'string', description: 'Task description' },
+          status: { type: 'string', enum: ['open', 'in-progress', 'review', 'done', 'blocked'] },
+          priority: { type: 'string', enum: ['high', 'med', 'low'] },
+          tags: { type: 'array', items: { type: 'string' }, description: 'Task tags' },
+          parent: { type: 'number', description: 'Parent task ID for subtasks' },
+          dependsOn: { type: 'number', description: 'Task dependency ID' },
+        },
+      },
     },
     required: ['action'],
   },
@@ -82,7 +94,18 @@ export const buildFsToolDefinition = (): ExperimentalTool => ({
     type: 'object',
     properties: {
       action: { type: 'string', enum: [...FS_ACTIONS] },
-      payload: { type: 'object' },
+      payload: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'Target path' },
+          paths: { type: 'array', items: { type: 'string' }, description: 'Array of paths for mkdir' },
+          source: { type: 'string', description: 'Source path for copy/move' },
+          destination: { type: 'string', description: 'Destination path for copy/move' },
+          pattern: { type: 'string', description: 'Glob pattern for list' },
+          maxLines: { type: 'number', description: 'Max lines per chunk for split' },
+          force: { type: 'boolean', description: 'Force operation' },
+        },
+      },
     },
     required: ['action'],
   },
@@ -95,7 +118,17 @@ export const buildShellToolDefinition = (): ExperimentalTool => ({
     type: 'object',
     properties: {
       action: { type: 'string', enum: [...SHELL_ACTIONS] },
-      payload: { type: 'object' },
+      payload: {
+        type: 'object',
+        properties: {
+          command: { type: 'string', description: 'Command to execute' },
+          commands: { type: 'array', items: { type: 'string' }, description: 'Multiple commands' },
+          args: { type: 'array', items: { type: 'string' }, description: 'Command arguments' },
+          cwd: { type: 'string', description: 'Working directory' },
+          timeoutMs: { type: 'number', description: 'Timeout in milliseconds' },
+          shell: { type: 'string', description: 'Shell to use (cmd, pwsh, bash)' },
+        },
+      },
     },
     required: ['action'],
   },
@@ -122,7 +155,13 @@ export const buildProviderToolDefinition = (): ExperimentalTool => ({
     type: 'object',
     properties: {
       action: { type: 'string', enum: [...PROVIDER_ACTIONS] },
-      payload: { type: 'object' },
+      payload: {
+        type: 'object',
+        properties: {
+          provider: { type: 'string', description: 'Provider name (qwen, gemini, ollama, codex)' },
+          model: { type: 'string', description: 'Model name' },
+        },
+      },
     },
     required: ['action'],
   },
@@ -135,7 +174,13 @@ export const buildGateToolDefinition = (): ExperimentalTool => ({
     type: 'object',
     properties: {
       action: { type: 'string', enum: [...GATE_ACTIONS] },
-      payload: { type: 'object' },
+      payload: {
+        type: 'object',
+        properties: {
+          minScore: { type: 'number', description: 'Minimum quality score threshold' },
+          timeoutMs: { type: 'number', description: 'Timeout in milliseconds' },
+        },
+      },
     },
     required: ['action'],
   },
@@ -325,7 +370,14 @@ export const buildSecurityToolDefinition = (): ExperimentalTool => ({
     type: 'object',
     properties: {
       action: { type: 'string', enum: [...SECURITY_ACTIONS] },
-      payload: { type: 'object' },
+      payload: {
+        type: 'object',
+        properties: {
+          path: { type: 'string', description: 'File or directory path' },
+          paths: { type: 'array', items: { type: 'string' }, description: 'Array of paths' },
+          reason: { type: 'string', description: 'Reason for blacklisting' },
+        },
+      },
     },
     required: ['action'],
   },
