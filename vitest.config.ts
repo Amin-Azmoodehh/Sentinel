@@ -4,9 +4,7 @@ export default defineConfig({
   test: {
     globals: true,
     environment: 'node',
-    include: ['tests/**/*.test.ts'],
-    threads: false,
-    singleThread: true,
+    include: ['src/**/*.test.ts'],
     coverage: {
       reporter: ['text', 'lcov'],
       provider: 'v8',

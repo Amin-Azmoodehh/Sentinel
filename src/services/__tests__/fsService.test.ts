@@ -1,5 +1,3 @@
-import { describe, it, expect } from '@jest/globals';
-
 describe('fsService path handling', () => {
   it('should handle quoted paths correctly', () => {
     const testCases = [

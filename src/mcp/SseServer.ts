@@ -32,5 +32,11 @@ export const startSseServer = (port: number): void => {
 
 export const broadcastSseEvent = (eventName: string, data: unknown): void => {
   const message = `event: ${eventName}\ndata: ${JSON.stringify(data)}\n\n`;
-  clients.forEach((client) => client.write(message));
+  clients.forEach((client) => {
+    try {
+      client.write(message);
+    } catch (error) {
+      log.error(`[SSE] Failed to write to a client: ${error}`);
+    }
+  });
 };

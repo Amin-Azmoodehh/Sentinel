@@ -29,7 +29,7 @@ export interface ShellDetectionResult {
   platform: string;
 }
 
-const DEFAULT_TIMEOUT = 30000; // 30 seconds
+const DEFAULT_TIMEOUT = 300000; // 5 minutes
 const DEFAULT_MAX_OUTPUT_SIZE = 1024 * 1024; // 1MB
 
 export class ShellService {

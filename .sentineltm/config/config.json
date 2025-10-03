@@ -1,6 +1,6 @@
 {
   "defaults": {
-    "provider": "codex",
+    "provider": "gemini",
     "model": "qwen-coder-flash"
   },
   "thresholds": {
