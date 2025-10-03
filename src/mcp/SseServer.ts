@@ -30,7 +30,7 @@ export const startSseServer = (port: number): void => {
   });
 };
 
-export const broadcastSseEvent = (eventName: string, data: any): void => {
+export const broadcastSseEvent = (eventName: string, data: unknown): void => {
   const message = `event: ${eventName}\ndata: ${JSON.stringify(data)}\n\n`;
   clients.forEach((client) => client.write(message));
 };

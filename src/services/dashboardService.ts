@@ -118,7 +118,7 @@ export class DashboardService {
     const config = configService.load();
     const threshold = config.thresholds?.gate || 95;
     try {
-      const lastRun = (config.meta?.gate as any)?.lastRun;
+      const lastRun = (config.meta?.gate as { lastRun?: { score: number; status: string; timestamp?: number } })?.lastRun;
       if (lastRun && typeof lastRun.score === 'number') {
         return {
           lastScore: lastRun.score,
