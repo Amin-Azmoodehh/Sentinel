@@ -58,8 +58,6 @@ const createMcpConfig = (providerName: string) => {
       [CLI_SERVER_NAME]: {
         command: invocation.command,
         args: invocation.args,
-        transport: 'stdio',
-        models: [],
         env: {},
       },
     },
@@ -105,16 +103,17 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
         server.args = invocation.args;
         updated = true;
       }
-      if (server.transport !== 'stdio') {
-        server.transport = 'stdio';
-        updated = true;
-      }
       if (!server.env || typeof server.env !== 'object') {
         server.env = {};
         updated = true;
       }
-      if (!Array.isArray(server.models)) {
-        server.models = [];
+      // Remove deprecated fields if they exist
+      if (server.transport !== undefined) {
+        delete server.transport;
+        updated = true;
+      }
+      if (server.models !== undefined) {
+        delete server.models;
         updated = true;
       }
       if (!server.name) {
@@ -145,16 +144,17 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
       server.args = invocation.args;
       updated = true;
     }
-    if (server.transport !== 'stdio') {
-      server.transport = 'stdio';
-      updated = true;
-    }
     if (!server.env || typeof server.env !== 'object') {
       server.env = {};
       updated = true;
     }
-    if (!Array.isArray(server.models)) {
-      server.models = [];
+    // Remove deprecated fields if they exist
+    if (server.transport !== undefined) {
+      delete server.transport;
+      updated = true;
+    }
+    if (server.models !== undefined) {
+      delete server.models;
       updated = true;
     }
 
@@ -246,7 +246,6 @@ const applyZed = (providerName: string): void => {
     'assistant.providers': {
       sentinel: {
         ...invocation,
-        transport: 'stdio',
       },
     },
   });
