@@ -202,6 +202,19 @@ const applyIdeProfile = (profileName: string, targetDir: string, providerName: s
   const mcpTargetPath = path.join(targetDir, 'mcp.json');
   writeJsonFile(mcpTargetPath, createMcpConfig(providerName));
   ensureMcpConfig(mcpTargetPath, providerName);
+  
+  // Copy rules.json if it exists in the project
+  const projectRulesPath = path.join(process.cwd(), '.sentineltm', 'config', 'rules.json');
+  const targetRulesPath = path.join(targetDir, 'rules.json');
+  
+  if (fs.existsSync(projectRulesPath)) {
+    try {
+      fs.copyFileSync(projectRulesPath, targetRulesPath);
+      log.success(`  Copied rules.json to ${profileName}`);
+    } catch (error) {
+      log.warn(`  Could not copy rules.json: ${(error as Error).message}`);
+    }
+  }
 };
 
 const applyVsCode = (providerName: string): void => {

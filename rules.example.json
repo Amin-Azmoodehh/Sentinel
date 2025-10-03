@@ -1,0 +1,26 @@
+{
+  "entrypoint": {
+    "filename": "main.py",
+    "maxLines": 4,
+    "mustImportOnly": true
+  },
+  "style": {
+    "maxLineLength": 79,
+    "noSideEffectsOnImport": true,
+    "absoluteImportsOnly": true
+  },
+  "forbidden": {
+    "functions": ["print(", "eval(", "exec(", "console.log("],
+    "modules": ["subprocess", "os.system"]
+  },
+  "externalization": {
+    "textsPath": "data/texts/*.json",
+    "configPath": "data/config/*.json",
+    "enforceNoHardcodedStrings": true
+  },
+  "quality": {
+    "minCoverage": 80,
+    "requireTests": true,
+    "requireDocs": true
+  }
+}
