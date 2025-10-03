@@ -7,7 +7,12 @@ import { readJsonFile, writeJsonFile } from '../utils/fileSystem.js';
 import { log, formatHeading } from '../utils/logger.js';
 import chalk from 'chalk';
 
-const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+const sleepSync = (ms: number): void => {
+  const end = Date.now() + ms;
+  while (Date.now() < end) {
+    // Busy wait
+  }
+};
 
 const executeProviderCommandWithRetry = (
   commandPath: string,
@@ -39,7 +44,7 @@ const executeProviderCommandWithRetry = (
       log.warn(`Attempt ${i + 1}/${retries} failed for ${commandPath} with error. Retrying...`);
     }
     if (i < retries - 1) {
-      delay(initialDelay * Math.pow(2, i)); // Exponential backoff
+      sleepSync(initialDelay * Math.pow(2, i)); // Exponential backoff
     }
   }
   log.error(`All ${retries} attempts failed for ${commandPath}.`);
