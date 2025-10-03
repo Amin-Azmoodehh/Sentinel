@@ -2,6 +2,7 @@
 
 SentinelTM (`st`) is a local-first AI agent orchestrator that combines a powerful CLI with an MCP server. It provides secure file operations, shell execution, code indexing, task management, and quality gates - all controlled by AI providers without requiring remote services.
 
+[![npm version](https://img.shields.io/npm/v/sentineltm-cli)](https://www.npmjs.com/package/sentineltm-cli)
 [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Amin-Azmoodehh/Sentinel)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.0+-blue)](https://github.com/Amin-Azmoodehh/Sentinel)
 [![License](https://img.shields.io/badge/license-ISC-green)](https://github.com/Amin-Azmoodehh/Sentinel)
@@ -46,14 +47,22 @@ pnpx sentineltm-cli --help
 ### Basic Usage
 
 ```bash
+# Check version
+st -v
+
 # Detect available AI providers
 st provider detect
 
 # Set your preferred AI provider
 st set provider gemini
 
-# Start MCP server for AI agents
+# Start MCP server for AI agents (stdio transport)
 st serve
+st serve --mcp-stdio  # Explicit stdio mode
+
+# Start with different transports
+st serve --transport http --port 8008
+st serve --transport sse --port 8008
 ```
 
 ### MCP Configuration
@@ -66,7 +75,8 @@ Add to your IDE's MCP config file:
   "mcpServers": {
     "sentineltm": {
       "command": "npx",
-      "args": ["-y", "sentineltm-cli", "serve"]
+      "args": ["-y", "sentineltm-cli", "serve", "--mcp-stdio"],
+      "env": {}
     }
   }
 }
@@ -78,7 +88,8 @@ Add to your IDE's MCP config file:
   "mcpServers": {
     "sentineltm": {
       "command": "bunx",
-      "args": ["sentineltm-cli", "serve"]
+      "args": ["sentineltm-cli", "serve", "--mcp-stdio"],
+      "env": {}
     }
   }
 }
@@ -90,7 +101,8 @@ Add to your IDE's MCP config file:
   "mcpServers": {
     "sentineltm": {
       "command": "pnpx",
-      "args": ["sentineltm-cli", "serve"]
+      "args": ["sentineltm-cli", "serve", "--mcp-stdio"],
+      "env": {}
     }
   }
 }
@@ -102,7 +114,8 @@ Add to your IDE's MCP config file:
   "mcpServers": {
     "sentineltm": {
       "command": "st",
-      "args": ["serve"]
+      "args": ["serve", "--mcp-stdio"],
+      "env": {}
     }
   }
 }
@@ -291,8 +304,22 @@ st ide set windsurf            # Configure single IDE
 Start the MCP server to let AI agents control SentinelTM:
 
 ```bash
+# Start with stdio transport (default)
 st serve
+st serve --mcp-stdio
+
+# Start with HTTP transport
+st serve --transport http --port 8008
+
+# Start with SSE transport
+st serve --transport sse --port 8008
 ```
+
+### Transport Options
+
+- **stdio** (default): Standard input/output for direct IDE integration
+- **http**: HTTP server for remote connections
+- **sse**: Server-Sent Events for real-time updates
 
 ### 🛠️ Available MCP Tools
 
@@ -369,13 +396,15 @@ Create `.sentineltm/config/rules.json` to enforce project standards:
 
 | Setting | Description | Default |
 |---------|-------------|---------|
-| `defaults.provider` | Active AI provider | `ollama` |
-| `defaults.model` | Default model name | `""` |
+| `defaults.provider` | Active AI provider | `qwen` |
+| `defaults.model` | Default model name | `qwen-coder-flash` |
 | `thresholds.gate` | Minimum quality score | `95` |
 | `thresholds.maxFileSizeMB` | File size limit | `5` |
 | `security.shell.allowedCommands` | Safe shell commands | `["npm","git","ls",...]` |
 | `security.forbidden` | Banned code patterns | `["console.log(","eval("]` |
 | `thresholds.maxIndexLines` | Max lines per file before split | `300` |
+| `provider.retry.attempts` | Number of retry attempts for provider commands | `3` |
+| `provider.retry.delay` | Initial delay between retries (ms) | `1000` |
 
 ## 📂 Project Structure
 
@@ -455,7 +484,30 @@ st gate run --min 95  # Run with retries
 **🔌 MCP connection issues:**
 ```bash
 st serve  # Ensure server is running
+st serve --mcp-stdio  # Use explicit stdio mode
 DEBUG=sentineltm:* st serve  # Enable debug logging
+```
+
+**⚠️ Provider timeout errors:**
+```bash
+# The system automatically retries failed provider commands up to 3 times
+# with exponential backoff. You can configure this in config.json:
+{
+  "provider": {
+    "retry": {
+      "attempts": 3,
+      "delay": 1000
+    }
+  }
+}
+```
+
+**🔄 Dashboard cache blocking commands:**
+```bash
+# Fixed in v1.4.3+
+# Dashboard no longer auto-refreshes and blocks CLI commands
+# Upgrade to latest version:
+npm install -g sentineltm-cli@latest
 ```
 
 **🛣️ Path errors ("must stay within workspace"):**
