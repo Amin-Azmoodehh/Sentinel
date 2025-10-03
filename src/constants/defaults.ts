@@ -9,6 +9,12 @@ export const defaultConfig = {
     maxTodoCount: 10,
     maxIndexLines: 300,
   },
+  provider: {
+    retry: {
+      attempts: 3,
+      delay: 1000, // ms
+    },
+  },
   security: {
     forbidden: ['console.log(', 'print(', 'eval' + '('],
     requiredRootDirs: ['src', '.sentineltm'],

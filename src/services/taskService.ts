@@ -352,7 +352,10 @@ export const deleteTask = (id: number): boolean => {
     }
     sqliteService.run('DELETE FROM task_tags WHERE task_id = ?', [id]);
     sqliteService.run('DELETE FROM subtasks WHERE task_id = ?', [id]);
-    sqliteService.run('DELETE FROM task_dependencies WHERE task_id = ? OR depends_on_id = ?', [id, id]);
+    sqliteService.run('DELETE FROM task_dependencies WHERE task_id = ? OR depends_on_id = ?', [
+      id,
+      id,
+    ]);
     sqliteService.run('DELETE FROM tasks WHERE id = ?', [id]);
     return true;
   });
@@ -405,10 +408,10 @@ export const addTaskDependency = (taskId: number, dependsOnId: number): boolean 
     const existingDeps = getTaskDependencies(dependsOnId);
     if (existingDeps.includes(taskId)) return false;
 
-    sqliteService.run('INSERT OR IGNORE INTO task_dependencies (task_id, depends_on_id) VALUES (?, ?)', [
-      taskId,
-      dependsOnId,
-    ]);
+    sqliteService.run(
+      'INSERT OR IGNORE INTO task_dependencies (task_id, depends_on_id) VALUES (?, ?)',
+      [taskId, dependsOnId]
+    );
     return true;
   });
 };

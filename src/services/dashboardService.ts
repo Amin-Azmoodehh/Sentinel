@@ -52,7 +52,9 @@ export class DashboardService {
       this.cachedMetrics = await this.fetchMetrics();
       log.info('Dashboard cache refreshed.');
     } catch (error) {
-      log.error(`Failed to refresh dashboard cache: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `Failed to refresh dashboard cache: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -65,10 +67,7 @@ export class DashboardService {
       const config = configService.load();
       const indexInfo = indexStatus();
 
-      const [tasks, quality] = await Promise.all([
-        this.getTaskStats(),
-        this.getQualityStats(),
-      ]);
+      const [tasks, quality] = await Promise.all([this.getTaskStats(), this.getQualityStats()]);
 
       const metrics: DashboardMetrics = {
         project: {
@@ -88,9 +87,17 @@ export class DashboardService {
       };
       return metrics;
     } catch (error) {
-      log.error(`Dashboard failed to fetch metrics: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `Dashboard failed to fetch metrics: ${error instanceof Error ? error.message : String(error)}`
+      );
       return {
-        project: { name: 'Error', root: process.cwd(), filesIndexed: 0, symbolsIndexed: 0, lastIndexRun: null },
+        project: {
+          name: 'Error',
+          root: process.cwd(),
+          filesIndexed: 0,
+          symbolsIndexed: 0,
+          lastIndexRun: null,
+        },
         tasks: { total: 0, pending: 0, inProgress: 0, completed: 0, blocked: 0 },
         quality: { lastScore: 0, lastRun: null, threshold: 0, passing: false },
         system: { platform: 'unknown', memory: { used: 0, total: 0, percentage: 0 }, uptime: 0 },
@@ -118,7 +125,9 @@ export class DashboardService {
     const config = configService.load();
     const threshold = config.thresholds?.gate || 95;
     try {
-      const lastRun = (config.meta?.gate as { lastRun?: { score: number; status: string; timestamp?: number } })?.lastRun;
+      const lastRun = (
+        config.meta?.gate as { lastRun?: { score: number; status: string; timestamp?: number } }
+      )?.lastRun;
       if (lastRun && typeof lastRun.score === 'number') {
         return {
           lastScore: lastRun.score,

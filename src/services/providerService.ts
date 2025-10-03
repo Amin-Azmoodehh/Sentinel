@@ -7,6 +7,45 @@ import { readJsonFile, writeJsonFile } from '../utils/fileSystem.js';
 import { log, formatHeading } from '../utils/logger.js';
 import chalk from 'chalk';
 
+const delay = (ms: number): Promise<void> => new Promise((resolve) => setTimeout(resolve, ms));
+
+const executeProviderCommandWithRetry = (
+  commandPath: string,
+  args: string[],
+  options: { encoding: string; timeout: number; shell: boolean; windowsHide: boolean }
+) => {
+  const config = configService.load();
+  const retries = config.provider?.retry?.attempts ?? 3;
+  const initialDelay = config.provider?.retry?.delay ?? 1000;
+
+  let lastError: any = null;
+  for (let i = 0; i < retries; i++) {
+    try {
+      const result = spawnSync(commandPath, args, {
+        encoding: 'utf-8',
+        timeout: 7000,
+        shell: true,
+        windowsHide: true,
+      });
+      if (result.status === 0) {
+        return result;
+      }
+      lastError = result;
+      log.warn(
+        `Attempt ${i + 1}/${retries} failed for ${commandPath} with status ${result.status}. Retrying...`
+      );
+    } catch (error) {
+      lastError = error;
+      log.warn(`Attempt ${i + 1}/${retries} failed for ${commandPath} with error. Retrying...`);
+    }
+    if (i < retries - 1) {
+      delay(initialDelay * Math.pow(2, i)); // Exponential backoff
+    }
+  }
+  log.error(`All ${retries} attempts failed for ${commandPath}.`);
+  return lastError;
+};
+
 export interface ProviderInfo {
   name: string;
   command: string;
@@ -89,17 +128,25 @@ const locateExecutable = (names: string[]): string | null => {
 };
 
 const execVersionCheck = (commandPath: string): boolean => {
-  const result = spawnSync(commandPath, ['--version'], {
+  const result = executeProviderCommandWithRetry(commandPath, ['--version'], {
     encoding: 'utf-8',
     timeout: 7000,
     shell: true,
     windowsHide: true,
   });
-  if (result.status !== 0) {
-    const stderr = result.stderr ? result.stderr.trim() : 'No stderr output';
-    log.warn(`--version check failed for ${commandPath}. Stderr: ${stderr}`);
+
+  if (!result || result.status !== 0) {
+    if (result) {
+      const stderr = result.stderr ? result.stderr.trim() : 'No stderr output';
+      log.warn(`--version check failed for ${commandPath}. Stderr: ${stderr}`);
+    } else {
+      log.warn(
+        `--version check failed for ${commandPath}. Command execution resulted in an error.`
+      );
+    }
+    return false;
   }
-  return result.status === 0;
+  return true;
 };
 
 export const detectProviders = (): ProviderDetectResult => {
@@ -147,15 +194,16 @@ export interface ModelsListResult {
 }
 
 const runModelList = (commandPath: string): string[] | null => {
-  const result = spawnSync(commandPath, ['models', 'list', '--json'], {
-    encoding: 'utf-8',
-    timeout: 2000,
-    shell: true,
-    windowsHide: true,
-  });
-  if (result.status !== 0) {
+  const result = executeProviderCommandWithRetry(
+    commandPath,
+    ['models', 'list', '--json'],
+    { encoding: 'utf-8', timeout: 20000, shell: true, windowsHide: true } // Increased timeout
+  );
+
+  if (!result || result.status !== 0) {
     return null;
   }
+
   try {
     const parsed = JSON.parse(result.stdout || '[]');
     if (Array.isArray(parsed)) {

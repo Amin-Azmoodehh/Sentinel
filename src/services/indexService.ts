@@ -279,13 +279,15 @@ export const searchIndexedFiles = (query: string, limit?: number): IndexedFileRe
     return [];
   }
 
-  const allFiles = sqliteService.all('SELECT path, size, lines, lang, mtime FROM files').map((row) => ({
-    path: String(row.path || ''),
-    size: Number(row.size || 0),
-    lines: Number(row.lines || 0),
-    lang: String(row.lang || 'unknown'),
-    mtime: Number(row.mtime || 0),
-  }));
+  const allFiles = sqliteService
+    .all('SELECT path, size, lines, lang, mtime FROM files')
+    .map((row) => ({
+      path: String(row.path || ''),
+      size: Number(row.size || 0),
+      lines: Number(row.lines || 0),
+      lang: String(row.lang || 'unknown'),
+      mtime: Number(row.mtime || 0),
+    }));
 
   const fuseResults = tinyFuse(allFiles, term, { keys: ['path'], threshold: 0.4 });
   const capped = capLimit(limit);
@@ -382,7 +384,7 @@ export interface SearchResult {
 export const searchIndex = (query: string): SearchResult[] => {
   const results: SearchResult[] = [];
   const term = query?.trim();
-  
+
   if (!term) {
     log.warn('Search query is empty');
     return [];
@@ -405,7 +407,9 @@ export const searchIndex = (query: string): SearchResult[] => {
   // If no results, provide helpful info
   if (results.length === 0) {
     const stats = indexStatus();
-    log.warn(`No results found for "${term}". Index has ${stats.files} files, ${stats.symbols} symbols`);
+    log.warn(
+      `No results found for "${term}". Index has ${stats.files} files, ${stats.symbols} symbols`
+    );
   }
 
   return results;

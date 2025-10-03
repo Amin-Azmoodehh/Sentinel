@@ -261,7 +261,10 @@ export class ComplexHandlers {
         const dependsOnId = ensureNumber(payload.dependsOnId, 'payload.dependsOnId');
         const success = taskService.addTaskDependency(taskId, dependsOnId);
         if (!success) {
-          throw new McpError(`Failed to add dependency: ${taskId} -> ${dependsOnId}`, 'ERR_BAD_REQUEST');
+          throw new McpError(
+            `Failed to add dependency: ${taskId} -> ${dependsOnId}`,
+            'ERR_BAD_REQUEST'
+          );
         }
         return successResponse({ taskId, dependsOnId, added: true });
       }

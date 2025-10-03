@@ -58,7 +58,11 @@ export class SentinelMcpServer {
         const result = await Promise.race([
           handler(args || {}),
           new Promise((_, reject) =>
-            setTimeout(() => reject(new McpError(`Tool '${name}' timed out after ${MCP_TIMEOUT}ms`, 'ERR_TIMEOUT')),
+            setTimeout(
+              () =>
+                reject(
+                  new McpError(`Tool '${name}' timed out after ${MCP_TIMEOUT}ms`, 'ERR_TIMEOUT')
+                ),
               MCP_TIMEOUT
             )
           ),
@@ -67,7 +71,9 @@ export class SentinelMcpServer {
         log.info(`[MCP][${callId}] Tool call '${name}' completed successfully.`);
         return { content: [{ type: 'text', text: JSON.stringify(result) }] };
       } catch (error) {
-        log.error(`[MCP][${callId}] Tool call '${name}' failed: ${error instanceof Error ? error.message : String(error)}`);
+        log.error(
+          `[MCP][${callId}] Tool call '${name}' failed: ${error instanceof Error ? error.message : String(error)}`
+        );
         return {
           content: [{ type: 'text', text: JSON.stringify(errorResponse(error)) }],
           isError: true,
@@ -97,7 +103,11 @@ export class SentinelMcpServer {
       const result = await Promise.race([
         handler(args || {}),
         new Promise((_, reject) =>
-          setTimeout(() => reject(new McpError(`Tool '${name}' timed out after ${MCP_TIMEOUT}ms`, 'ERR_TIMEOUT')),
+          setTimeout(
+            () =>
+              reject(
+                new McpError(`Tool '${name}' timed out after ${MCP_TIMEOUT}ms`, 'ERR_TIMEOUT')
+              ),
             MCP_TIMEOUT
           )
         ),
@@ -106,8 +116,13 @@ export class SentinelMcpServer {
       log.info(`[HTTP][${callId}] Tool call '${name}' completed successfully.`);
       return { content: [{ type: 'text', text: JSON.stringify(result) }] };
     } catch (error) {
-      log.error(`[HTTP][${callId}] Tool call '${name}' failed: ${error instanceof Error ? error.message : String(error)}`);
-      return { content: [{ type: 'text', text: JSON.stringify(errorResponse(error)) }], isError: true };
+      log.error(
+        `[HTTP][${callId}] Tool call '${name}' failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+      return {
+        content: [{ type: 'text', text: JSON.stringify(errorResponse(error)) }],
+        isError: true,
+      };
     }
   }
 

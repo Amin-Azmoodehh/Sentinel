@@ -303,15 +303,17 @@ export class ShellService {
 
     const commandParts = command.trim().split(/\s+/);
     const primaryCommand = commandParts[0].toLowerCase();
-    
+
     // Extract base command (remove path and extension)
     const baseCommand = path.basename(primaryCommand, path.extname(primaryCommand));
 
     // Check blocked commands - exact match or starts with
-    if (blocked.some((blockedCmd: string) => {
-      const normalizedBlocked = blockedCmd.toLowerCase();
-      return baseCommand === normalizedBlocked || baseCommand.startsWith(normalizedBlocked + '-');
-    })) {
+    if (
+      blocked.some((blockedCmd: string) => {
+        const normalizedBlocked = blockedCmd.toLowerCase();
+        return baseCommand === normalizedBlocked || baseCommand.startsWith(normalizedBlocked + '-');
+      })
+    ) {
       return {
         valid: false,
         error: `Command '${primaryCommand}' is blocked for security reasons`,
@@ -325,10 +327,10 @@ export class ShellService {
         return (
           baseCommand === normalizedAllowed ||
           baseCommand.startsWith(normalizedAllowed + '3') || // python3, pip3
-          baseCommand.startsWith(normalizedAllowed + '-')    // python-config
+          baseCommand.startsWith(normalizedAllowed + '-') // python-config
         );
       });
-      
+
       if (!isAllowed) {
         return {
           valid: false,

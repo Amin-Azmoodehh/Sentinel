@@ -21,7 +21,9 @@ const buildPrdPrompt = (prdContent: string): string => {
   `;
 };
 
-export const estimateTaskComplexity = async (task: taskService.TaskRecord): Promise<{ complexity: number; confidence: number }> => {
+export const estimateTaskComplexity = async (
+  task: taskService.TaskRecord
+): Promise<{ complexity: number; confidence: number }> => {
   const provider = resolvePreferredProvider();
   if (!provider) {
     throw new Error('No preferred AI provider is configured or available.');
@@ -38,9 +40,12 @@ export const estimateTaskComplexity = async (task: taskService.TaskRecord): Prom
     Please provide only the JSON object in your response.
   `;
 
-  const result = await shellService.executeCommand(`"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`, {
-    isProviderCommand: true,
-  });
+  const result = await shellService.executeCommand(
+    `"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`,
+    {
+      isProviderCommand: true,
+    }
+  );
 
   if (!result.success) {
     throw new Error(`AI provider execution failed: ${result.stderr}`);
@@ -49,7 +54,9 @@ export const estimateTaskComplexity = async (task: taskService.TaskRecord): Prom
   try {
     return JSON.parse(result.stdout);
   } catch (error) {
-    throw new Error(`Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 };
 
@@ -70,9 +77,12 @@ export const suggestNextActions = async (): Promise<string[]> => {
     Please provide only the JSON array in your response.
   `;
 
-  const result = await shellService.executeCommand(`"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`, {
-    isProviderCommand: true,
-  });
+  const result = await shellService.executeCommand(
+    `"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`,
+    {
+      isProviderCommand: true,
+    }
+  );
 
   if (!result.success) {
     throw new Error(`AI provider execution failed: ${result.stderr}`);
@@ -81,7 +91,9 @@ export const suggestNextActions = async (): Promise<string[]> => {
   try {
     return JSON.parse(result.stdout);
   } catch (error) {
-    throw new Error(`Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 };
 
@@ -92,18 +104,20 @@ export const parsePrdToTasks = async (prdContent: string): Promise<taskService.T
   }
 
   const prompt = buildPrdPrompt(prdContent);
-  const result = await shellService.executeCommand(`"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`, {
-    isProviderCommand: true,
-  });
+  const result = await shellService.executeCommand(
+    `"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`,
+    {
+      isProviderCommand: true,
+    }
+  );
 
   if (!result.success) {
     throw new Error(`AI provider execution failed: ${result.stderr}`);
   }
 
   try {
-    const parsedTasks: { title: string; description: string; dependencies: string[] }[] = JSON.parse(
-      result.stdout
-    );
+    const parsedTasks: { title: string; description: string; dependencies: string[] }[] =
+      JSON.parse(result.stdout);
 
     const createdTasks: taskService.TaskRecord[] = [];
     const taskTitleToId: { [title: string]: number } = {};
@@ -130,6 +144,8 @@ export const parsePrdToTasks = async (prdContent: string): Promise<taskService.T
 
     return createdTasks;
   } catch (error) {
-    throw new Error(`Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`);
+    throw new Error(
+      `Failed to parse AI response: ${error instanceof Error ? error.message : String(error)}`
+    );
   }
 };
