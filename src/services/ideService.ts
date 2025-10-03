@@ -197,22 +197,58 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
   }
 };
 
+const createDefaultRules = () => ({
+  entrypoint: {
+    filename: 'main.py',
+    maxLines: 4,
+    mustImportOnly: true,
+  },
+  style: {
+    maxLineLength: 79,
+    noSideEffectsOnImport: true,
+    absoluteImportsOnly: true,
+  },
+  forbidden: {
+    functions: ['print(', 'eval(', 'exec(', 'console.log('],
+    modules: ['subprocess', 'os.system'],
+  },
+  externalization: {
+    textsPath: 'data/texts/*.json',
+    configPath: 'data/config/*.json',
+    enforceNoHardcodedStrings: true,
+  },
+  quality: {
+    minCoverage: 80,
+    requireTests: true,
+    requireDocs: true,
+  },
+});
+
 const applyIdeProfile = (profileName: string, targetDir: string, providerName: string) => {
   ensureDir(targetDir);
   const mcpTargetPath = path.join(targetDir, 'mcp.json');
   writeJsonFile(mcpTargetPath, createMcpConfig(providerName));
   ensureMcpConfig(mcpTargetPath, providerName);
   
-  // Copy rules.json if it exists in the project
+  // Copy or create rules.json
   const projectRulesPath = path.join(process.cwd(), '.sentineltm', 'config', 'rules.json');
   const targetRulesPath = path.join(targetDir, 'rules.json');
   
   if (fs.existsSync(projectRulesPath)) {
+    // Copy existing rules from .sentineltm
     try {
       fs.copyFileSync(projectRulesPath, targetRulesPath);
       log.success(`  Copied rules.json to ${profileName}`);
     } catch (error) {
       log.warn(`  Could not copy rules.json: ${(error as Error).message}`);
+    }
+  } else {
+    // Create default rules.json
+    try {
+      writeJsonFile(targetRulesPath, createDefaultRules());
+      log.success(`  Created default rules.json in ${profileName}`);
+    } catch (error) {
+      log.warn(`  Could not create rules.json: ${(error as Error).message}`);
     }
   }
 };
