@@ -213,8 +213,8 @@ const createDefaultRules = () => ({
     modules: ['subprocess', 'os.system'],
   },
   externalization: {
-    textsPath: 'data/texts/*.json',
-    configPath: 'data/config/*.json',
+    textsPath: 'data/texts/*.yml',
+    configPath: 'data/config/*.yml',
     enforceNoHardcodedStrings: true,
   },
   quality: {
