@@ -1,0 +1,38 @@
+# Source files
+src/
+tests/
+
+# IDE configs
+.cursor/
+.gemini/
+.trae/
+.windsurf/
+.zed/
+.vscode/
+.idea/
+
+# SentinelTM data
+.sentineltm/
+
+# Config files
+tsconfig.json
+tsconfig.build.json
+vitest.config.ts
+eslint.config.js
+.prettierrc
+.env
+.env.example
+
+# Documentation (keep only essential)
+DOCUMENTATION.md
+CHANGELOG_ENHANCED.md
+ENHANCED_FEATURES.md
+
+# Build artifacts
+*.log
+*.tmp
+node_modules/
+
+# Git
+.git/
+.gitignore

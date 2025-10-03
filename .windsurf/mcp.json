@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "sentineltm": {
+      "command": "node",
+      "args": [
+        "d:\\Sentinel\\dist\\cli.js",
+        "serve"
+      ],
+      "env": {
+        "SENTINEL_WORKSPACE": "d:\\Work Directory\\channel"
+      }
+    }
+  }
+}

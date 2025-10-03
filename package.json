@@ -1,0 +1,86 @@
+{
+  "name": "sentineltm-cli",
+  "version": "1.3.0",
+  "description": "Local-first AI agent orchestrator with MCP server, secure file operations, shell execution, code indexing, and quality gates",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "st": "dist/cli.js",
+    "sentineltm": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Amin-Azmoodehh/Sentinel.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Amin-Azmoodehh/Sentinel/issues"
+  },
+  "homepage": "https://github.com/Amin-Azmoodehh/Sentinel#readme",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "lint": "eslint --max-warnings=0 \"src/**/*.{ts,tsx}\"",
+    "format": "prettier --check \"src/**/*.ts\" package.json tsconfig*.json vitest.config.ts",
+    "test": "vitest run",
+    "gate": "npm run lint && npm run test && npm run build",
+    "prepare": "npm run build",
+    "ci:check": "npm run build && node dist/cli.js provider detect && node dist/cli.js gate run",
+    "status": "node dist/cli.js status",
+    "status:watch": "node dist/cli.js status --watch"
+  },
+  "keywords": [
+    "ai",
+    "mcp",
+    "model-context-protocol",
+    "cli",
+    "agent",
+    "orchestrator",
+    "task-management",
+    "code-indexing",
+    "quality-gates",
+    "ci-cd",
+    "security",
+    "dashboard",
+    "local-first",
+    "typescript"
+  ],
+  "author": "Amin Azmodeh",
+  "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "@ai-sdk/google": "^2.0.17",
+    "@modelcontextprotocol/sdk": "^1.18.1",
+    "chalk": "^5.3.0",
+    "cli-table3": "^0.6.5",
+    "commander": "^11.1.0",
+    "dayjs": "^1.11.10",
+    "fast-glob": "^3.3.2",
+    "figlet": "^1.9.3",
+    "fs-extra": "^11.2.0",
+    "ignore": "^5.3.1",
+    "sql.js": "^1.13.0",
+    "typescript": "^5.3.3"
+  },
+  "devDependencies": {
+    "@types/fs-extra": "^11.0.4",
+    "@types/node": "^20.11.0",
+    "@types/sql.js": "^1.4.4",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "ts-node": "^10.9.1",
+    "tslib": "^2.6.2",
+    "typescript": "^5.3.3",
+    "typescript-eslint": "^8.44.1",
+    "vitest": "^1.2.1"
+  }
+}

@@ -1,0 +1,40 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build output
+dist/
+build/
+out/
+
+# Environment
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# SentinelTM
+.sentineltm/db/
+.sentineltm/cache/
+.sentineltm/profiles/
+.sentineltm/index.db
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test
+coverage/
+.nyc_output/
+
+# Temp
+*.tmp
+*.temp
+temp/
+tmp/

@@ -1,0 +1,231 @@
+---
+description: Comprehensive reference for SentinelTM MCP tools and CLI commands.
+globs: **/*
+alwaysApply: true
+---
+
+# SentinelTM Tool & Command Reference
+
+This document provides a detailed reference for interacting with SentinelTM, covering both the recommended MCP tools, suitable for integrations like Cursor, and the corresponding `st` CLI commands, designed for direct user interaction or fallback.
+
+**Note:** For interacting with SentinelTM programmatically or via integrated tools, using the **MCP tools is strongly recommended** due to better performance, structured data, and error handling. The CLI commands serve as a user-friendly alternative and fallback.
+
+**🤖 AI Agent Orchestrator:** SentinelTM is a local-first AI agent orchestrator that combines a powerful CLI with an MCP server. It provides secure file operations, shell execution, code indexing, task management, and quality gates - all controlled by AI providers without requiring remote services.
+
+---
+
+## Core Concept
+
+**AI Provider Commands → SentinelTM Executes**
+
+Your AI model (Gemini, Claude, Qwen, Ollama) connects via MCP and controls SentinelTM's tools to:
+- 📁 Read/write files securely
+- 🖥️ Execute shell commands safely  
+- 🔍 Index and search codebases
+- 📋 Manage tasks and workflows
+- ✅ Run quality checks
+
+---
+
+## MCP Tools Available
+
+### 📁 File Operations
+- `file_read` - Read file contents
+- `file_write` - Write/append to files  
+- `file_delete` - Delete files/directories
+- `file_mkdir` - Create directories
+
+### 🖥️ Shell Operations
+- `shell_execute` - Run commands safely
+- `shell_detect` - Detect available shells
+- `shell_list` - List allowed commands
+
+### 🔍 Code Intelligence
+- `index_build` - Index project files
+- `index_query` - Search code/symbols/docs
+
+### 📋 Task Management
+- `task_create` - Create new tasks
+- `task_list` - List tasks with filters
+- `task_next` - Get next priority task
+- `task_expand` - Get task details + subtasks
+
+### ⚙️ System Control
+- `gate_run` - Execute quality gates
+- `sentinel.provider` - Manage AI providers
+- `sentinel.status` - Get system status
+
+---
+
+## CLI Commands Reference
+
+### 🤖 Provider Management
+```bash
+st provider detect              # Show all available AI providers
+st set provider gemini          # Set default AI provider
+st models list                  # List available models
+st models set gemini-1.5-pro    # Set default model
+```
+
+**Supported Providers:**
+- 🔥 **Gemini** - Google's Gemini models
+- 🧠 **Qwen** - Alibaba's Qwen models  
+- 🦙 **Ollama** - Local LLM execution
+- 🔧 **Codex** - OpenAI Codex models
+
+### 📊 System Status
+```bash
+st status                       # Show complete system status
+st status --json               # JSON format output
+st status --watch 5            # Auto-refresh every 5 seconds
+```
+
+### 📁 File Operations
+```bash
+st fs ls "src/**/*.ts"         # List TypeScript files
+st fs mkdir "app/models,app/views"  # Create multiple directories
+st fs cp src/old.ts src/new.ts # Copy files
+st fs mv src/temp.ts src/final.ts   # Move files
+st fs rm dist --force          # Remove with force
+st fs split large-file.ts --max 300  # Split files by line count
+```
+
+### 🖥️ Shell Execution (Secure)
+```bash
+st shell run "npm test"        # Run npm commands
+st shell run "git status"      # Git operations
+st shell run "dir" --shell powershell  # Windows PowerShell
+st shell run "ls -la" --timeout 30000  # With timeout
+```
+
+### 🔍 Code Indexing
+```bash
+st index run                   # Index entire project
+st index status               # Show index statistics
+st index search "createTask"  # Search indexed code
+st index symbols --name Task  # Find symbols by name
+st index doc --path src/app.ts # Get file content from index
+```
+
+### 📋 Task Management
+```bash
+st task create --title "Fix bug" --priority high --tags bug,urgent
+st task list --status open    # List open tasks
+st task next                  # Get next priority task
+st task update 1 --status done # Update task status
+st sub add --parent 1 --title "Write tests"  # Add subtask
+```
+
+### ✅ Quality Gates
+```bash
+st gate run                   # Run all quality checks
+st gate run --min 90         # Set minimum score threshold
+```
+
+### 💻 IDE Integration
+```bash
+st ide list                    # Show available IDE targets
+st ide set "VS Code,Cursor"    # Configure specific IDEs
+st ide set all                 # Configure all supported IDEs
+st ide set windsurf            # Configure single IDE
+```
+
+**Supported IDEs:**
+- **Code Editors:** VS Code, Cursor, Zed, Windsurf
+- **AI Extensions:** Continue, Cline, Codex, Claude, Gemini
+- **Specialized Tools:** Kiro, Trae, OpenCode, Roo, Amp, Kilo
+
+---
+
+## Configuration
+
+Edit `.sentineltm/config/config.json` or use:
+
+```bash
+st config set defaults.provider gemini
+st config set thresholds.gate 95
+st config set security.shell.allowedCommands '["npm","git","ls"]'
+```
+
+### Key Settings
+
+| Setting | Description | Default |
+|---------|-------------|---------|
+| `defaults.provider` | Active AI provider | `ollama` |
+| `defaults.model` | Default model name | `""` |
+| `thresholds.gate` | Minimum quality score | `95` |
+| `thresholds.maxFileSizeMB` | File size limit | `5` |
+| `security.shell.allowedCommands` | Safe shell commands | `["npm","git","ls",...]` |
+| `security.forbidden` | Banned code patterns | `["console.log(","eval("]` |
+
+---
+
+## Security Features
+
+- **Safe Shell Execution:** Only allowed commands can be executed
+- **File System Protection:** Restricted access to sensitive directories
+- **Code Pattern Detection:** Blocks dangerous code patterns
+- **Provider Validation:** Ensures AI providers are legitimate
+
+---
+
+## Development Workflow
+
+```bash
+# Development mode
+npm run dev -- --help
+
+# Testing
+npm run test
+npm run lint
+
+# Build
+npm run build
+
+# Quality gate
+npm run gate
+
+# CI check
+npm run ci:check
+```
+
+---
+
+## Best Practices
+
+1. **Always use MCP tools** when available for programmatic access
+2. **Set up quality gates** to maintain code standards
+3. **Configure providers** properly for AI integration
+4. **Use secure shell commands** only
+5. **Index your codebase** for better AI understanding
+6. **Monitor system status** regularly
+
+---
+
+## Troubleshooting
+
+**🚫 Provider not found:**
+```bash
+st provider detect  # Check if provider is in PATH
+```
+
+**❌ Gate failing:**
+```bash
+st gate run --min 95  # Run with retries
+```
+
+**🔌 MCP connection issues:**
+```bash
+st serve  # Ensure server is running
+DEBUG=sentineltm:* st serve  # Enable debug logging
+```
+
+**📄 Large files:**
+```bash
+st fs split large-file.ts --max 300  # Split before indexing
+```
+
+**🪟 Windows-specific issues:**
+- Ensure PowerShell execution policy allows scripts
+- Use `st shell run "command" --shell powershell` for PowerShell commands
+- Provider detection improved for Windows PATH resolution

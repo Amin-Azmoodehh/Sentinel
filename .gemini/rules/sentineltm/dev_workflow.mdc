@@ -1,0 +1,250 @@
+---
+description: SentinelTM development workflow and best practices
+globs: **/*
+alwaysApply: true
+---
+
+# SentinelTM Development Workflow
+
+This document outlines the recommended development workflow when working with SentinelTM projects.
+
+## 🚀 Project Setup Workflow
+
+### 1. Initial Setup
+```bash
+# Clone or create project
+git clone <repository>
+cd <project>
+
+# Install dependencies
+npm install
+
+# Build the project
+npm run build
+
+# Link CLI globally (optional)
+npm link
+
+# Detect available AI providers
+st provider detect
+
+# Set your preferred AI provider
+st set provider gemini
+```
+
+### 2. IDE Configuration
+```bash
+# Configure your IDE for MCP integration
+st ide set cursor          # For Cursor
+st ide set windsurf        # For Windsurf
+st ide set "VS Code"       # For VS Code
+st ide set all             # For all supported IDEs
+```
+
+### 3. Start MCP Server
+```bash
+# Start the MCP server for AI agents
+st serve
+```
+
+## 🔄 Development Cycle
+
+### 1. Code Development
+- Use your configured IDE with MCP integration
+- AI agents can now control SentinelTM tools
+- Write code following security best practices
+
+### 2. Quality Checks
+```bash
+# Run quality gates before committing
+st gate run
+
+# Run with custom threshold
+st gate run --min 90
+```
+
+### 3. Code Indexing
+```bash
+# Index your codebase for better AI understanding
+st index run
+
+# Search indexed code
+st index search "function name"
+
+# Get symbols
+st index symbols --name ClassName
+```
+
+### 4. Task Management
+```bash
+# Create tasks for features/bugs
+st task create --title "Implement feature X" --priority high
+
+# List current tasks
+st task list --status open
+
+# Get next task to work on
+st task next
+
+# Update task status
+st task update 1 --status done
+```
+
+## 🛡️ Security Workflow
+
+### 1. Shell Command Safety
+- Only use allowed shell commands
+- Review `security.shell.allowedCommands` in config
+- Test commands with `st shell run "command"`
+
+### 2. File System Protection
+- Respect `security.requiredRootDirs` settings
+- Use `st fs` commands for file operations
+- Avoid direct file system manipulation
+
+### 3. Code Pattern Detection
+- Configure `security.forbidden` patterns
+- Run quality gates to detect violations
+- Review and fix security issues
+
+## 📊 Monitoring Workflow
+
+### 1. System Status
+```bash
+# Check overall system health
+st status
+
+# Watch status in real-time
+st status --watch 5
+
+# Get JSON output for automation
+st status --json
+```
+
+### 2. Provider Management
+```bash
+# Check available providers
+st provider detect
+
+# Switch providers if needed
+st set provider ollama
+
+# List available models
+st models list
+```
+
+## 🔧 Configuration Management
+
+### 1. Project Configuration
+```bash
+# Set provider preferences
+st config set defaults.provider gemini
+
+# Adjust quality thresholds
+st config set thresholds.gate 95
+
+# Configure security settings
+st config set security.shell.allowedCommands '["npm","git","ls"]'
+```
+
+### 2. Model Configuration
+```bash
+# Set default model
+st models set gemini-1.5-pro
+
+# Configure research model
+st models set --research perplexity-sonar
+
+# Set fallback model
+st models set --fallback ollama-llama2
+```
+
+## 🚨 Troubleshooting Workflow
+
+### 1. Provider Issues
+```bash
+# Detect providers
+st provider detect
+
+# Check PATH configuration
+echo $PATH  # Linux/Mac
+echo %PATH% # Windows
+```
+
+### 2. MCP Connection Issues
+```bash
+# Start server with debug logging
+DEBUG=sentineltm:* st serve
+
+# Check MCP configuration
+cat .cursor/mcp.json
+```
+
+### 3. Quality Gate Failures
+```bash
+# Run with lower threshold for debugging
+st gate run --min 80
+
+# Check specific components
+npm run lint
+npm run test
+npm run build
+```
+
+## 📝 Best Practices
+
+### 1. Code Quality
+- Always run quality gates before commits
+- Keep code coverage above threshold
+- Follow linting rules consistently
+
+### 2. Security
+- Review allowed commands regularly
+- Update forbidden patterns as needed
+- Monitor file system access
+
+### 3. AI Integration
+- Use MCP tools over CLI when possible
+- Keep AI providers updated
+- Monitor AI usage and costs
+
+### 4. Task Management
+- Break large tasks into subtasks
+- Use descriptive task titles
+- Update task status regularly
+
+### 5. Documentation
+- Keep README updated
+- Document configuration changes
+- Maintain troubleshooting guides
+
+## 🔄 CI/CD Integration
+
+### 1. Pre-commit Hooks
+```bash
+# Install pre-commit hooks
+st hooks install
+
+# Run quality checks
+st gate run --min 95
+```
+
+### 2. Automated Testing
+```bash
+# Run full test suite
+npm run ci:check
+
+# Generate coverage reports
+npm run test:coverage
+```
+
+### 3. Deployment
+```bash
+# Build for production
+npm run build
+
+# Run final quality check
+st gate run --min 98
+```
+
+This workflow ensures consistent, secure, and high-quality development with SentinelTM.

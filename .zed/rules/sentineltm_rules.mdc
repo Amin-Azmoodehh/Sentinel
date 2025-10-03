@@ -1,0 +1,106 @@
+# SentinelTM MCP Integration Rules
+
+## Core Principles
+- **Local-First**: All operations execute locally, no cloud dependencies
+- **Security**: Strict validation, sandboxed execution, no arbitrary code
+- **Reliability**: Timeouts, error handling, graceful degradation
+
+## MCP Tools Usage
+
+### File Operations
+```javascript
+// ✅ CORRECT: Use relative paths
+mcp0_file_read({ path: "src/app.ts" })
+mcp0_file_write({ path: "src/new.ts", content: "..." })
+
+// ❌ WRONG: Absolute paths fail
+mcp0_file_read({ path: "d:\\project\\file.ts" })
+```
+
+### Task Management
+```javascript
+// ✅ CORRECT: Use taskId for subtasks
+mcp0_sentinel_task({ 
+  action: "createSubtask", 
+  payload: { taskId: 3, title: "..." } 
+})
+
+// ✅ CORRECT: Update with proper status
+mcp0_sentinel_task({ 
+  action: "updateTask", 
+  payload: { id: 1, status: "done" } 
+})
+```
+
+### Indexing
+```javascript
+// ✅ CORRECT: Always specify root
+mcp0_index_build({ root: "src" })
+
+// ❌ WRONG: Missing root causes EBUSY
+mcp0_index_build()
+```
+
+### Shell Commands
+```javascript
+// ✅ CORRECT: Use allowed commands
+mcp0_shell_execute({ command: "npm test" })
+mcp0_shell_execute({ command: "git status" })
+
+// ❌ WRONG: Dangerous commands blocked
+mcp0_shell_execute({ command: "rm -rf /" })
+```
+
+### Enhanced Shell Features
+```javascript
+// Use preset commands (via CLI)
+// st shell preset git-status
+// st shell preset npm-install
+
+// Adaptive commands (via CLI)
+// st shell adaptive "ls -la"  // Auto-converts to 'dir' on Windows
+```
+
+### Security & Dashboard
+```javascript
+// Path security
+mcp0_sentinel_security({ action: 'validatePath', payload: { path: 'src/app.ts' }})
+
+// Project metrics
+mcp0_sentinel_dashboard({ action: 'getMetrics' })
+
+// CI/CD
+mcp0_sentinel_cicd({ action: 'runQualityGate' })
+```
+
+### Quality Gates
+```javascript
+// ⚠️ WARNING: Long operation (30s timeout)
+mcp0_gate_run({ minScore: 80 })
+// Better: Use CLI for gates
+// node dist/cli.js gate run --min 80
+```
+
+## Timeouts
+- **Gate operations**: 30s
+- **Subtask updates**: 15s
+- **Index operations**: No timeout (fast)
+- **Shell commands**: 120s
+
+## Error Handling
+- Always check `success` field in response
+- Handle timeout errors gracefully
+- Provide fallback for long operations
+
+## Best Practices
+1. Use relative paths for all file operations
+2. Specify `root` parameter for indexing
+3. Check allowed commands before shell execution
+4. Use CLI for long-running operations (gates)
+5. Handle errors with clear user messages
+
+## Common Issues
+- **"Step was canceled"**: MCP server not running → Restart IDE
+- **"Path must stay within workspace"**: Use relative paths
+- **"EBUSY"**: Missing root parameter in index_build
+- **Timeout**: Operation too long → Use CLI instead

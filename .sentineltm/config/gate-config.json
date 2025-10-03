@@ -1,0 +1,10 @@
+{
+  "excludePaths": [
+    "C:\\Users\\*\\.prefect",
+    "C:\\Users\\*\\AppData",
+    "node_modules",
+    ".git"
+  ],
+  "scanScope": "project-only",
+  "maxDepth": 5
+}

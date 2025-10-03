@@ -1,0 +1,135 @@
+{
+  "defaults": {
+    "provider": "codex",
+    "model": "qwen-coder-flash"
+  },
+  "thresholds": {
+    "gate": 95,
+    "maxFileSizeMB": 5,
+    "maxTodoCount": 10,
+    "maxIndexLines": 10000
+  },
+  "security": {
+    "forbidden": [
+      "eval(",
+      "exec(",
+      "dangerouslySetInnerHTML"
+    ],
+    "requiredRootDirs": [
+      "src",
+      ".sentineltm"
+    ],
+    "shell": {
+      "allowedCommands": [
+        "ls",
+        "dir",
+        "cat",
+        "type",
+        "echo",
+        "printenv",
+        "env",
+        "pwd",
+        "cd",
+        "mkdir",
+        "touch",
+        "head",
+        "tail",
+        "grep",
+        "find",
+        "which",
+        "where",
+        "ps",
+        "top",
+        "htop",
+        "df",
+        "du",
+        "free",
+        "uname",
+        "hostname",
+        "whoami",
+        "id",
+        "date",
+        "time",
+        "wc",
+        "sort",
+        "uniq",
+        "cut",
+        "paste",
+        "join",
+        "comm",
+        "diff",
+        "cmp",
+        "strings",
+        "file",
+        "stat",
+        "npm",
+        "node",
+        "git",
+        "st"
+      ],
+      "blockedCommands": [
+        "rm",
+        "rmdir",
+        "del",
+        "format",
+        "fdisk",
+        "mkfs",
+        "dd",
+        "mv",
+        "cp",
+        "ln",
+        "chmod",
+        "chown",
+        "kill",
+        "pkill",
+        "killall",
+        "reboot",
+        "shutdown",
+        "halt",
+        "poweroff",
+        "passwd",
+        "su",
+        "sudo",
+        "useradd",
+        "userdel",
+        "groupadd",
+        "groupdel",
+        "mount",
+        "umount",
+        "swapon",
+        "swapoff"
+      ]
+    },
+    "allowedRootFiles": [
+      "launcher.*"
+    ]
+  },
+  "i18n": {
+    "logs": "en",
+    "chat": "en"
+  },
+  "meta": {
+    "gate": {
+      "lastRun": {
+        "timestamp": 1759451968553,
+        "score": 70,
+        "threshold": 95,
+        "success": false,
+        "source": "internal",
+        "attempts": 5,
+        "fallback": false
+      }
+    }
+  },
+  "language": {
+    "logs": "en",
+    "chat": "en"
+  },
+  "mcp": {
+    "timeouts": {
+      "gate": 30000,
+      "subtask": 15000,
+      "shell": 120000
+    }
+  }
+}

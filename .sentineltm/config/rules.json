@@ -1,0 +1,33 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema",
+  "version": "1.0.0",
+  "entrypoint": {
+    "filename": "main.py",
+    "maxLines": 4,
+    "mustImportOnly": true,
+    "description": "Entry point must be minimal and only contain imports"
+  },
+  "style": {
+    "maxLineLength": 79,
+    "noSideEffectsOnImport": true,
+    "absoluteImportsOnly": true,
+    "description": "PEP8 compliance and clean import structure"
+  },
+  "forbidden": {
+    "functions": ["print(", "eval(", "exec(", "compile("],
+    "modules": ["subprocess", "os.system", "__import__"],
+    "description": "Dangerous or debugging functions not allowed in production"
+  },
+  "externalization": {
+    "textsPath": "data/texts/*.json",
+    "configPath": "data/config/*.json",
+    "enforceNoHardcodedStrings": true,
+    "description": "All user-facing text and configuration must be externalized"
+  },
+  "logging": {
+    "consoleLanguage": "en",
+    "chatLanguage": "fa",
+    "onlyLoggingAllowed": true,
+    "description": "Use logging module only; console in English, chat in Persian"
+  }
+}

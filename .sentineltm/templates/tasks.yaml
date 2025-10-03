@@ -1,0 +1,41 @@
+# Task Orchestration Template
+# Managed by agent_plan tool at think_depth >= 4
+
+tasks:
+  - id: 1
+    title: "پیادهسازی think_depth system"
+    status: done
+    priority: high
+    deps: []
+    owner: agent
+    artifacts:
+      - src/types/thinkDepth.ts
+      - src/services/thinkDepthService.ts
+      - src/mcp/toolHandlers/thinkDepthHandler.ts
+    
+  - id: 2
+    title: "تست واحد think_depth"
+    status: pending
+    priority: high
+    deps: [1]
+    owner: agent
+    
+  - id: 3
+    title: "یکپارچگی با Task Master"
+    status: pending
+    priority: medium
+    deps: [1, 2]
+    owner: agent
+    
+  - id: 4
+    title: "مستندسازی API"
+    status: pending
+    priority: low
+    deps: [1]
+    owner: agent
+
+metadata:
+  created: 2025-01-01
+  last_updated: 2025-01-01
+  total_tasks: 4
+  completed: 1
