@@ -41,10 +41,23 @@ export class DashboardService {
   private maxHistorySize = 50;
   private cachedMetrics: DashboardMetrics | null = null;
   private readonly CACHE_TTL = 30000; // 30 seconds
+  private refreshInterval: NodeJS.Timeout | null = null;
 
   constructor() {
+    // Don't auto-refresh by default - only when explicitly requested
+  }
+
+  public startAutoRefresh(): void {
+    if (this.refreshInterval) return; // Already running
     this.refreshCache(); // Initial cache population
-    setInterval(() => this.refreshCache(), this.CACHE_TTL);
+    this.refreshInterval = setInterval(() => this.refreshCache(), this.CACHE_TTL);
+  }
+
+  public stopAutoRefresh(): void {
+    if (this.refreshInterval) {
+      clearInterval(this.refreshInterval);
+      this.refreshInterval = null;
+    }
   }
 
   private async refreshCache(): Promise<void> {
