@@ -12,8 +12,13 @@ export const registerServeCommand = (program: Command): void => {
     .command('serve')
     .description('🚀 Start MCP server for AI agents')
     .option('-t, --transport <type>', 'Specify the transport type (stdio, http, sse)', 'stdio')
+    .option('--mcp-stdio', 'Use stdio transport (alias for --transport stdio)')
     .option('-p, --port <port>', 'Specify the port for http/sse transports', '8008')
-    .action(async (options: ServeOptions) => {
+    .action(async (options: ServeOptions & { mcpStdio?: boolean }) => {
+      // If --mcp-stdio is used, override transport to stdio
+      if (options.mcpStdio) {
+        options.transport = 'stdio';
+      }
       try {
         // This will be updated to handle different transports
         switch (options.transport) {
