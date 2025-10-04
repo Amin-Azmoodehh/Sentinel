@@ -76,27 +76,34 @@ export const registerIdeCommands = (program: Command): void => {
         return;
       }
 
-      log.info(`Fetching models from ${providerName}...`);
-      let models;
+      // Try to fetch models, but if it fails, show popular models
+      let models: any[] = [];
+      let needsApiKey = false;
+
       try {
+        log.info(`Fetching models from ${providerName}...`);
         models = await provider.listModels();
+        log.success(`Found ${models.length} models`);
       } catch (error) {
-        log.error(`Failed to fetch models from '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
-        log.warn('Please check your API key and network connection.');
-        return;
+        log.warn(`Could not fetch models from ${providerName}. Showing popular models instead.`);
+        needsApiKey = true;
+        
+        // Import the function from providerCommands
+        const { getPopularModelsForProvider } = await import('./providerCommands.js');
+        const popularModels = getPopularModelsForProvider(providerName);
+        models = popularModels.map((id: string) => ({ id }));
       }
 
       if (models.length === 0) {
-        log.error(`No models found for provider '${providerName}'.`);
+        log.error(`No models available for provider '${providerName}'.`);
         return;
       }
 
-      log.success(`Found ${models.length} models`);
-
       const modelChoices = models.map((m) => {
         const isCurrentModel = m.id === tempModel && providerName === tempProvider;
+        const suffix = isCurrentModel ? ' ⭐ current' : (needsApiKey ? ' (requires API key)' : '');
         return {
-          name: `${m.id}${isCurrentModel ? ' ⭐ current' : ''}`,
+          name: `${m.id}${suffix}`,
           value: m.id,
           short: m.id,
         };
@@ -224,27 +231,34 @@ export const registerIdeCommands = (program: Command): void => {
         return;
       }
 
-      log.info(`Fetching models from ${providerName}...`);
-      let models;
+      // Try to fetch models, but if it fails, show popular models
+      let models: any[] = [];
+      let needsApiKey = false;
+
       try {
+        log.info(`Fetching models from ${providerName}...`);
         models = await provider.listModels();
+        log.success(`Found ${models.length} models`);
       } catch (error) {
-        log.error(`Failed to fetch models from '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
-        log.warn('Please check your API key and network connection.');
-        return;
+        log.warn(`Could not fetch models from ${providerName}. Showing popular models instead.`);
+        needsApiKey = true;
+        
+        // Import the function from providerCommands
+        const { getPopularModelsForProvider } = await import('./providerCommands.js');
+        const popularModels = getPopularModelsForProvider(providerName);
+        models = popularModels.map((id: string) => ({ id }));
       }
 
       if (models.length === 0) {
-        log.error(`No models found for provider '${providerName}'.`);
+        log.error(`No models available for provider '${providerName}'.`);
         return;
       }
 
-      log.success(`Found ${models.length} models`);
-
       const modelChoices = models.map((m) => {
         const isCurrentModel = m.id === currentModel && providerName === currentProvider;
+        const suffix = isCurrentModel ? ' ⭐ current' : (needsApiKey ? ' (requires API key)' : '');
         return {
-          name: `${m.id}${isCurrentModel ? ' ⭐ current' : ''}`,
+          name: `${m.id}${suffix}`,
           value: m.id,
           short: m.id,
         };

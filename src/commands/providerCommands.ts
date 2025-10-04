@@ -10,7 +10,7 @@ import {
   upsertProviderConfig,
 } from '../services/providerService.js';
 
-const getPopularModelsForProvider = (provider: string): string[] => {
+export const getPopularModelsForProvider = (provider: string): string[] => {
   const popularModels: Record<string, string[]> = {
     // OpenAI
     openai: [
