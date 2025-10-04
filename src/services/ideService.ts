@@ -198,29 +198,125 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
 };
 
 const createDefaultRules = () => ({
+  $schema: 'https://json-schema.org/draft-07/schema',
+  version: '1.6.3',
+  contract: {
+    version: '3.0',
+    name: 'Zero Tolerance Python Contract',
+    enforcement: 'MANDATORY',
+    binding: 'ABSOLUTE',
+    violations: 'AUTOMATIC_REJECTION',
+  },
   entrypoint: {
     filename: 'main.py',
     maxLines: 4,
     mustImportOnly: true,
+    noLogic: true,
+    noSideEffects: true,
   },
   style: {
     maxLineLength: 79,
+    pep8Compliant: true,
     noSideEffectsOnImport: true,
     absoluteImportsOnly: true,
+    noRelativeImports: true,
+    noWildcardImports: true,
+  },
+  typing: {
+    typeHintsRequired: true,
+    typeHintsCoverage: 100,
+    enforceEverywhere: true,
   },
   forbidden: {
-    functions: ['print(', 'eval(', 'exec(', 'console.log('],
+    functions: ['print(', 'console.log('],
     modules: ['subprocess', 'os.system'],
+    hardcodedStrings: true,
+    hardcodedNumbers: true,
+    hardcodedUrls: true,
+    hardcodedRegex: true,
   },
   externalization: {
     textsPath: 'data/texts/*.yml',
     configPath: 'data/config/*.yml',
     enforceNoHardcodedStrings: true,
+    enforceNoHardcodedNumbers: true,
+    allConfigFromYaml: true,
+  },
+  architecture: {
+    maxFileLines: 300,
+    modularOnly: true,
+    separationOfConcerns: true,
+  },
+  i18n: {
+    logsLanguage: 'en',
+    uiLanguage: 'fa',
+    enforceLogLanguage: true,
+    enforceUiLanguage: true,
   },
   quality: {
     minCoverage: 80,
     requireTests: true,
     requireDocs: true,
+    scoreThreshold: 100,
+    zeroTolerance: true,
+  },
+  validation: {
+    preGeneration: {
+      acknowledgmentRequired: true,
+      explicitRulesCheck: true,
+    },
+    postGeneration: {
+      selfAssessmentRequired: true,
+      evidenceRequired: true,
+      validationCommands: [
+        'wc -l main.py',
+        "grep -r 'print(' app/",
+        'grep -r \'".*"\' app/ | wc -l',
+        'find . -name "*.py" -exec wc -l {} \\;',
+      ],
+    },
+    scoring: {
+      totalRules: 12,
+      passingScore: 12,
+      failureAction: 'REJECT_AND_REWRITE',
+    },
+  },
+  deliverables: {
+    required: [
+      'Pre-Generation Acknowledgment',
+      'Generated Code',
+      'Self-Assessment Table',
+      'Validation Commands Output',
+      'Final Verdict (PASS/FAIL)',
+    ],
+    mandatoryFormat: {
+      preGeneration: 'I acknowledge the following BINDING rules: ✓ main.py will be exactly ≤4 lines ✓ Zero hardcoded strings/numbers/URLs ✓ Zero print() statements ✓ All config from YAML files ✓ Type hints on every function ✓ PEP8 with ≤79 chars/line ✓ Files ≤300 lines maximum ✓ Absolute imports only ✓ English logs / Persian UI ✓ Modular architecture. I will provide self-assessment after generation.',
+      selfAssessment: 'MANDATORY_TABLE_WITH_EVIDENCE',
+      finalVerdict: 'Score: X/12, Grade: PASS ✅ / FAIL ❌',
+    },
+  },
+  enforcement: {
+    scoreRequired: 12,
+    totalRules: 12,
+    passingThreshold: '12/12',
+    failureAction: 'COMPLETE_REWRITE_REQUIRED',
+    noExceptions: true,
+    evidenceRequired: true,
+    contractualBinding: true,
+  },
+  validationCommands: {
+    mainPyLines: 'wc -l main.py',
+    hardcodedStrings: 'grep -r \'".*"\' app/ | wc -l',
+    printStatements: "grep -r 'print(' app/",
+    fileLineLimits: 'find . -name "*.py" -exec wc -l {} \\;',
+    lineLength: 'find app/ -name "*.py" -exec grep -n \'.\\{80,\\}\' {} +',
+    relativeImports: "grep -r 'from \\.' app/",
+    typeHints: 'python -m mypy app/ --strict',
+  },
+  apiIntegration: {
+    preferredProviders: ['ollama', 'openai', 'claude'],
+    fallbackBehavior: 'graceful',
+    timeoutMs: 30000,
   },
 });
 
@@ -231,24 +327,48 @@ const applyIdeProfile = (profileName: string, targetDir: string, providerName: s
   ensureMcpConfig(mcpTargetPath, providerName);
 
   // Copy or create rules.json
-  const projectRulesPath = path.join(process.cwd(), '.sentineltm', 'config', 'rules.json');
+  const projectRulesPath = path.join(process.cwd(), 'rules.example.json');
+  const fallbackRulesPath = path.join(process.cwd(), '.sentineltm', 'config', 'rules.json');
   const targetRulesPath = path.join(targetDir, 'rules.json');
 
-  if (fs.existsSync(projectRulesPath)) {
-    // Copy existing rules from .sentineltm
+  // Try to copy from rules.example.json first, then fallback to .sentineltm
+  let sourceRulesPath = projectRulesPath;
+  if (!fs.existsSync(projectRulesPath) && fs.existsSync(fallbackRulesPath)) {
+    sourceRulesPath = fallbackRulesPath;
+  }
+
+  if (fs.existsSync(sourceRulesPath)) {
+    // Copy existing rules
     try {
-      fs.copyFileSync(projectRulesPath, targetRulesPath);
-      log.success(`  Copied rules.json to ${profileName}`);
+      fs.copyFileSync(sourceRulesPath, targetRulesPath);
+      log.success(`  ✅ Copied rules.json to ${profileName}`);
     } catch (error) {
-      log.warn(`  Could not copy rules.json: ${(error as Error).message}`);
+      log.warn(`  ⚠️ Could not copy rules.json: ${(error as Error).message}`);
     }
   } else {
     // Create default rules.json
     try {
       writeJsonFile(targetRulesPath, createDefaultRules());
-      log.success(`  Created default rules.json in ${profileName}`);
+      log.success(`  ✅ Created default rules.json in ${profileName}`);
     } catch (error) {
-      log.warn(`  Could not create rules.json: ${(error as Error).message}`);
+      log.warn(`  ⚠️ Could not create rules.json: ${(error as Error).message}`);
+    }
+  }
+
+  // Also copy to profiles directory if it exists
+  const profilesDir = path.join(process.cwd(), '.sentineltm', 'profiles', profileName);
+  if (fs.existsSync(path.dirname(profilesDir))) {
+    ensureDir(profilesDir);
+    const profileRulesPath = path.join(profilesDir, 'rules.json');
+    try {
+      if (fs.existsSync(sourceRulesPath)) {
+        fs.copyFileSync(sourceRulesPath, profileRulesPath);
+      } else {
+        writeJsonFile(profileRulesPath, createDefaultRules());
+      }
+      log.success(`  ✅ Copied rules to profile: ${profileName}`);
+    } catch (error) {
+      log.warn(`  ⚠️ Could not copy to profile: ${(error as Error).message}`);
     }
   }
 };
