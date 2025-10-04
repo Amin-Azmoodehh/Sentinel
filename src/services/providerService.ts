@@ -226,49 +226,34 @@ export const setModel = (model: string): void => {
 export const generateCompletion = async (request: CompletionRequest): Promise<CompletionResponse> => {
   const config = configService.load();
   const providerName = config.defaults.provider;
-  
-  if (!providerName) {
-    // Record input tokens even if configuration is missing
-    try {
-      contextMonitorService.recordUsageFromText(
-        request?.prompt ?? '',
-        '',
-        process.env.ST_COMMAND || 'ai_completion'
-      );
-    } catch {
-      // Ignore monitoring errors to avoid affecting main flow
-    }
-    throw new Error('No default provider set.');
-  }
+  const promptText = request?.prompt ?? '';
+  const operation = process.env.ST_COMMAND || 'ai_completion';
+  let completionText = '';
 
-  const provider = createProvider(providerName, config);
-  if (!provider) {
-    // Record input tokens on provider resolution failure
-    try {
-      contextMonitorService.recordUsageFromText(
-        request?.prompt ?? '',
-        '',
-        process.env.ST_COMMAND || 'ai_completion'
-      );
-    } catch {
-      // Ignore monitoring errors
-    }
-    throw new Error(`Provider '${providerName}' is not available.`);
-  }
-
-  let completion: CompletionResponse | undefined;
   try {
-    completion = await provider.generateCompletion(request);
+    if (!providerName) {
+      throw new Error('No default provider set.');
+    }
+
+    const provider = createProvider(providerName, config);
+    if (!provider) {
+      throw new Error(`Provider '${providerName}' is not available.`);
+    }
+
+    const completion = await provider.generateCompletion(request);
+    completionText = completion.content;
     return completion;
+
+  } catch (error) {
+    // Re-throw the error after ensuring usage is recorded in finally
+    throw error;
   } finally {
-    // Always attempt to record token usage (success or failure)
+    // Always record usage, even on failure. completionText will be empty on error.
     try {
-      const promptText = request?.prompt ?? '';
-      const completionText = completion?.content ?? '';
-      const operation = process.env.ST_COMMAND || 'ai_completion';
       contextMonitorService.recordUsageFromText(promptText, completionText, operation);
-    } catch {
-      // Swallow monitoring errors
+    } catch (monitorError) {
+      // Swallow monitoring errors to not disrupt the main flow
+      log.warn('Could not record token usage: ' + (monitorError as Error).message);
     }
   }
 };
