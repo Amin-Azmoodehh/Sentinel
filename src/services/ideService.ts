@@ -355,21 +355,24 @@ const applyIdeProfile = (profileName: string, targetDir: string, providerName: s
     }
   }
 
-  // Also copy to profiles directory if it exists
-  const profilesDir = path.join(process.cwd(), '.sentineltm', 'profiles', profileName);
-  if (fs.existsSync(path.dirname(profilesDir))) {
-    ensureDir(profilesDir);
-    const profileRulesPath = path.join(profilesDir, 'rules.json');
-    try {
-      if (fs.existsSync(sourceRulesPath)) {
-        fs.copyFileSync(sourceRulesPath, profileRulesPath);
-      } else {
-        writeJsonFile(profileRulesPath, createDefaultRules());
-      }
-      log.success(`  ✅ Copied rules to profile: ${profileName}`);
-    } catch (error) {
-      log.warn(`  ⚠️ Could not copy to profile: ${(error as Error).message}`);
+  // Also copy to profiles directory
+  const sentinelDir = path.join(process.cwd(), '.sentineltm');
+  const profilesDir = path.join(sentinelDir, 'profiles', profileName);
+  
+  // Ensure .sentineltm directory exists
+  ensureDir(sentinelDir);
+  ensureDir(profilesDir);
+  
+  const profileRulesPath = path.join(profilesDir, 'rules.json');
+  try {
+    if (fs.existsSync(sourceRulesPath)) {
+      fs.copyFileSync(sourceRulesPath, profileRulesPath);
+    } else {
+      writeJsonFile(profileRulesPath, createDefaultRules());
     }
+    log.success(`  ✅ Copied rules to profile: ${profileName}`);
+  } catch (error) {
+    log.warn(`  ⚠️ Could not copy to profile: ${(error as Error).message}`);
   }
 };
 
