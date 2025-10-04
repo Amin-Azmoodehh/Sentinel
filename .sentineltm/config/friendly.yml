@@ -1,0 +1,36 @@
+# SentinelTM Friendly Configuration
+# This file configures user preferences and friendly interactions
+
+user:
+  name: "امین"
+  timezone: "Asia/Tehran"
+  language: "fa"
+  
+preferences:
+  greeting: "سلام! چطور می‌تونم کمکتون کنم؟"
+  farewell: "موفق باشید!"
+  default_component_path: "src/components"
+  default_test_command: "npm test"
+  min_quality_score: 80
+  
+aliases:
+  - alias: "build"
+    command: "npm run build"
+    description: "Build the project"
+  
+  - alias: "test"
+    command: "npm test"
+    description: "Run tests"
+    
+  - alias: "dev"
+    command: "npm run dev"
+    description: "Start development server"
+    
+  - alias: "lint"
+    command: "npm run lint"
+    description: "Run linter"
+
+interaction:
+  mode: "friendly"
+  show_tips: true
+  auto_suggestions: true
