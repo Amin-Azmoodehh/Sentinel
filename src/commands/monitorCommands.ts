@@ -112,6 +112,23 @@ export const registerMonitorCommands = (program: Command): void => {
       }
     });
 
+  // Count tokens in text
+  monitorCommand
+    .command('count <text>')
+    .description('Count tokens in text using tiktoken')
+    .option('-m, --model <model>', 'Model to use for tokenization')
+    .action((text: string, options: { model?: string }) => {
+      const tokenCount = contextMonitorService.countTokens(text, options.model);
+      const config = require('../services/configService.js').configService.load();
+      const model = options.model || config.defaults.model || 'gpt-4';
+      
+      log.success(`✅ Token count for "${text.slice(0, 50)}${text.length > 50 ? '...' : ''}"`);
+      log.info(`Model: ${model}`);
+      log.info(`Tokens: ${tokenCount}`);
+      log.info(`Characters: ${text.length}`);
+      log.info(`Ratio: ${(text.length / tokenCount).toFixed(2)} chars/token`);
+    });
+
   // Friendly aliases command
   const aliasCommand = program
     .command('alias')

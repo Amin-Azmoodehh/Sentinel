@@ -1,5 +1,6 @@
 import { configService } from './configService.js';
 import { log } from '../utils/logger.js';
+import { encoding_for_model, get_encoding, Tiktoken } from 'tiktoken';
 
 export interface ContextWindowStats {
   modelContextWindow: number;
@@ -20,6 +21,7 @@ export interface TokenUsageRecord {
 export class ContextMonitorService {
   private static instance: ContextMonitorService;
   private sessionHistory: TokenUsageRecord[] = [];
+  private tokenizer: Tiktoken | null = null;
   private modelContextWindows: Record<string, number> = {
     // OpenAI models
     'gpt-4': 8192,
@@ -47,6 +49,56 @@ export class ContextMonitorService {
       ContextMonitorService.instance = new ContextMonitorService();
     }
     return ContextMonitorService.instance;
+  }
+
+  private getTokenizer(model: string): Tiktoken {
+    if (this.tokenizer) {
+      return this.tokenizer;
+    }
+
+    try {
+      // Try to get model-specific encoding
+      if (model.includes('gpt-4')) {
+        this.tokenizer = encoding_for_model('gpt-4' as any);
+      } else if (model.includes('gpt-3.5')) {
+        this.tokenizer = encoding_for_model('gpt-3.5-turbo' as any);
+      } else {
+        // Default to cl100k_base (used by GPT-4 and GPT-3.5-turbo)
+        this.tokenizer = get_encoding('cl100k_base');
+      }
+    } catch (error) {
+      log.warn(`Could not load tokenizer for ${model}, using default`);
+      this.tokenizer = get_encoding('cl100k_base');
+    }
+
+    return this.tokenizer;
+  }
+
+  /**
+   * Count tokens in text using tiktoken
+   */
+  countTokens(text: string, model?: string): number {
+    try {
+      const config = configService.load();
+      const modelName = model || config.defaults.model || 'gpt-4';
+      const tokenizer = this.getTokenizer(modelName);
+      
+      const tokens = tokenizer.encode(text);
+      return tokens.length;
+    } catch (error) {
+      // Fallback to rough estimation: ~4 characters per token
+      return Math.ceil(text.length / 4);
+    }
+  }
+
+  /**
+   * Record usage with automatic token counting
+   */
+  recordUsageFromText(prompt: string, completion: string, operation: string): void {
+    const inputTokens = this.countTokens(prompt);
+    const outputTokens = this.countTokens(completion);
+    
+    this.recordTokenUsage(inputTokens, outputTokens, operation);
   }
 
   private getModelContextWindow(model: string): number {
