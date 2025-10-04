@@ -2,11 +2,19 @@ import { Command } from 'commander';
 import path from 'node:path';
 import dayjs from 'dayjs';
 import { indexProject, indexStatus, searchIndex } from '../services/indexService.js';
+import { indexingService } from '../services/indexingService.js';
 import { renderTable } from '../utils/table.js';
 import { log } from '../utils/logger.js';
 
 export const registerIndexCommands = (program: Command): void => {
   const indexCommand = program.command('index').description('🔍 Index and search your codebase');
+
+  indexCommand
+    .command('build')
+    .description('Build persistent project index')
+    .action(() => {
+      indexingService.buildIndex();
+    });
 
   indexCommand
     .command('run')
@@ -22,19 +30,33 @@ export const registerIndexCommands = (program: Command): void => {
     .command('status')
     .description('Show index statistics')
     .action(() => {
-      const status = indexStatus();
-      const timestamp = status.lastRun
-        ? dayjs(status.lastRun).format('YYYY-MM-DD HH:mm:ss')
+      // Get both old and new index status
+      const oldStatus = indexStatus();
+      const newStatus = indexingService.getIndexStatus();
+      
+      const oldTimestamp = oldStatus.lastRun
+        ? dayjs(oldStatus.lastRun).format('YYYY-MM-DD HH:mm:ss')
         : 'never';
+      
+      const newTimestamp = newStatus.lastUpdated
+        ? dayjs(newStatus.lastUpdated).format('YYYY-MM-DD HH:mm:ss')
+        : 'never';
+      
       const table = renderTable({
-        head: ['Metric', 'Value'],
+        head: ['Index Type', 'Files', 'Last Updated'],
         rows: [
-          ['Files', String(status.files)],
-          ['Symbols', String(status.symbols)],
-          ['Last Run', timestamp],
+          ['Search Index (legacy)', String(oldStatus.files), oldTimestamp],
+          ['Project Index (new)', String(newStatus.files), newTimestamp],
         ],
       });
+      log.raw('\n📊 Index Status');
       log.raw(table);
+      
+      if (newStatus.files === 0) {
+        log.warn('\n⚠️ No files in project index. Run `st index build` to build it.');
+      } else {
+        log.success(`\n✅ Project index contains ${newStatus.files} files`);
+      }
     });
 
   indexCommand

@@ -23,19 +23,30 @@ const getProviderConfig = (name: string) => {
 };
 
 export const getProvider = (name: string): Provider => {
-  if (name === 'ollama') {
-    const config = getProviderConfig('ollama');
+  const config = getProviderConfig(name);
+  
+  // Determine provider type
+  const providerType = config.type || 'openai-compatible';
+  
+  if (providerType === 'ollama') {
+    if (!config.baseURL) {
+      throw new Error(`'baseURL' is required for Ollama provider '${name}'.`);
+    }
     return new OllamaProvider(config.baseURL);
   }
-
-  const config = getProviderConfig(name);
-  if (!config.baseURL) {
-    throw new Error(`'baseURL' is required for provider '${name}'.`);
+  
+  // Handle all OpenAI-compatible providers (including openrouter, claude, gemini, etc.)
+  if (providerType === 'openai-compatible') {
+    if (!config.baseURL) {
+      throw new Error(`'baseURL' is required for provider '${name}'.`);
+    }
+    
+    // Allow empty API key for now - will be handled by the calling code
+    const apiKey = config.apiKey || '';
+    return new OpenAICompatibleProvider(config.baseURL, apiKey);
   }
   
-  // Allow empty API key for now - will be handled by the calling code
-  const apiKey = config.apiKey || '';
-  return new OpenAICompatibleProvider(config.baseURL, apiKey);
+  throw new Error(`Unknown provider type '${providerType}' for provider '${name}'. Supported types: 'ollama', 'openai-compatible'`);
 };
 
 export const getAvailableProviders = (): string[] => {
