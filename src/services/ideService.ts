@@ -243,7 +243,6 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
 };
 
 const createDefaultRules = () => ({
-  $schema: 'https://json-schema.org/draft-07/schema',
   version: '1.6.3',
   contract: {
     version: '3.0',
