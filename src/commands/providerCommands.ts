@@ -15,13 +15,32 @@ export const registerProviderCommands = (program: Command) => {
   providerCommand.description('🤖 Manage AI providers via API (Ollama, OpenAI, Claude, Gemini)');
 
   providerCommand
-    .command('set <provider>')
+    .command('set [provider]')
     .description('Set and configure an AI provider')
     .option('--type <type>', 'Provider type (e.g., ollama, openai-compatible)')
     .option('--base-url <url>', 'API endpoint base URL')
     .option('--api-key <key>', 'Your secret API key')
     .option('--model <id>', 'Default model ID for this provider')
-    .action((provider, options) => {
+    .action(async (provider, options) => {
+      if (!provider) {
+        const { configService } = await import('../services/configService.js');
+        const config = configService.load();
+        const providers = Object.keys(config.providers || {});
+        if (providers.length === 0) {
+          console.log('No providers configured. Use `st provider set <name> --type ...` to add one.');
+          return;
+        }
+        const { chosenProvider } = await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'chosenProvider',
+            message: 'Choose a provider to set as default:',
+            choices: providers,
+          },
+        ]);
+        provider = chosenProvider;
+      }
+
       // First, create or update the provider's configuration
       upsertProviderConfig(provider, options);
       // Then, set it as the default
