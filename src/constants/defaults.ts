@@ -8,16 +8,46 @@ export const defaultConfig = {
   providers: {
     ollama: {
       type: 'ollama',
-      baseUrl: 'http://localhost:11434',
+      baseURL: 'http://localhost:11434',
     },
     openai: {
       type: 'openai-compatible',
-      baseUrl: 'https://api.openai.com',
+      baseURL: 'https://api.openai.com/v1',
       apiKey: '',
     },
     claude: {
       type: 'openai-compatible',
-      baseUrl: 'https://api.anthropic.com',
+      baseURL: 'https://api.anthropic.com/v1',
+      apiKey: '',
+    },
+    gemini: {
+      type: 'openai-compatible',
+      baseURL: 'https://generativelanguage.googleapis.com/v1beta/openai',
+      apiKey: '',
+    },
+    mistral: {
+      type: 'openai-compatible',
+      baseURL: 'https://api.mistral.ai/v1',
+      apiKey: '',
+    },
+    openrouter: {
+      type: 'openai-compatible',
+      baseURL: 'https://openrouter.ai/api/v1',
+      apiKey: '',
+    },
+    groq: {
+      type: 'openai-compatible',
+      baseURL: 'https://api.groq.com/openai/v1',
+      apiKey: '',
+    },
+    together: {
+      type: 'openai-compatible',
+      baseURL: 'https://api.together.xyz/v1',
+      apiKey: '',
+    },
+    deepseek: {
+      type: 'openai-compatible',
+      baseURL: 'https://api.deepseek.com/v1',
       apiKey: '',
     },
   },
