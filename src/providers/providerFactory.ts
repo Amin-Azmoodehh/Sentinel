@@ -1,15 +1,25 @@
 import { configService } from '../services/configService.js';
+import { preconfiguredProviders } from '../constants/preconfiguredProviders.js';
 import { OllamaProvider } from './OllamaProvider.js';
 import { OpenAICompatibleProvider } from './OpenAICompatibleProvider.js';
 import { Provider } from './types.js';
 
 const getProviderConfig = (name: string) => {
   const config = configService.load();
-  const providerConfig = (config.providers as Record<string, any>)?.[name];
-  if (!providerConfig) {
-    throw new Error(`Configuration for provider '${name}' not found.`);
+  const userProviderConfig = (config.providers as Record<string, any>)?.[name];
+  
+  // If user has configured this provider, use their config
+  if (userProviderConfig) {
+    return userProviderConfig;
   }
-  return providerConfig;
+  
+  // Otherwise, use preconfigured defaults
+  const preconfig = (preconfiguredProviders as Record<string, any>)[name];
+  if (!preconfig) {
+    throw new Error(`Provider '${name}' not found in preconfigured providers.`);
+  }
+  
+  return preconfig;
 };
 
 export const getProvider = (name: string): Provider => {
@@ -26,6 +36,6 @@ export const getProvider = (name: string): Provider => {
 };
 
 export const getAvailableProviders = (): string[] => {
-  const config = configService.load();
-  return Object.keys(config.providers || {});
+  // Return all preconfigured providers, not just the ones in user config
+  return Object.keys(preconfiguredProviders);
 };
