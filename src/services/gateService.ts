@@ -228,8 +228,11 @@ const aiRuleCheck: GateCheck = {
       });
 
       if (!result.success) {
-        log.warn('AI provider execution failed, skipping AI Rule Check.');
-        return true;
+        log.error('❌ AI provider execution failed!');
+        log.warn('This indicates a problem with the AI provider configuration or availability.');
+        log.warn('Please check: 1) Provider is installed, 2) API keys are set, 3) Network connectivity');
+        // Fail the check - AI review is important for code quality
+        return false;
       }
 
       const output = result.stdout;
@@ -237,16 +240,20 @@ const aiRuleCheck: GateCheck = {
 
       if (scoreMatch?.[1]) {
         const score = parseInt(scoreMatch[1], 10);
-        log.info(`AI model returned a score of: ${score}`);
+        log.info(`AI model returned a score of: ${score}/100`);
         return score >= 95;
       }
 
-      log.warn('Could not parse score from AI output. Passing by default.');
-      return true;
+      log.error('❌ Could not parse AI score from output!');
+      log.warn('Expected format: "Final Score: XX/100"');
+      if (output) {
+        log.warn(`Received: ${output.substring(0, 200)}...`);
+      }
+      return false;
     } catch (error) {
-      log.warn('Error during AI Rule Check, skipping.');
+      log.error('❌ Error during AI Rule Check!');
       log.warn(error instanceof Error ? error.message : String(error));
-      return true;
+      return false;
     } finally {
       if (fs.existsSync(tempFilePath)) {
         fs.unlinkSync(tempFilePath);
