@@ -37,16 +37,35 @@ export const registerIdeCommands = (program: Command): void => {
         return;
       }
 
+      // Enrich provider list with details
+      const tempConfig = configService.load();
+      const tempProvider = tempConfig.defaults.provider;
+      const tempModel = tempConfig.defaults.model;
+
+      const providerChoices = availableProviders.map((name) => {
+        const providerConfig = (tempConfig.providers as Record<string, any>)?.[name];
+        const type = providerConfig?.type || 'unknown';
+        const isCurrent = name === tempProvider;
+        const hasApiKey = providerConfig?.apiKey ? '🔑' : '🔓';
+        
+        return {
+          name: `${name} ${hasApiKey} (${type})${isCurrent ? ' ⭐ current' : ''}`,
+          value: name,
+          short: name,
+        };
+      });
+
       const { providerName } = await inquirer.prompt([
         {
           type: 'list',
           name: 'providerName',
-          message: 'Select a provider:',
-          choices: availableProviders,
+          message: `Select a provider ${tempProvider ? `(current: ${tempProvider} → ${tempModel})` : ''}:`,
+          choices: providerChoices,
         },
       ]);
 
       const provider = getProvider(providerName);
+      log.info(`Fetching models from ${providerName}...`);
       const models = await provider.listModels();
 
       if (models.length === 0) {
@@ -54,12 +73,24 @@ export const registerIdeCommands = (program: Command): void => {
         return;
       }
 
+      log.success(`Found ${models.length} models`);
+
+      const modelChoices = models.map((m) => {
+        const isCurrentModel = m.id === tempModel && providerName === tempProvider;
+        return {
+          name: `${m.id}${isCurrentModel ? ' ⭐ current' : ''}`,
+          value: m.id,
+          short: m.id,
+        };
+      });
+
       const { modelId } = await inquirer.prompt([
         {
           type: 'list',
           name: 'modelId',
           message: `Select a model from ${providerName}:`,
-          choices: models.map((m) => m.id),
+          choices: modelChoices,
+          pageSize: 15,
         },
       ]);
 
@@ -136,12 +167,30 @@ export const registerIdeCommands = (program: Command): void => {
         return;
       }
 
+      // Enrich provider list with details
+      const currentConfig = configService.load();
+      const currentProvider = currentConfig.defaults.provider;
+      const currentModel = currentConfig.defaults.model;
+
+      const providerChoices = availableProviders.map((name) => {
+        const providerConfig = (currentConfig.providers as Record<string, any>)?.[name];
+        const type = providerConfig?.type || 'unknown';
+        const isCurrent = name === currentProvider;
+        const hasApiKey = providerConfig?.apiKey ? '🔑' : '🔓';
+        
+        return {
+          name: `${name} ${hasApiKey} (${type})${isCurrent ? ' ⭐ current' : ''}`,
+          value: name,
+          short: name,
+        };
+      });
+
       const { providerName } = await inquirer.prompt([
         {
           type: 'list',
           name: 'providerName',
-          message: 'Select a provider:',
-          choices: availableProviders,
+          message: `Select a provider ${currentProvider ? `(current: ${currentProvider} → ${currentModel})` : ''}:`,
+          choices: providerChoices,
         },
       ]);
 

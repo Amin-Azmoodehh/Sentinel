@@ -5,6 +5,7 @@ import { configService } from './configService.js';
 import { log, type SummaryRow } from '../utils/logger.js';
 import { ShellService } from './shellService.js';
 import { indexingService } from './indexingService.js';
+import { CompressionService } from './compressionService.js';
 
 interface GateCheck {
   name: string;

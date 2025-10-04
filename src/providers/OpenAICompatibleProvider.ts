@@ -16,7 +16,7 @@ export class OpenAICompatibleProvider implements Provider {
   }
 
   async listModels(): Promise<Model[]> {
-    const res = await this.client.post('/v1/models');
+    const res = await this.client.get('/v1/models');
     const items = Array.isArray(res.data?.data) ? res.data.data : [];
     return items.map((m: any) => ({ id: String(m.id), name: String(m.id) }));
   }
