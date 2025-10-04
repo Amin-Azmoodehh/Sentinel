@@ -7,6 +7,7 @@ import { ShellService } from './shellService.js';
 import { indexingService } from './indexingService.js';
 import { CompressionService } from './compressionService.js';
 import { contextService } from './contextService.js';
+import { generateCompletion } from './providerService.js';
 
 interface GateCheck {
   name: string;
@@ -246,9 +247,6 @@ const aiRuleCheck: GateCheck = {
       ].join('\n');
 
       log.info(`Sending contextual request to ${providerName} (${model})...`);
-      
-      // Use the new API-based provider service
-      const { generateCompletion } = await import('./providerService.js');
       const response = await generateCompletion({
         prompt,
         model,

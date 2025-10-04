@@ -250,6 +250,7 @@ export const generateCompletion = async (request: CompletionRequest): Promise<Co
   } finally {
     // Always record usage, even on failure. completionText will be empty on error.
     try {
+      log.info(`[ContextMonitor] Attempting to record usage for operation: ${operation}`);
       contextMonitorService.recordUsageFromText(promptText, completionText, operation);
     } catch (monitorError) {
       // Swallow monitoring errors to not disrupt the main flow
