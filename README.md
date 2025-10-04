@@ -1,8 +1,14 @@
-# 🤖 SentinelTM: AI-Powered Development Orchestrator
+# 🛡️ SentinelTM: The Ultimate AI-Powered Development Guardian
 
-[![npm version](https://img.shields.io/npm/v/sentineltm-cli)](https://www.npmjs.com/package/sentineltm-cli) [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Amin-Azmoodehh/Sentinel) [![License](https://img.shields.io/badge/license-ISC-green)](https://github.com/Amin-Azmoodehh/Sentinel)
+[![npm version](https://img.shields.io/npm/v/sentineltm-cli?style=for-the-badge&logo=npm&color=red)](https://www.npmjs.com/package/sentineltm-cli) 
+[![Downloads](https://img.shields.io/npm/dm/sentineltm-cli?style=for-the-badge&logo=npm&color=orange)](https://www.npmjs.com/package/sentineltm-cli)
+[![License](https://img.shields.io/badge/license-ISC-green?style=for-the-badge)](https://github.com/Amin-Azmoodehh/Sentinel)
+[![Stars](https://img.shields.io/github/stars/Amin-Azmoodehh/Sentinel?style=for-the-badge&logo=github&color=yellow)](https://github.com/Amin-Azmoodehh/Sentinel)
 
-SentinelTM (`st`) is a next-generation AI orchestrator that combines a powerful CLI with MCP (Model Context Protocol) server capabilities. It provides secure file operations, intelligent shell execution, advanced code indexing, and automated quality gates—all powered by your choice of AI provider through direct API integration.
+> **The World's Most Advanced AI Development Orchestrator**  
+> Enforce Zero Tolerance Quality Standards with Military-Grade Precision
+
+SentinelTM (`st`) is a revolutionary AI-powered development guardian that transforms how you build software. Combining enterprise-grade CLI tools with cutting-edge MCP (Model Context Protocol) capabilities, it enforces uncompromising quality standards while seamlessly integrating with 20+ AI providers and 23+ IDEs.
 
 ## ✨ What Makes SentinelTM Different?
 

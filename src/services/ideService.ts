@@ -23,6 +23,25 @@ const ensureDir = (dir: string): void => {
   }
 };
 
+const copyFolderRecursive = (source: string, target: string): void => {
+  if (!fs.existsSync(source)) return;
+  
+  ensureDir(target);
+  
+  const files = fs.readdirSync(source);
+  
+  for (const file of files) {
+    const sourcePath = path.join(source, file);
+    const targetPath = path.join(target, file);
+    
+    if (fs.statSync(sourcePath).isDirectory()) {
+      copyFolderRecursive(sourcePath, targetPath);
+    } else {
+      fs.copyFileSync(sourcePath, targetPath);
+    }
+  }
+};
+
 const arraysEqual = (left: string[] | undefined, right: string[]): boolean => {
   if (!Array.isArray(left) || left.length !== right.length) {
     return false;
@@ -388,11 +407,10 @@ const applyIdeProfile = (
   }
 
   if (applyRules) {
-    // Also copy to profiles directory
+    // Copy to profiles directory
     const sentinelDir = path.join(process.cwd(), '.sentineltm');
     const profilesDir = path.join(sentinelDir, 'profiles', profileName);
 
-    // Ensure .sentineltm directory exists
     ensureDir(sentinelDir);
     ensureDir(profilesDir);
 
@@ -406,6 +424,20 @@ const applyIdeProfile = (
       log.success(`  ✅ Copied rules to profile: ${profileName}`);
     } catch (error) {
       log.warn(`  ⚠️ Could not copy to profile: ${(error as Error).message}`);
+    }
+
+    // Copy entire rules folder if it exists (for advanced configurations)
+    const sourceRulesFolder = path.join(process.cwd(), '.windsurf', 'rules');
+    const targetRulesFolder = path.join(targetDir, 'rules');
+    
+    if (fs.existsSync(sourceRulesFolder)) {
+      try {
+        // Copy entire rules folder
+        copyFolderRecursive(sourceRulesFolder, targetRulesFolder);
+        log.success(`  📁 Copied rules folder to ${profileName}`);
+      } catch (error) {
+        log.warn(`  ⚠️ Could not copy rules folder: ${(error as Error).message}`);
+      }
     }
   }
 };

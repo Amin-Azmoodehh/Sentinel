@@ -1,8 +1,8 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
-  "title": "SentinelTM Zero Tolerance Contract",
-  "description": "A comprehensive, strict, and non-negotiable contract for AI code generation enforced by SentinelTM. This contract ensures production-grade code quality across multiple languages and frameworks.",
-  "version": "4.0.0",
+  "title": "SentinelTM Zero Tolerance Contract v5.0",
+  "description": "The world's most comprehensive and strict AI code generation contract. This military-grade standard ensures enterprise-level code quality across all languages, frameworks, and development environments. Non-negotiable. Zero exceptions.",
+  "version": "5.0.0",
 
   "metadata": {
     "author": "SentinelTM",
