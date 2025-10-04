@@ -6,6 +6,7 @@ import { log, type SummaryRow } from '../utils/logger.js';
 import { ShellService } from './shellService.js';
 import { indexingService } from './indexingService.js';
 import { CompressionService } from './compressionService.js';
+import { contextService } from './contextService.js';
 
 interface GateCheck {
   name: string;
@@ -168,17 +169,15 @@ const aiRuleCheck: GateCheck = {
     }
 
     try {
-      // Load project-specific rules
-      const projectRulesPath = 'project_rules.md';
-      const projectRules = fs.existsSync(projectRulesPath)
-        ? fs.readFileSync(projectRulesPath, 'utf-8')
-        : '';
-
-      // Load SentinelTM rules
-      const rulesPath = '.sentineltm/config/rules.json';
-      const sentinelRules = fs.existsSync(rulesPath)
-        ? fs.readFileSync(rulesPath, 'utf-8')
-        : '';
+      log.info('🧠 Enriching context for AI analysis...');
+      
+      // Use context service for intelligent analysis
+      const context = await contextService.enrichContext({
+        intent: 'code quality review and analysis',
+        keywords: ['typescript', 'react', 'service', 'component', 'error', 'security'],
+        fileTypes: ['.ts', '.tsx'],
+        maxFiles: 3,
+      });
 
       // Get git diff for recent changes (focus on changes, not entire codebase)
       let gitDiff = '';
@@ -189,40 +188,37 @@ const aiRuleCheck: GateCheck = {
           cwd: process.cwd()
         });
         if (result.stdout) {
-          gitDiff = result.stdout.slice(0, 2000); // Limit diff size
+          gitDiff = result.stdout.slice(0, 1500); // Limit diff size
         }
       } catch {
-        // Fallback to file analysis if git diff fails
+        // Fallback to context-enriched file analysis
       }
 
-      // If no git diff, analyze recent files
+      // If no git diff, use context-enriched analysis
       if (!gitDiff.trim()) {
-        const sourceFiles = indexingService.getFiles()
-          .filter(f => f.startsWith('src') && f.endsWith('.ts') && !f.includes('.test.') && !f.includes('.spec.'))
-          .slice(0, 3); // Limit to 3 most relevant files
-        
-        gitDiff = sourceFiles
-          .map((file) => {
-            const content = fs.readFileSync(file, 'utf-8');
-            const lines = content.split('\n').slice(0, 100).join('\n'); // Limit to 100 lines per file
-            return `=== ${file} ===\n${lines}`;
-          })
+        gitDiff = context.relevantFiles
+          .map(file => `=== ${file.path} (${file.type}) ===\n${file.content.slice(0, 800)}`)
           .join('\n\n');
       }
 
       const prompt = [
-        'You are a senior code reviewer. Analyze the provided code based on the project rules.',
+        'You are a senior code reviewer with deep knowledge of this specific project.',
+        'Analyze the provided code based on the established project patterns and rules.',
         'Return your feedback ONLY in the following JSON format. Do not add any other text.',
         '',
-        '## PROJECT RULES:',
-        projectRules || 'No specific project rules defined.',
+        '## PROJECT RULES & STANDARDS:',
+        context.projectRules,
         '',
-        '## SENTINELTM STANDARDS:',
-        '- TypeScript strict mode required',
-        '- No hardcoded strings or credentials',
-        '- Comprehensive error handling',
-        '- Clean architecture principles',
-        '- Security best practices',
+        '## ESTABLISHED PATTERNS TO FOLLOW:',
+        ...context.patterns.map(pattern => `**${pattern.type}**: ${pattern.usage}`),
+        '',
+        '## PROJECT CONVENTIONS:',
+        `Naming: ${context.conventions.naming.join(', ')}`,
+        `Structure: ${context.conventions.structure.join(', ')}`,
+        `Imports: ${context.conventions.imports.join(', ')}`,
+        '',
+        '## DEPENDENCIES IN USE:',
+        ...context.dependencies.map(dep => `- ${dep.name} (${dep.version}): ${dep.usage.slice(0, 2).join(', ')}`),
         '',
         '## CODE TO REVIEW:',
         gitDiff || 'No code changes to analyze.',
@@ -235,13 +231,18 @@ const aiRuleCheck: GateCheck = {
         '  "suggestions": [',
         '    {',
         '      "severity": "<critical|major|minor>",',
-        '      "category": "<security|architecture|quality|style>",',
-        '      "comment": "<specific improvement suggestion>"',
+        '      "category": "<security|architecture|quality|style|patterns>",',
+        '      "comment": "<specific improvement suggestion with reference to project patterns>"',
         '    }',
         '  ]',
         '}',
         '',
-        'Focus on actionable feedback. Be constructive but thorough.',
+        'Focus on:',
+        '1. Adherence to established project patterns',
+        '2. Consistency with existing code conventions',
+        '3. Proper use of project dependencies',
+        '4. Security and quality best practices',
+        'Be constructive and reference specific examples from the project context.',
       ].join('\n');
 
       log.info(`Sending contextual request to ${providerName} (${model})...`);

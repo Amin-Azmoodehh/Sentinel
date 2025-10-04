@@ -1,0 +1,62 @@
+{
+  "name": "SentinelTM Development Batch",
+  "description": "Example batch operations for rapid development",
+  "operations": [
+    {
+      "type": "component",
+      "name": "UserProfile",
+      "options": {
+        "name": "UserProfile",
+        "path": "src/components",
+        "framework": "react",
+        "style": "tailwind",
+        "includeTest": true,
+        "includeStory": true,
+        "props": [
+          { "name": "userId", "type": "string", "optional": false },
+          { "name": "showAvatar", "type": "boolean", "optional": true }
+        ]
+      }
+    },
+    {
+      "type": "component",
+      "name": "LoadingSpinner",
+      "options": {
+        "name": "LoadingSpinner",
+        "path": "src/components/ui",
+        "framework": "react",
+        "style": "tailwind",
+        "includeTest": true,
+        "props": [
+          { "name": "size", "type": "'sm' | 'md' | 'lg'", "optional": true },
+          { "name": "color", "type": "string", "optional": true }
+        ]
+      }
+    },
+    {
+      "type": "api",
+      "name": "getUserProfile",
+      "options": {
+        "name": "getUserProfile",
+        "method": "GET",
+        "path": "/api/users/:id",
+        "responseType": "UserProfile",
+        "includeValidation": true,
+        "includeTest": true
+      }
+    },
+    {
+      "type": "api",
+      "name": "updateUserProfile",
+      "options": {
+        "name": "updateUserProfile",
+        "method": "PUT",
+        "path": "/api/users/:id",
+        "requestType": "UpdateUserRequest",
+        "responseType": "UserProfile",
+        "includeValidation": true,
+        "includeTest": true
+      }
+    }
+  ]
+}
