@@ -74,8 +74,6 @@ const createMcpConfig = (providerName: string) => {
   const defaultsModel = config.defaults.model || 'llama3';
 
   return {
-    version: '1.0.0',
-    description: 'SentinelTM MCP Server Configuration - AI-powered development orchestrator with quality gates, secure file operations, and intelligent shell execution',
     mcpServers: {
       [CLI_SERVER_NAME]: {
         command: invocation.command,
@@ -84,31 +82,7 @@ const createMcpConfig = (providerName: string) => {
           SENTINEL_LOG_LEVEL: 'info',
           SENTINEL_AUTO_INDEX: 'true',
         },
-        timeout: 30000,
-        restart: {
-          maxAttempts: 3,
-          delay: 1000,
-        },
-        capabilities: {
-          filesystem: true,
-          shell: true,
-          indexing: true,
-          qualityGates: true,
-          taskManagement: true,
-        },
       },
-    },
-    defaults: {
-      provider: defaultsProvider,
-      model: defaultsModel,
-      temperature: 0.7,
-      maxTokens: 4096,
-    },
-    features: {
-      autoIndex: true,
-      qualityGateOnSave: false,
-      secureShellExecution: true,
-      filesystemSandbox: true,
     },
   };
 };
