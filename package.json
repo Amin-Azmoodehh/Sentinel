@@ -67,9 +67,11 @@
     "fast-glob": "^3.3.2",
     "figlet": "^1.9.3",
     "fs-extra": "^11.2.0",
+    "gpt-tokenizer": "^3.0.1",
     "ignore": "^5.3.1",
     "inquirer": "^12.9.6",
     "sql.js": "^1.13.0",
+    "tiktoken": "^1.0.22",
     "typescript": "^5.3.3",
     "yaml": "^2.8.1"
   },
