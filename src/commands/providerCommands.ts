@@ -34,6 +34,7 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
     
     // Google Gemini
     gemini: [
+      'gemini-2.0-flash-exp',
       'gemini-1.5-pro-latest',
       'gemini-1.5-flash-latest',
       'gemini-1.5-pro',
@@ -57,6 +58,7 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
     openrouter: [
       // Free Models
       'deepseek/deepseek-chat',
+      'deepseek/deepseek-chat-v3.1:free',
       'google/gemini-flash-1.5',
       'meta-llama/llama-3.1-8b-instruct:free',
       'microsoft/phi-3-medium-128k-instruct:free',

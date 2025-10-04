@@ -119,6 +119,34 @@ export const registerIdeCommands = (program: Command): void => {
         },
       ]);
 
+      // Step 3: Get API key if needed
+      if (needsApiKey || (providerName !== 'ollama' && providerName !== 'lmstudio' && providerName !== 'localai' && providerName !== 'jan')) {
+        const { apiKey } = await inquirer.prompt([
+          {
+            type: 'password',
+            name: 'apiKey',
+            message: `Enter API Key for ${providerName} (required for ${modelId}):`,
+            mask: '*',
+            validate: (input: string) => {
+              return input.length > 0 || 'API key is required for this provider';
+            },
+          },
+        ]);
+
+        // Save the API key to config
+        const currentConfig = configService.load();
+        if (!currentConfig.providers) {
+          (currentConfig as any).providers = {};
+        }
+        const existingProvider = (currentConfig.providers as any)[providerName] || {};
+        (currentConfig.providers as any)[providerName] = {
+          ...existingProvider,
+          apiKey: apiKey,
+        };
+        configService.save(currentConfig);
+        log.success(`API key saved for ${providerName}`);
+      }
+
       const config = configService.load();
       config.defaults.provider = providerName;
       config.defaults.model = modelId;
@@ -273,6 +301,34 @@ export const registerIdeCommands = (program: Command): void => {
           pageSize: 15,
         },
       ]);
+
+      // Step 3: Get API key if needed
+      if (needsApiKey || (providerName !== 'ollama' && providerName !== 'lmstudio' && providerName !== 'localai' && providerName !== 'jan')) {
+        const { apiKey } = await inquirer.prompt([
+          {
+            type: 'password',
+            name: 'apiKey',
+            message: `Enter API Key for ${providerName} (required for ${modelId}):`,
+            mask: '*',
+            validate: (input: string) => {
+              return input.length > 0 || 'API key is required for this provider';
+            },
+          },
+        ]);
+
+        // Save the API key to config
+        const config = configService.load();
+        if (!config.providers) {
+          (config as any).providers = {};
+        }
+        const existingProvider = (config.providers as any)[providerName] || {};
+        (config.providers as any)[providerName] = {
+          ...existingProvider,
+          apiKey: apiKey,
+        };
+        configService.save(config);
+        log.success(`API key saved for ${providerName}`);
+      }
 
       const config = configService.load();
       config.defaults.provider = providerName;
