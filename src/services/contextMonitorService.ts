@@ -98,6 +98,8 @@ export class ContextMonitorService {
     const inputTokens = this.countTokens(prompt);
     const outputTokens = this.countTokens(completion);
     
+    log.info(`[ContextMonitor] Recording usage. Prompt: ${inputTokens} tokens, Completion: ${outputTokens} tokens, Operation: ${operation}`);
+    
     this.recordTokenUsage(inputTokens, outputTokens, operation);
   }
 
@@ -129,6 +131,9 @@ export class ContextMonitorService {
     };
 
     this.sessionHistory.push(record);
+    
+    const totalSessionTokens = this.sessionHistory.reduce((sum, r) => sum + r.totalTokens, 0);
+    log.info(`[ContextMonitor] Token usage recorded. New session total: ${totalSessionTokens} tokens (History size: ${this.sessionHistory.length} records)`);
 
     // Keep only last 100 records to avoid memory issues
     if (this.sessionHistory.length > 100) {
