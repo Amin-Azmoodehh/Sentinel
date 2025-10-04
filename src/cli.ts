@@ -67,14 +67,11 @@ const getVersion = () => {
   try {
     const currentFilePath = new URL(import.meta.url).pathname;
     // Fix Windows path (remove leading slash)
-    const normalizedPath = process.platform === 'win32' && currentFilePath.startsWith('/')
-      ? currentFilePath.slice(1)
-      : currentFilePath;
-    const pkgPath = path.join(
-      path.dirname(normalizedPath),
-      '..',
-      'package.json'
-    );
+    const normalizedPath =
+      process.platform === 'win32' && currentFilePath.startsWith('/')
+        ? currentFilePath.slice(1)
+        : currentFilePath;
+    const pkgPath = path.join(path.dirname(normalizedPath), '..', 'package.json');
     return JSON.parse(fs.readFileSync(pkgPath, 'utf-8')).version;
   } catch (error) {
     // Fallback: try to read from node_modules

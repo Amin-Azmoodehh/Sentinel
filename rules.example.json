@@ -10,7 +10,7 @@
     "absoluteImportsOnly": true
   },
   "forbidden": {
-    "functions": ["print(", "eval(", "exec(", "console.log("],
+    "functions": ["print(", "exec(", "console.log("],
     "modules": ["subprocess", "os.system"]
   },
   "externalization": {

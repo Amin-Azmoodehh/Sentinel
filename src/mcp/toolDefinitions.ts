@@ -98,7 +98,11 @@ export const buildFsToolDefinition = (): ExperimentalTool => ({
         type: 'object',
         properties: {
           path: { type: 'string', description: 'Target path' },
-          paths: { type: 'array', items: { type: 'string' }, description: 'Array of paths for mkdir' },
+          paths: {
+            type: 'array',
+            items: { type: 'string' },
+            description: 'Array of paths for mkdir',
+          },
           source: { type: 'string', description: 'Source path for copy/move' },
           destination: { type: 'string', description: 'Destination path for copy/move' },
           pattern: { type: 'string', description: 'Glob pattern for list' },

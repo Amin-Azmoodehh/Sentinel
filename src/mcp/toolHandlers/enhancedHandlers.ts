@@ -11,11 +11,11 @@ export const handleSecurityTool: ToolHandler = async (args) => {
     case 'validatePath': {
       const { path, paths } = payload as { path?: string; paths?: string[] };
       const targetPath = path || (paths && paths[0]);
-      
+
       if (!targetPath) {
         return { success: false, error: { message: 'Either path or paths[0] must be provided' } };
       }
-      
+
       const result = pathSecurityService.validatePath(targetPath);
       return { success: true, data: result };
     }
@@ -23,23 +23,27 @@ export const handleSecurityTool: ToolHandler = async (args) => {
     case 'addWhitelist': {
       const { path, paths } = payload as { path?: string; paths?: string[] };
       const targetPath = path || (paths && paths[0]);
-      
+
       if (!targetPath) {
         return { success: false, error: { message: 'Either path or paths[0] must be provided' } };
       }
-      
+
       pathSecurityService.addWhitelist(targetPath);
       return { success: true, data: { message: `Added to whitelist: ${targetPath}` } };
     }
 
     case 'addBlacklist': {
-      const { path, paths, reason } = payload as { path?: string; paths?: string[]; reason?: string };
+      const { path, paths, reason } = payload as {
+        path?: string;
+        paths?: string[];
+        reason?: string;
+      };
       const targetPath = path || (paths && paths[0]);
-      
+
       if (!targetPath) {
         return { success: false, error: { message: 'Either path or paths[0] must be provided' } };
       }
-      
+
       pathSecurityService.addBlacklist(targetPath, reason);
       return { success: true, data: { message: `Added to blacklist: ${targetPath}` } };
     }

@@ -229,11 +229,11 @@ const applyIdeProfile = (profileName: string, targetDir: string, providerName: s
   const mcpTargetPath = path.join(targetDir, 'mcp.json');
   writeJsonFile(mcpTargetPath, createMcpConfig(providerName));
   ensureMcpConfig(mcpTargetPath, providerName);
-  
+
   // Copy or create rules.json
   const projectRulesPath = path.join(process.cwd(), '.sentineltm', 'config', 'rules.json');
   const targetRulesPath = path.join(targetDir, 'rules.json');
-  
+
   if (fs.existsSync(projectRulesPath)) {
     // Copy existing rules from .sentineltm
     try {

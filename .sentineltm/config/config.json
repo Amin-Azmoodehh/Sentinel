@@ -9,6 +9,12 @@
     "maxTodoCount": 10,
     "maxIndexLines": 10000
   },
+  "provider": {
+    "retry": {
+      "attempts": 3,
+      "delay": 1000
+    }
+  },
   "security": {
     "forbidden": [
       "eval(",
@@ -111,8 +117,8 @@
   "meta": {
     "gate": {
       "lastRun": {
-        "timestamp": 1759451968553,
-        "score": 70,
+        "timestamp": 1759543539653,
+        "score": 80,
         "threshold": 95,
         "success": false,
         "source": "internal",
