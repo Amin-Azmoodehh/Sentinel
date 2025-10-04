@@ -6,7 +6,7 @@ import { configService } from '../services/configService.js';
 import { log } from '../utils/logger.js';
 
 export const registerIdeCommands = (program: Command): void => {
-  const ide = program.command('ide').description('💻 Configure IDE MCP integration');
+  const ide = program.command('ide').description('Configure IDE MCP integration');
 
   ide
     .command('set [ides...]')
@@ -26,7 +26,7 @@ export const registerIdeCommands = (program: Command): void => {
         targets = chosenIdes;
       }
 
-            if (targets.length === 0) {
+      if (targets.length === 0) {
         log.info('No IDEs selected. Exiting.');
         return;
       }
@@ -78,7 +78,7 @@ export const registerIdeCommands = (program: Command): void => {
         },
       ]);
 
-            const applied = setIde(targets, applyRules, providerName);
+      const applied = setIde(targets, applyRules, providerName);
 
       if (applied.length === 0) {
         log.warn('No IDE profiles were configured!');

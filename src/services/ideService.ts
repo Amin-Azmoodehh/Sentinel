@@ -484,7 +484,7 @@ export const setIde = (
 };
 
 export const applyIdeTargets = (targets: string[]): string[] => {
-  log.warn('`applyIdeTargets` is deprecated and will be removed. Use `setIde` instead.');
+  log.warn('`applyIdeTargets` is deprecated. For interactive setup, use `st ide set`.');
   const config = configService.load();
   const providerName = config.defaults.provider || 'ollama';
   return setIde(targets, true, providerName);
