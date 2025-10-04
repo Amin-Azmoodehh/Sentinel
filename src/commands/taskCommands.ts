@@ -55,6 +55,7 @@ export const registerTaskCommands = (program: Command): void => {
 
   taskCommand
     .command('create')
+    .alias('add')
     .description('Create a new task')
     .requiredOption('--title <title>', 'Task title')
     .option('--desc <description>', 'Task description', '')
@@ -142,6 +143,22 @@ export const registerTaskCommands = (program: Command): void => {
       }
       
       log.success('Task updated.');
+    });
+
+  taskCommand
+    .command('complete <id>')
+    .alias('done')
+    .description('Mark task as done')
+    .action((id: string) => {
+      const record = updateTask({
+        id: Number(id),
+        status: 'done',
+      });
+      if (!record) {
+        log.warn('Task not found: ' + id);
+        return;
+      }
+      log.success(`Task ${id} marked as done.`);
     });
 
   taskCommand
