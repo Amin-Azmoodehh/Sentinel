@@ -137,6 +137,18 @@ export const defaultConfig = {
     logs: 'en',
     chat: 'fa',
   },
+  indexing: {
+    include: ['**/*'],
+    ignore: [
+      'node_modules/**',
+      'dist/**',
+      '.git/**',
+      '*.log',
+      '*.lock',
+      '.DS_Store',
+      '.sentineltm/db/**',
+    ],
+  },
   meta: {
     gate: {
       lastRun: null,

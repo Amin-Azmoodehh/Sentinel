@@ -1,10 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import fg from 'fast-glob';
 import { configService } from './configService.js';
 import { log, type SummaryRow } from '../utils/logger.js';
 import { ShellService } from './shellService.js';
+import { indexingService } from './indexingService.js';
 
 interface GateCheck {
   name: string;
@@ -103,10 +103,7 @@ const securityCheck: GateCheck = {
     if (!Array.isArray(patterns) || patterns.length === 0) {
       return true;
     }
-    const files = fg.sync(['**/*.{ts,tsx,js,jsx,json}'], {
-      cwd: process.cwd(),
-      ignore: ['node_modules/**', 'dist/**', '.git/**'],
-    });
+    const files = indexingService.getFiles();
     log.info(`Scanning ${files.length} files...`);
     for (const file of files) {
       const content = fs.readFileSync(path.join(process.cwd(), file), 'utf-8');
@@ -130,10 +127,7 @@ const hygieneCheck: GateCheck = {
     const maxFileSize = (config.thresholds?.maxFileSizeMB ?? 5) * 1024 * 1024;
     const maxTodos = config.thresholds?.maxTodoCount ?? 10;
 
-    const files = fg.sync(['**/*'], {
-      cwd: process.cwd(),
-      ignore: ['node_modules/**', 'dist/**', '.git/**', '.sentineltm/db/index.db'],
-    });
+    const files = indexingService.getFiles();
     let todoCount = 0;
     for (const file of files) {
       const abs = path.join(process.cwd(), file);
@@ -179,7 +173,7 @@ const aiRuleCheck: GateCheck = {
         : 'No project rules defined';
       
       // Limit source files to avoid huge prompts
-      const sourceFiles = fg.sync('src/**/*.ts', { ignore: ['**/*.test.ts', '**/*.spec.ts'] });
+      const sourceFiles = indexingService.getFiles().filter(f => f.startsWith('src') && f.endsWith('.ts') && !f.endsWith('.test.ts') && !f.endsWith('.spec.ts'));
       const maxFiles = 5; // Reduced to 5 files for API limits
       const limitedFiles = sourceFiles.slice(0, maxFiles);
       

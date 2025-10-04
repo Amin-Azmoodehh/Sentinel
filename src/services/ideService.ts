@@ -7,7 +7,7 @@ import { log } from '../utils/logger.js';
 
 interface IdeTemplate {
   name: string;
-  apply: (providerName: string) => void;
+  apply: (providerName: string, applyRules: boolean) => void;
 }
 
 interface CliInvocation {
@@ -314,13 +314,18 @@ const createDefaultRules = () => ({
     typeHints: 'python -m mypy app/ --strict',
   },
   apiIntegration: {
-    preferredProviders: ['ollama', 'openai', 'claude'],
+    preferredProviders: ['ollama', 'openai', 'claude', 'gemini', 'mistral', 'openrouter'],
     fallbackBehavior: 'graceful',
     timeoutMs: 30000,
   },
 });
 
-const applyIdeProfile = (profileName: string, targetDir: string, providerName: string) => {
+const applyIdeProfile = (
+  profileName: string,
+  targetDir: string,
+  providerName: string,
+  applyRules: boolean
+) => {
   ensureDir(targetDir);
   const mcpTargetPath = path.join(targetDir, 'mcp.json');
   writeJsonFile(mcpTargetPath, createMcpConfig(providerName));
@@ -355,28 +360,30 @@ const applyIdeProfile = (profileName: string, targetDir: string, providerName: s
     }
   }
 
-  // Also copy to profiles directory
-  const sentinelDir = path.join(process.cwd(), '.sentineltm');
-  const profilesDir = path.join(sentinelDir, 'profiles', profileName);
-  
-  // Ensure .sentineltm directory exists
-  ensureDir(sentinelDir);
-  ensureDir(profilesDir);
-  
-  const profileRulesPath = path.join(profilesDir, 'rules.json');
-  try {
-    if (fs.existsSync(sourceRulesPath)) {
-      fs.copyFileSync(sourceRulesPath, profileRulesPath);
-    } else {
-      writeJsonFile(profileRulesPath, createDefaultRules());
+  if (applyRules) {
+    // Also copy to profiles directory
+    const sentinelDir = path.join(process.cwd(), '.sentineltm');
+    const profilesDir = path.join(sentinelDir, 'profiles', profileName);
+
+    // Ensure .sentineltm directory exists
+    ensureDir(sentinelDir);
+    ensureDir(profilesDir);
+
+    const profileRulesPath = path.join(profilesDir, 'rules.json');
+    try {
+      if (fs.existsSync(sourceRulesPath)) {
+        fs.copyFileSync(sourceRulesPath, profileRulesPath);
+      } else {
+        writeJsonFile(profileRulesPath, createDefaultRules());
+      }
+      log.success(`  ✅ Copied rules to profile: ${profileName}`);
+    } catch (error) {
+      log.warn(`  ⚠️ Could not copy to profile: ${(error as Error).message}`);
     }
-    log.success(`  ✅ Copied rules to profile: ${profileName}`);
-  } catch (error) {
-    log.warn(`  ⚠️ Could not copy to profile: ${(error as Error).message}`);
   }
 };
 
-const applyVsCode = (providerName: string): void => {
+const applyVsCode = (providerName: string, applyRules: boolean): void => {
   const root = process.cwd();
   const vscodeDir = path.join(root, '.vscode');
   ensureDir(vscodeDir);
@@ -399,16 +406,16 @@ const applyVsCode = (providerName: string): void => {
     recommendations: ['ms-vscode.vscode-typescript-next'],
   });
 
-  applyIdeProfile('VS Code', vscodeDir, providerName);
+  applyIdeProfile('VS Code', vscodeDir, providerName, applyRules);
 };
 
-const applyCursor = (providerName: string): void => {
+const applyCursor = (providerName: string, applyRules: boolean): void => {
   const root = process.cwd();
   const cursorDir = path.join(root, '.cursor');
-  applyIdeProfile('Cursor', cursorDir, providerName);
+  applyIdeProfile('Cursor', cursorDir, providerName, applyRules);
 };
 
-const applyZed = (providerName: string): void => {
+const applyZed = (providerName: string, applyRules: boolean): void => {
   const root = process.cwd();
   const zedDir = path.join(root, '.zed');
   ensureDir(zedDir);
@@ -421,61 +428,64 @@ const applyZed = (providerName: string): void => {
       },
     },
   });
-  applyIdeProfile('Zed', zedDir, providerName);
+  applyIdeProfile('Zed', zedDir, providerName, applyRules);
 };
 
-const applyWindsurf = (providerName: string): void => {
+const applyWindsurf = (providerName: string, applyRules: boolean): void => {
   const root = process.cwd();
   const windsurfDir = path.join(root, '.windsurf');
-  applyIdeProfile('Windsurf', windsurfDir, providerName);
+  applyIdeProfile('Windsurf', windsurfDir, providerName, applyRules);
 };
 
-const applyProfile = (name: string, providerName: string): void => {
+const applyProfile = (name: string, providerName: string, applyRules: boolean): void => {
   const root = process.cwd();
   const targetDir = path.join(root, `.${name.toLowerCase()}`);
-  applyIdeProfile(name, targetDir, providerName);
+  applyIdeProfile(name, targetDir, providerName, applyRules);
 };
 
-const templates: IdeTemplate[] = [
+const ideTemplates: IdeTemplate[] = [
   { name: 'VS Code', apply: applyVsCode },
   { name: 'Cursor', apply: applyCursor },
   { name: 'Zed', apply: applyZed },
   { name: 'Windsurf', apply: applyWindsurf },
-  { name: 'Trae', apply: (command: string) => applyProfile('Trae', command) },
-  { name: 'Kiro', apply: (command: string) => applyProfile('Kiro', command) },
-  { name: 'Continue', apply: (command: string) => applyProfile('Continue', command) },
-  { name: 'Cline', apply: (command: string) => applyProfile('Cline', command) },
-  { name: 'Codex', apply: (command: string) => applyProfile('Codex', command) },
-  { name: 'Claude', apply: (command: string) => applyProfile('Claude', command) },
-  { name: 'Gemini', apply: (command: string) => applyProfile('Gemini', command) },
-  { name: 'OpenCode', apply: (command: string) => applyProfile('OpenCode', command) },
-  { name: 'Roo', apply: (command: string) => applyProfile('Roo', command) },
-  { name: 'Amp', apply: (command: string) => applyProfile('Amp', command) },
-  { name: 'Kilo', apply: (command: string) => applyProfile('Kilo', command) },
+  { name: 'Trae', apply: (providerName: string, applyRules: boolean) => applyProfile('Trae', providerName, applyRules) },
+  { name: 'Kiro', apply: (providerName: string, applyRules: boolean) => applyProfile('Kiro', providerName, applyRules) },
+  { name: 'Continue', apply: (providerName: string, applyRules: boolean) => applyProfile('Continue', providerName, applyRules) },
+  { name: 'Cline', apply: (providerName: string, applyRules: boolean) => applyProfile('Cline', providerName, applyRules) },
+  { name: 'Codex', apply: (providerName: string, applyRules: boolean) => applyProfile('Codex', providerName, applyRules) },
+  { name: 'Claude', apply: (providerName: string, applyRules: boolean) => applyProfile('Claude', providerName, applyRules) },
+  { name: 'Gemini', apply: (providerName: string, applyRules: boolean) => applyProfile('Gemini', providerName, applyRules) },
+  { name: 'OpenCode', apply: (providerName: string, applyRules: boolean) => applyProfile('OpenCode', providerName, applyRules) },
+  { name: 'Roo', apply: (providerName: string, applyRules: boolean) => applyProfile('Roo', providerName, applyRules) },
+  { name: 'Amp', apply: (providerName: string, applyRules: boolean) => applyProfile('Amp', providerName, applyRules) },
+  { name: 'Kilo', apply: (providerName: string, applyRules: boolean) => applyProfile('Kilo', providerName, applyRules) },
 ];
 
+export const getAvailableIdes = (): string[] => ideTemplates.map((t) => t.name);
+
+export const setIde = (
+  targets: string[],
+  applyRules: boolean,
+  providerName: string
+): string[] => {
+  
+  const allTemplates = targets.length === 0 || targets.includes('all');
+  const templatesToApply = allTemplates
+    ? ideTemplates
+    : ideTemplates.filter((t) =>
+        targets.some((target) => t.name.toLowerCase() === target.toLowerCase())
+      );
+
+  templatesToApply.forEach((template) => {
+    template.apply(providerName, applyRules);
+  });
+
+  return templatesToApply.map((t) => t.name);
+};
+
 export const applyIdeTargets = (targets: string[]): string[] => {
-  const provider = configService.load().defaults.provider;
-  const applied: string[] = [];
-
-  if (targets.length === 0) {
-    // No targets specified, apply all
-    templates.forEach((template) => {
-      template.apply(provider);
-      applied.push(template.name);
-    });
-  } else {
-    // Apply only specified targets
-    const normalizedTargets = targets.map((t) => t.toLowerCase());
-    templates.forEach((template) => {
-      const templateName = template.name.toLowerCase();
-      if (normalizedTargets.includes(templateName) || normalizedTargets.includes('all')) {
-        template.apply(provider);
-        applied.push(template.name);
-      }
-    });
-  }
-
-  paths.ensureDir(paths.profilesDir());
-  return applied;
+  log.warn('`applyIdeTargets` is deprecated and will be removed. Use `setIde` instead.');
+  const config = configService.load();
+  const providerName = config.defaults.provider || 'ollama';
+  return setIde(targets, true, providerName);
 };

@@ -1,67 +1,107 @@
 import { Command } from 'commander';
-import { applyIdeTargets } from '../services/ideService.js';
+import inquirer from 'inquirer';
+import { setIde, getAvailableIdes } from '../services/ideService.js';
+import { getAvailableProviders, getProvider } from '../providers/providerFactory.js';
+import { configService } from '../services/configService.js';
 import { log } from '../utils/logger.js';
 
 export const registerIdeCommands = (program: Command): void => {
-  const runIdeSet = (targetsArg?: string) => {
-    const targets = targetsArg
-      ? targetsArg
-          .split(',')
-          .map((item) => item.trim())
-          .filter(Boolean)
-      : [];
-
-    if (targets.length === 0) {
-      log.info('No targets specified, configuring all IDE profiles...');
-    } else {
-      log.info(`Configuring IDE profiles: ${targets.join(', ')}`);
-    }
-
-    const applied = applyIdeTargets(targets);
-
-    if (applied.length === 0) {
-      log.warn('No IDE profiles were configured!');
-      return;
-    }
-
-    log.raw('\n🎯 IDE Configuration Complete');
-    applied.forEach((name) => {
-      log.success(`${name} → MCP profile ready`);
-    });
-
-    log.info(`\n📁 Generated ${applied.length} IDE configuration${applied.length > 1 ? 's' : ''}`);
-  };
-
   const ide = program.command('ide').description('💻 Configure IDE MCP integration');
 
   ide
-    .command('set')
-    .description('Configure IDE profiles for MCP integration')
-    .argument(
-      '[targets]',
-      'Comma separated IDE names (VS Code, Cursor, Zed, Windsurf, Trae) or "all"'
-    )
-    .action((targetsArg?: string) => runIdeSet(targetsArg));
+    .command('set [ides...]')
+    .description('Set up IDE configurations')
+    .action(async (ides: string[]) => {
+      let targets = ides;
+      if (targets.length === 0) {
+        const availableIdes = getAvailableIdes();
+        const { chosenIdes } = await inquirer.prompt([
+          {
+            type: 'checkbox',
+            name: 'chosenIdes',
+            message: 'Select IDEs to configure:',
+            choices: availableIdes,
+          },
+        ]);
+        targets = chosenIdes;
+      }
+
+            if (targets.length === 0) {
+        log.info('No IDEs selected. Exiting.');
+        return;
+      }
+
+      const availableProviders = getAvailableProviders();
+      if (availableProviders.length === 0) {
+        log.error('No providers configured. Please run `st config set` to add a provider.');
+        return;
+      }
+
+      const { providerName } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'providerName',
+          message: 'Select a provider:',
+          choices: availableProviders,
+        },
+      ]);
+
+      const provider = getProvider(providerName);
+      const models = await provider.listModels();
+
+      if (models.length === 0) {
+        log.error(`No models found for provider '${providerName}'.`);
+        return;
+      }
+
+      const { modelId } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'modelId',
+          message: `Select a model from ${providerName}:`,
+          choices: models.map((m) => m.id),
+        },
+      ]);
+
+      const config = configService.load();
+      config.defaults.provider = providerName;
+      config.defaults.model = modelId;
+      configService.save(config);
+      log.success(`Set default provider to '${providerName}' and model to '${modelId}'.`);
+
+      const { applyRules } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'applyRules',
+          message: 'Apply Zero Tolerance rules to selected IDEs?',
+          default: true,
+        },
+      ]);
+
+            const applied = setIde(targets, applyRules, providerName);
+
+      if (applied.length === 0) {
+        log.warn('No IDE profiles were configured!');
+        return;
+      }
+
+      log.raw('\n🎯 IDE Configuration Complete');
+      applied.forEach((name) => {
+        log.success(`${name} → MCP profile ready`);
+      });
+
+      log.info(`\n📁 Generated ${applied.length} IDE configuration${applied.length > 1 ? 's' : ''}`);
+    });
 
   ide
     .command('list')
     .description('List available IDE targets')
     .action(() => {
       log.raw('\n💻 Available IDE Targets');
-      const ides = ['VS Code', 'Cursor', 'Zed', 'Windsurf', 'Trae'];
+      const ides = getAvailableIdes();
       ides.forEach((name) => {
         log.info(`• ${name}`);
       });
-      log.raw('\n💡 Usage: st ide set "VS Code,Cursor" or st ide set all');
+      log.raw('\n💡 Usage: st ide set');
     });
-
-  let legacySetCommand = program.commands.find((cmd) => cmd.name() === 'set');
-  if (!legacySetCommand) {
-    legacySetCommand = program.command('set').description('⚙️ Quick configuration shortcuts');
-  }
-
-  legacySetCommand
-    .command('ide [targets]')
-    .description('Alias of "st ide set" for backward compatibility')
-    .action((targetsArg?: string) => runIdeSet(targetsArg));
 };
