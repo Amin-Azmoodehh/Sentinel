@@ -12,21 +12,214 @@ import {
 
 const getPopularModelsForProvider = (provider: string): string[] => {
   const popularModels: Record<string, string[]> = {
-    openai: ['gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'],
-    claude: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-haiku-20240307'],
-    gemini: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro'],
-    mistral: ['mistral-large-latest', 'mistral-medium-latest', 'mistral-small-latest'],
-    openrouter: ['deepseek/deepseek-chat', 'x-ai/grok-2-latest', 'anthropic/claude-3.5-sonnet'],
-    groq: ['llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
-    together: ['meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', 'mistralai/Mixtral-8x7B-Instruct-v0.1'],
-    deepseek: ['deepseek-chat', 'deepseek-coder'],
-    perplexity: ['llama-3.1-sonar-large-128k-online', 'llama-3.1-sonar-small-128k-online'],
-    cohere: ['command-r-plus', 'command-r', 'command'],
-    ai21: ['jamba-1.5-large', 'jamba-1.5-mini'],
-    ollama: ['llama3.1', 'llama3', 'qwen2.5', 'mistral', 'codellama'],
+    // OpenAI
+    openai: [
+      'gpt-4o',
+      'gpt-4o-mini', 
+      'gpt-4-turbo',
+      'gpt-4',
+      'gpt-3.5-turbo',
+      'o1-preview',
+      'o1-mini'
+    ],
+    
+    // Anthropic Claude
+    claude: [
+      'claude-3-5-sonnet-20241022',
+      'claude-3-5-haiku-20241022',
+      'claude-3-opus-20240229',
+      'claude-3-sonnet-20240229',
+      'claude-3-haiku-20240307'
+    ],
+    
+    // Google Gemini
+    gemini: [
+      'gemini-1.5-pro-latest',
+      'gemini-1.5-flash-latest',
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-pro',
+      'gemini-pro-vision'
+    ],
+    
+    // Mistral AI
+    mistral: [
+      'mistral-large-latest',
+      'mistral-large-2407',
+      'mistral-medium-latest',
+      'mistral-small-latest',
+      'mistral-nemo',
+      'codestral-latest',
+      'mixtral-8x7b-instruct'
+    ],
+    
+    // OpenRouter (Multi-Provider) - Free models prioritized
+    openrouter: [
+      // Free Models
+      'deepseek/deepseek-chat',
+      'google/gemini-flash-1.5',
+      'meta-llama/llama-3.1-8b-instruct:free',
+      'microsoft/phi-3-medium-128k-instruct:free',
+      'mistralai/mistral-7b-instruct:free',
+      'huggingfaceh4/zephyr-7b-beta:free',
+      'openchat/openchat-7b:free',
+      'gryphe/mythomist-7b:free',
+      'undi95/toppy-m-7b:free',
+      'openrouter/auto',
+      // Popular Paid Models
+      'x-ai/grok-2-latest',
+      'anthropic/claude-3.5-sonnet',
+      'openai/gpt-4o',
+      'google/gemini-pro-1.5',
+      'meta-llama/llama-3.1-405b-instruct',
+      'qwen/qwen-2.5-72b-instruct',
+      'mistralai/mixtral-8x22b-instruct',
+      'anthropic/claude-3-opus',
+      'cohere/command-r-plus'
+    ],
+    
+    // Groq (Fast Inference)
+    groq: [
+      'llama-3.1-70b-versatile',
+      'llama-3.1-8b-instant',
+      'llama-3.2-90b-text-preview',
+      'llama-3.2-11b-text-preview',
+      'mixtral-8x7b-32768',
+      'gemma2-9b-it',
+      'whisper-large-v3'
+    ],
+    
+    // Together AI
+    together: [
+      'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
+      'meta-llama/Meta-Llama-3.1-8B-Instruct-Turbo',
+      'mistralai/Mixtral-8x7B-Instruct-v0.1',
+      'mistralai/Mixtral-8x22B-Instruct-v0.1',
+      'Qwen/Qwen2.5-72B-Instruct-Turbo',
+      'microsoft/DialoGPT-medium'
+    ],
+    
+    // DeepSeek
+    deepseek: [
+      'deepseek-chat',
+      'deepseek-coder',
+      'deepseek-math',
+      'deepseek-reasoner'
+    ],
+    
+    // Perplexity
+    perplexity: [
+      'llama-3.1-sonar-large-128k-online',
+      'llama-3.1-sonar-small-128k-online',
+      'llama-3.1-sonar-large-128k-chat',
+      'llama-3.1-sonar-small-128k-chat'
+    ],
+    
+    // Cohere
+    cohere: [
+      'command-r-plus',
+      'command-r',
+      'command',
+      'command-nightly',
+      'command-light'
+    ],
+    
+    // AI21 Labs
+    ai21: [
+      'jamba-1.5-large',
+      'jamba-1.5-mini',
+      'j2-ultra',
+      'j2-mid',
+      'j2-light'
+    ],
+    
+    // Hugging Face
+    huggingface: [
+      'microsoft/DialoGPT-large',
+      'microsoft/DialoGPT-medium',
+      'facebook/blenderbot-400M-distill',
+      'microsoft/GODEL-v1_1-large-seq2seq',
+      'EleutherAI/gpt-j-6b'
+    ],
+    
+    // Fireworks AI
+    fireworks: [
+      'accounts/fireworks/models/llama-v3p1-70b-instruct',
+      'accounts/fireworks/models/llama-v3p1-8b-instruct',
+      'accounts/fireworks/models/mixtral-8x7b-instruct',
+      'accounts/fireworks/models/qwen2p5-72b-instruct'
+    ],
+    
+    // Anyscale
+    anyscale: [
+      'meta-llama/Llama-2-70b-chat-hf',
+      'meta-llama/Llama-2-13b-chat-hf',
+      'meta-llama/Llama-2-7b-chat-hf',
+      'mistralai/Mixtral-8x7B-Instruct-v0.1'
+    ],
+    
+    // Replicate
+    replicate: [
+      'meta/llama-2-70b-chat',
+      'meta/llama-2-13b-chat',
+      'meta/llama-2-7b-chat',
+      'mistralai/mixtral-8x7b-instruct-v0.1'
+    ],
+    
+    // Ollama (Local)
+    ollama: [
+      'llama3.2:latest',
+      'llama3.1:latest',
+      'llama3:latest',
+      'qwen2.5:latest',
+      'qwen2.5:32b',
+      'qwen2.5:14b',
+      'qwen2.5:7b',
+      'mistral:latest',
+      'mixtral:latest',
+      'codellama:latest',
+      'deepseek-coder:latest',
+      'phi3:latest',
+      'gemma2:latest',
+      'nomic-embed-text:latest'
+    ],
+    
+    // LM Studio (Local)
+    lmstudio: [
+      'llama-3.1-8b-instruct',
+      'llama-3.1-70b-instruct',
+      'qwen2.5-7b-instruct',
+      'mistral-7b-instruct',
+      'codellama-7b-instruct'
+    ],
+    
+    // LocalAI (Local)
+    localai: [
+      'gpt-3.5-turbo',
+      'gpt-4',
+      'llama2-chat',
+      'codellama-instruct'
+    ],
+    
+    // Jan (Local)
+    jan: [
+      'trinity-v1.2-7b',
+      'stealth-v1.2-7b',
+      'llama2-chat-7b',
+      'mistral-ins-7b-q4'
+    ],
+    
+    // Azure OpenAI
+    azure: [
+      'gpt-4o',
+      'gpt-4-turbo',
+      'gpt-4',
+      'gpt-35-turbo',
+      'text-embedding-ada-002'
+    ]
   };
   
-  return popularModels[provider] || ['gpt-4', 'gpt-3.5-turbo'];
+  return popularModels[provider] || ['gpt-4o', 'gpt-3.5-turbo'];
 };
 
 export const registerProviderCommands = (program: Command) => {
