@@ -49,7 +49,7 @@ export const registerProviderCommands = (program: Command) => {
       setProvider(providerToSet);
     });
 
-  providerCommand
+    providerCommand
     .command('configure [provider]')
     .description('Configure a provider interactively')
     .action(async (providerName) => {
@@ -81,12 +81,14 @@ export const registerProviderCommands = (program: Command) => {
         },
       ]);
 
+      // First, save the provider config with the API key
       upsertProviderConfig(provider, { ...preconfig, apiKey });
 
       try {
+        console.log('Fetching models from provider...');
         const { models } = await listModels(provider);
         if (models.length === 0) {
-          console.log('Could not fetch models from provider. Please check your API key and network connection.');
+          console.log('Could not fetch models. Please check your API key and network connection.');
           return;
         }
 
@@ -99,8 +101,11 @@ export const registerProviderCommands = (program: Command) => {
           },
         ]);
 
+        // Now, update the config with the chosen model and set it as the default provider
         upsertProviderConfig(provider, { model: chosenModel });
         setProvider(provider);
+
+        console.log(`Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`);
 
       } catch (error) {
         console.log(`Error fetching models: ${error instanceof Error ? error.message : String(error)}`);
