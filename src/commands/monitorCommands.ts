@@ -100,11 +100,11 @@ export const registerMonitorCommands = (program: Command): void => {
     .command('export')
     .description('Export monitoring statistics to JSON')
     .option('-o, --output <file>', 'Output file path')
-    .action((options: { output?: string }) => {
+    .action(async (options: { output?: string }) => {
       const stats = contextMonitorService.exportStats();
       
       if (options.output) {
-        const fs = require('node:fs');
+        const fs = await import('node:fs');
         fs.writeFileSync(options.output, stats);
         log.success(`✅ Stats exported to ${options.output}`);
       } else {
@@ -117,9 +117,10 @@ export const registerMonitorCommands = (program: Command): void => {
     .command('count <text>')
     .description('Count tokens in text using tiktoken')
     .option('-m, --model <model>', 'Model to use for tokenization')
-    .action((text: string, options: { model?: string }) => {
+    .action(async (text: string, options: { model?: string }) => {
       const tokenCount = contextMonitorService.countTokens(text, options.model);
-      const config = require('../services/configService.js').configService.load();
+      const { configService } = await import('../services/configService.js');
+      const config = configService.load();
       const model = options.model || config.defaults.model || 'gpt-4';
       
       log.success(`✅ Token count for "${text.slice(0, 50)}${text.length > 50 ? '...' : ''}"`);

@@ -1,6 +1,9 @@
 import { configService } from './configService.js';
 import { log } from '../utils/logger.js';
 import { encoding_for_model, get_encoding, Tiktoken } from 'tiktoken';
+import fs from 'node:fs';
+import path from 'node:path';
+import os from 'node:os';
 
 export interface ContextWindowStats {
   modelContextWindow: number;
@@ -22,33 +25,44 @@ export class ContextMonitorService {
   private static instance: ContextMonitorService;
   private sessionHistory: TokenUsageRecord[] = [];
   private tokenizer: Tiktoken | null = null;
-  private modelContextWindows: Record<string, number> = {
-    // OpenAI models
-    'gpt-4': 8192,
-    'gpt-4-32k': 32768,
-    'gpt-4-turbo': 128000,
-    'gpt-4-turbo-preview': 128000,
-    'gpt-3.5-turbo': 4096,
-    'gpt-3.5-turbo-16k': 16384,
-    // Anthropic models
-    'claude-3-opus': 200000,
-    'claude-3-sonnet': 200000,
-    'claude-3-haiku': 200000,
-    'claude-2': 100000,
-    // Google models
-    'gemini-pro': 32768,
-    'gemini-ultra': 32768,
-    // OpenRouter (various)
-    'openrouter/auto': 128000,
-    // Default fallback
-    'default': 4096,
-  };
+  private sessionFilePath: string;
+
+  constructor() {
+    const homeDir = os.homedir();
+    const sentinelDir = path.join(homeDir, '.sentineltm');
+    if (!fs.existsSync(sentinelDir)) {
+      fs.mkdirSync(sentinelDir, { recursive: true });
+    }
+    this.sessionFilePath = path.join(sentinelDir, 'context-monitor-session.json');
+    this.loadSession();
+  }
 
   static getInstance(): ContextMonitorService {
     if (!ContextMonitorService.instance) {
       ContextMonitorService.instance = new ContextMonitorService();
+      log.info(`[ContextMonitor] Singleton instance created`);
     }
     return ContextMonitorService.instance;
+  }
+
+  private loadSession(): void {
+    try {
+      if (fs.existsSync(this.sessionFilePath)) {
+        const data = fs.readFileSync(this.sessionFilePath, 'utf-8');
+        this.sessionHistory = JSON.parse(data);
+      }
+    } catch (err) {
+      log.warn(`[ContextMonitor] Failed to load session: ${(err as Error).message}`);
+      this.sessionHistory = [];
+    }
+  }
+
+  private saveSession(): void {
+    try {
+      fs.writeFileSync(this.sessionFilePath, JSON.stringify(this.sessionHistory, null, 2));
+    } catch (err) {
+      log.warn(`[ContextMonitor] Failed to save session: ${(err as Error).message}`);
+    }
   }
 
   private getTokenizer(model: string): Tiktoken {
@@ -85,7 +99,7 @@ export class ContextMonitorService {
       
       const tokens = tokenizer.encode(text);
       return tokens.length;
-    } catch (error) {
+    } catch {
       // Fallback to rough estimation: ~4 characters per token
       return Math.ceil(text.length / 4);
     }
@@ -104,21 +118,59 @@ export class ContextMonitorService {
   }
 
   private getModelContextWindow(model: string): number {
-    // Try exact match first
-    if (this.modelContextWindows[model]) {
-      return this.modelContextWindows[model];
+    const config = configService.load();
+    
+    // Check if user has defined contextWindow in config
+    const defaults = config.defaults as Record<string, unknown> | undefined;
+    if (defaults && typeof defaults.contextWindow === 'number') {
+      return defaults.contextWindow;
     }
 
-    // Try partial match
-    for (const [key, value] of Object.entries(this.modelContextWindows)) {
-      if (model.toLowerCase().includes(key.toLowerCase())) {
-        return value;
-      }
+    // Simple pattern matching for common models (only major families)
+    const modelLower = model.toLowerCase();
+    
+    // Claude models (very large context)
+    if (modelLower.includes('claude')) {
+      return 200000;
     }
-
-    // Default fallback
-    log.warn(`Unknown model context window for "${model}", using default 4096`);
-    return this.modelContextWindows.default;
+    
+    // GPT-4 variants
+    if (modelLower.includes('gpt-4-turbo') || modelLower.includes('gpt-4-32k')) {
+      return modelLower.includes('32k') ? 32768 : 128000;
+    }
+    if (modelLower.includes('gpt-4')) {
+      return 8192;
+    }
+    
+    // GPT-3.5 variants
+    if (modelLower.includes('gpt-3.5')) {
+      return modelLower.includes('16k') ? 16384 : 4096;
+    }
+    
+    // Gemini models
+    if (modelLower.includes('gemini')) {
+      return 32768;
+    }
+    
+    // DeepSeek models
+    if (modelLower.includes('deepseek')) {
+      return 64000;
+    }
+    
+    // Llama models
+    if (modelLower.includes('llama')) {
+      return 8192;
+    }
+    
+    // Qwen models
+    if (modelLower.includes('qwen')) {
+      return 32768;
+    }
+    
+    // Default: modern models typically have 8K+
+    const defaultContextWindow = 8192;
+    log.info(`[ContextMonitor] Unknown model "${model}", using default ${defaultContextWindow} tokens. To set custom value, add "contextWindow" to config.json defaults.`);
+    return defaultContextWindow;
   }
 
   recordTokenUsage(inputTokens: number, outputTokens: number, operation: string): void {
@@ -139,6 +191,9 @@ export class ContextMonitorService {
     if (this.sessionHistory.length > 100) {
       this.sessionHistory.shift();
     }
+
+    // Persist to disk
+    this.saveSession();
   }
 
   getStats(): ContextWindowStats {
@@ -221,6 +276,13 @@ export class ContextMonitorService {
 
   resetSession(): void {
     this.sessionHistory = [];
+    try {
+      if (fs.existsSync(this.sessionFilePath)) {
+        fs.unlinkSync(this.sessionFilePath);
+      }
+    } catch (err) {
+      log.warn(`[ContextMonitor] Failed to delete session file: ${(err as Error).message}`);
+    }
     log.info('🔄 Context monitoring session reset');
   }
 
