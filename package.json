@@ -1,6 +1,6 @@
 {
   "name": "sentineltm-cli",
-  "version": "2.2.3",
+  "version": "2.2.4",
   "description": "Local-first AI agent orchestrator with MCP server, secure file operations, shell execution, code indexing, and quality gates",
   "type": "module",
   "main": "dist/index.js",
