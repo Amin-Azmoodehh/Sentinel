@@ -1,4 +1,5 @@
 import { indexStatus } from './indexService.js';
+import { indexingService } from './indexingService.js';
 import * as taskService from './taskService.js';
 import { configService } from './configService.js';
 import os from 'node:os';
@@ -78,7 +79,10 @@ export class DashboardService {
   private async fetchMetrics(): Promise<DashboardMetrics> {
     try {
       const config = configService.load();
-      const indexInfo = indexStatus();
+      // Use new indexing service for accurate file count
+      const newIndexInfo = indexingService.getIndexStatus();
+      // Fallback to legacy for symbols (if needed)
+      const legacyIndexInfo = indexStatus();
 
       const [tasks, quality] = await Promise.all([this.getTaskStats(), this.getQualityStats()]);
 
@@ -86,9 +90,9 @@ export class DashboardService {
         project: {
           name: (config as any).project?.name || 'Unknown',
           root: process.cwd(),
-          filesIndexed: indexInfo.files,
-          symbolsIndexed: indexInfo.symbols,
-          lastIndexRun: indexInfo.lastRun,
+          filesIndexed: newIndexInfo.files, // Use new indexing service
+          symbolsIndexed: legacyIndexInfo.symbols, // Keep legacy for symbols
+          lastIndexRun: newIndexInfo.lastUpdated?.getTime() || legacyIndexInfo.lastRun,
         },
         tasks,
         quality,
