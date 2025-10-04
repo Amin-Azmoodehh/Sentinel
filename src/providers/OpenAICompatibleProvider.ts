@@ -5,11 +5,19 @@ export class OpenAICompatibleProvider implements Provider {
   private client: AxiosInstance;
 
   constructor(private readonly baseURL: string, private readonly apiKey: string) {
+    // Clean up baseURL and ensure it doesn't end with /v1
+    let cleanBaseURL = this.baseURL.replace(/\/$/, '');
+    if (cleanBaseURL.endsWith('/v1')) {
+      cleanBaseURL = cleanBaseURL.slice(0, -3);
+    }
+    
     this.client = axios.create({
-      baseURL: this.baseURL.replace(/\/$/, ''),
+      baseURL: cleanBaseURL,
       headers: {
         Authorization: `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
+        'HTTP-Referer': 'https://sentineltm.dev',
+        'X-Title': 'SentinelTM',
       },
       timeout: 30000,
     });
