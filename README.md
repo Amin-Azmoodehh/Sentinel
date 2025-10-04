@@ -1,23 +1,55 @@
-# 🛡️ SentinelTM: The Ultimate AI-Powered Development Guardian
+# 🛡️ SentinelTM: Your AI Development Companion
 
 [![npm version](https://img.shields.io/npm/v/sentineltm-cli?style=for-the-badge&logo=npm&color=red)](https://www.npmjs.com/package/sentineltm-cli) 
 [![Downloads](https://img.shields.io/npm/dm/sentineltm-cli?style=for-the-badge&logo=npm&color=orange)](https://www.npmjs.com/package/sentineltm-cli)
 [![License](https://img.shields.io/badge/license-ISC-green?style=for-the-badge)](https://github.com/Amin-Azmoodehh/Sentinel)
 [![Stars](https://img.shields.io/github/stars/Amin-Azmoodehh/Sentinel?style=for-the-badge&logo=github&color=yellow)](https://github.com/Amin-Azmoodehh/Sentinel)
 
-> **The World's Most Advanced AI Development Orchestrator**  
-> Enforce Zero Tolerance Quality Standards with Military-Grade Precision
+> **Transform Your IDE into an Intelligent Development Environment**  
+> Agent-Oriented Architecture • Context-Aware AI • Zero Tolerance Quality
 
-SentinelTM (`st`) is a revolutionary AI-powered development guardian that transforms how you build software. Combining enterprise-grade CLI tools with cutting-edge MCP (Model Context Protocol) capabilities, it enforces uncompromising quality standards while seamlessly integrating with 20+ AI providers and 23+ IDEs.
+SentinelTM (`st`) is a revolutionary **Agent Companion** that transforms how you build software. Combining enterprise-grade CLI tools with cutting-edge MCP (Model Context Protocol), intelligent workflows, and context-aware AI, it provides a seamless development experience across 20+ AI providers and 23+ IDEs.
 
-## ✨ What Makes SentinelTM Different?
+## 🌟 Revolutionary Features (v2.2+)
 
-- 🎯 **Zero Tolerance Quality**: Enforces strict coding standards with AI-powered validation
+### 🤝 Friendly AI Companion
+- **Personalized Interaction**: Configure tone, language, and personality through `friendly.yml`
+- **Smart Aliases**: Use natural language commands (Persian/English)
+- **Context Memory**: Remembers your preferences and workflows
+- **Encouragement System**: Celebrates your successes and helps with challenges
+
+### 🎟️ Context Window Monitor
+- **Real-Time Tracking**: Monitor token usage across all AI operations
+- **Smart Warnings**: Get alerts at 85% and 95% usage
+- **Estimated Turns**: Know how many interactions remain
+- **MCP Integration**: Available as `sentinel_context_monitor` tool
+
+### 🏗️ High-Level Workflows
+- **Declarative Operations**: From imperative commands to intelligent workflows
+- **Component Scaffolding**: `st workflow component UserProfile` generates complete structure
+- **API Endpoints**: Auto-generate controllers with tests and validation
+- **Project-Wide Refactoring**: Rename symbols across entire codebase
+
+### 🧠 Context Enrichment System
+- **Pattern Detection**: Learns from your existing code
+- **Smart Suggestions**: AI generates code matching your project style
+- **Dependency Analysis**: Understands your tech stack
+- **Convention Extraction**: Follows your naming and structure patterns
+
+### 📜 Named Scripts System
+- **Reusable Workflows**: Define complex operations in `scripts.yml`
+- **Security Validation**: Whitelist/blacklist commands
+- **Parameter Substitution**: Dynamic script execution
+- **Confirmation Prompts**: For sensitive operations
+
+## ✨ Core Capabilities
+
+- 🎯 **Zero Tolerance Quality**: AI-powered code review with structured feedback
 - 🔐 **Security-First**: Sandboxed file system and controlled shell execution
 - 🤖 **Provider Agnostic**: Works with Ollama, OpenAI, Claude, Gemini, Mistral, OpenRouter, and any OpenAI-compatible API
 - 🚀 **Interactive Setup**: Guided configuration with smart defaults
-- 📊 **Quality Gates**: Automated code review and compliance checking
-- 🎨 **IDE Integration**: One-command setup for VS Code, Cursor, Zed, Windsurf, and more
+- 📊 **Quality Gates**: Automated compliance checking with actionable insights
+- 🎨 **IDE Integration**: One-command setup for VS Code, Cursor, Zed, Windsurf, and 19+ more
 
 ---
 
@@ -166,8 +198,46 @@ st gate run
 | Command | Description |
 |---------|-------------|
 | `st task list` | List all tasks |
-| `st task add <title>` | Create new task |
-| `st task done <id>` | Mark task as complete |
+| `st task create --title "Fix bug"` | Create new task |
+| `st task update <id> --status done` | Update task status |
+| `st task delete <id> --force` | Delete task |
+
+### 🏗️ Workflow Commands (v2.2+)
+
+| Command | Description |
+|---------|-------------|
+| `st workflow analyze` | Analyze project patterns |
+| `st workflow component <name>` | Scaffold React component with tests |
+| `st workflow api <name> --method POST` | Create API endpoint |
+| `st workflow rename <old> <new>` | Refactor symbol across project |
+| `st workflow batch --config workflow.json` | Execute batch operations |
+
+### 🎟️ Context Monitor (v2.2+)
+
+| Command | Description |
+|---------|-------------|
+| `st monitor stats` | Show token usage statistics |
+| `st monitor summary` | Session summary with history |
+| `st monitor recent` | Recent operations |
+| `st monitor reset` | Reset monitoring session |
+
+### 🤝 Friendly Companion (v2.2+)
+
+| Command | Description |
+|---------|-------------|
+| `st alias list` | Show all command aliases |
+| `st friendly greet` | Get personalized greeting |
+| `st friendly preferences` | Show your preferences |
+| `st shell scripts` | List named scripts |
+| `st shell exec <script>` | Execute named script |
+
+**Example Aliases** (configure in `friendly.yml`):
+```yaml
+aliases:
+  وضعیت: "st status"                    # Status
+  تست_کامل: "st gate run"              # Full test
+  کامپوننت_جدید: "st workflow component $1"  # New component
+```
 
 ---
 
@@ -187,10 +257,11 @@ See [ZERO_TOLERANCE_CONTRACT.md](./ZERO_TOLERANCE_CONTRACT.md) for full details.
 
 ---
 
-## 🔧 Configuration
+## 🔧 Configuration Files
 
-All configuration is stored in `.sentineltm/config/config.json`:
+SentinelTM uses multiple configuration files for maximum flexibility:
 
+### Core Configuration (`.sentineltm/config/config.json`)
 ```json
 {
   "defaults": {
@@ -205,6 +276,98 @@ All configuration is stored in `.sentineltm/config/config.json`:
     }
   }
 }
+```
+
+### Friendly Companion (`friendly.yml`) - v2.2+
+```yaml
+personality:
+  tone: "enthusiastic_partner"
+  use_emojis: true
+  user_name: "Your Name"
+  
+aliases:
+  status: "st status"
+  test: "st gate run"
+  component: "st workflow component $1"
+
+preferences:
+  default_component_path: "src/components"
+  min_quality_score: 85
+  message_language: "english"  # or "persian"
+```
+
+### Named Scripts (`scripts.yml`) - v2.2+
+```yaml
+scripts:
+  install: "npm install"
+  test: "npm test"
+  deploy:
+    - "npm run build"
+    - "npm test"
+    - "st gate run"
+    - "npm publish"
+
+security:
+  allowedCommands: ["npm", "git", "st"]
+  requireConfirmation: ["deploy", "publish"]
+```
+
+### Project Rules (`project_rules.md`) - v2.1+
+```markdown
+# Project Coding Standards
+
+- All state management must use Zustand
+- API calls through `src/api/client.ts` only
+- Use react-query for data fetching
+- Functional components with TypeScript types
+```
+
+---
+
+## 🔌 MCP Tools Integration
+
+SentinelTM provides powerful MCP tools for IDE integration:
+
+### Available Tools
+
+| Tool | Description | Actions |
+|------|-------------|---------|
+| `sentinel_task` | Task management | create, list, update, delete, subtasks |
+| `sentinel_fs` | File operations | list, read, write, move, copy, remove |
+| `sentinel_shell` | Shell execution | execute, detectShells, listAllowed |
+| `sentinel_index` | Code indexing | build, search, symbols, status |
+| `sentinel_context_monitor` | Token tracking | getStats, recordUsage, getWarning, getSummary |
+| `sentinel_security` | Security validation | validatePath, whitelist, blacklist |
+| `sentinel_dashboard` | Project metrics | getMetrics, generateReport |
+| `sentinel_gate` | Quality checks | run with configurable threshold |
+
+### Example MCP Usage
+
+```javascript
+// Monitor context window
+const stats = await mcp.callTool('sentinel_context_monitor', {
+  action: 'getStats'
+});
+// Returns: { usagePercentage: 65, remainingTurns: 12, warningLevel: 'safe' }
+
+// Record AI operation
+await mcp.callTool('sentinel_context_monitor', {
+  action: 'recordUsage',
+  payload: {
+    inputTokens: 1500,
+    outputTokens: 800,
+    operation: 'code_generation'
+  }
+});
+
+// Scaffold component
+await mcp.callTool('sentinel_task', {
+  action: 'createTask',
+  payload: {
+    title: 'Build UserProfile component',
+    priority: 'high'
+  }
+});
 ```
 
 ---
