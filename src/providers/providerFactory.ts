@@ -29,10 +29,13 @@ export const getProvider = (name: string): Provider => {
   }
 
   const config = getProviderConfig(name);
-  if (!config.baseURL || !config.apiKey) {
-    throw new Error(`'baseURL' and 'apiKey' are required for provider '${name}'.`);
+  if (!config.baseURL) {
+    throw new Error(`'baseURL' is required for provider '${name}'.`);
   }
-  return new OpenAICompatibleProvider(config.baseURL, config.apiKey);
+  
+  // Allow empty API key for now - will be handled by the calling code
+  const apiKey = config.apiKey || '';
+  return new OpenAICompatibleProvider(config.baseURL, apiKey);
 };
 
 export const getAvailableProviders = (): string[] => {

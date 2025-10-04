@@ -64,14 +64,8 @@ export const registerIdeCommands = (program: Command): void => {
         },
       ]);
 
-      // Check if provider is properly configured
-      const providerConfig = (tempConfig.providers as Record<string, any>)?.[providerName];
-      if (!providerConfig || (providerName !== 'ollama' && !providerConfig.apiKey)) {
-        log.error(`Provider '${providerName}' is not configured or missing API key.`);
-        log.warn(`Please run: st provider configure ${providerName}`);
-        log.warn(`Or use: st set provider`);
-        return;
-      }
+      // Check if provider is properly configured (skip validation for now, let user configure it)
+      // We'll handle API key validation later in the flow
 
       let provider;
       try {
@@ -218,14 +212,8 @@ export const registerIdeCommands = (program: Command): void => {
         },
       ]);
 
-      // Check if provider is properly configured
-      const providerConfig = (currentConfig.providers as Record<string, any>)?.[providerName];
-      if (!providerConfig || (providerName !== 'ollama' && !providerConfig.apiKey)) {
-        log.error(`Provider '${providerName}' is not configured or missing API key.`);
-        log.warn(`Please run: st provider configure ${providerName}`);
-        log.warn(`Or use: st set provider`);
-        return;
-      }
+      // Check if provider is properly configured (skip validation for now, let user configure it)
+      // We'll handle API key validation later in the flow
 
       let provider;
       try {
