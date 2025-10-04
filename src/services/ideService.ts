@@ -74,7 +74,6 @@ const createMcpConfig = (providerName: string) => {
   const defaultsModel = config.defaults.model || 'llama3';
 
   return {
-    $schema: 'https://modelcontextprotocol.io/schema/mcp.json',
     version: '1.0.0',
     description: 'SentinelTM MCP Server Configuration - AI-powered development orchestrator with quality gates, secure file operations, and intelligent shell execution',
     mcpServers: {

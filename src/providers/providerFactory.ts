@@ -8,17 +8,21 @@ const getProviderConfig = (name: string) => {
   const config = configService.load();
   const userProviderConfig = (config.providers as Record<string, any>)?.[name];
   
-  // If user has configured this provider, use their config
-  if (userProviderConfig) {
-    return userProviderConfig;
-  }
-  
-  // Otherwise, use preconfigured defaults
+  // Get preconfigured defaults
   const preconfig = (preconfiguredProviders as Record<string, any>)[name];
   if (!preconfig) {
     throw new Error(`Provider '${name}' not found in preconfigured providers.`);
   }
   
+  // If user has configured this provider, merge with defaults
+  if (userProviderConfig) {
+    return {
+      ...preconfig,
+      ...userProviderConfig,
+    };
+  }
+  
+  // Otherwise, use preconfigured defaults (will need API key later)
   return preconfig;
 };
 
