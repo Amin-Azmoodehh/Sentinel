@@ -10,6 +10,25 @@ import {
   upsertProviderConfig,
 } from '../services/providerService.js';
 
+const getPopularModelsForProvider = (provider: string): string[] => {
+  const popularModels: Record<string, string[]> = {
+    openai: ['gpt-4-turbo', 'gpt-4', 'gpt-3.5-turbo'],
+    claude: ['claude-3-5-sonnet-20241022', 'claude-3-opus-20240229', 'claude-3-haiku-20240307'],
+    gemini: ['gemini-1.5-pro', 'gemini-1.5-flash', 'gemini-pro'],
+    mistral: ['mistral-large-latest', 'mistral-medium-latest', 'mistral-small-latest'],
+    openrouter: ['deepseek/deepseek-chat', 'x-ai/grok-2-latest', 'anthropic/claude-3.5-sonnet'],
+    groq: ['llama-3.1-70b-versatile', 'llama-3.1-8b-instant', 'mixtral-8x7b-32768'],
+    together: ['meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo', 'mistralai/Mixtral-8x7B-Instruct-v0.1'],
+    deepseek: ['deepseek-chat', 'deepseek-coder'],
+    perplexity: ['llama-3.1-sonar-large-128k-online', 'llama-3.1-sonar-small-128k-online'],
+    cohere: ['command-r-plus', 'command-r', 'command'],
+    ai21: ['jamba-1.5-large', 'jamba-1.5-mini'],
+    ollama: ['llama3.1', 'llama3', 'qwen2.5', 'mistral', 'codellama'],
+  };
+  
+  return popularModels[provider] || ['gpt-4', 'gpt-3.5-turbo'];
+};
+
 export const registerProviderCommands = (program: Command) => {
   const providerCommand = new Command('provider');
   providerCommand.description('🤖 Manage AI providers via API (Ollama, OpenAI, Claude, Gemini)');
@@ -72,43 +91,72 @@ export const registerProviderCommands = (program: Command) => {
         return;
       }
 
-      const { apiKey } = await inquirer.prompt([
+      // Step 1: Try to fetch models with existing config (if any) or show popular models
+      let models: string[] = [];
+      let needsApiKey = false;
+
+      try {
+        console.log('Checking available models...');
+        const result = await listModels(provider);
+        models = result.models;
+      } catch (error) {
+        // If fetching fails, show popular models for this provider
+        needsApiKey = true;
+        models = getPopularModelsForProvider(provider);
+        if (models.length === 0) {
+          console.log('Could not determine available models. You can configure the API key first.');
+          models = ['gpt-4', 'gpt-3.5-turbo']; // fallback
+        }
+      }
+
+      // Step 2: Let user choose a model
+      const { chosenModel } = await inquirer.prompt([
         {
-          type: 'password',
-          name: 'apiKey',
-          message: `Enter API Key for ${provider} (leave blank if not needed):`,
-          mask: '*',
+          type: 'list',
+          name: 'chosenModel',
+          message: needsApiKey 
+            ? `Choose a model for ${provider} (API key required):` 
+            : `Choose a default model from ${provider}:`,
+          choices: models,
         },
       ]);
 
-      // First, save the provider config with the API key
-      upsertProviderConfig(provider, { ...preconfig, apiKey });
-
-      try {
-        console.log('Fetching models from provider...');
-        const { models } = await listModels(provider);
-        if (models.length === 0) {
-          console.log('Could not fetch models. Please check your API key and network connection.');
-          return;
-        }
-
-        const { chosenModel } = await inquirer.prompt([
+      // Step 3: Get API key if needed
+      let apiKey = (preconfig as any).apiKey || '';
+      
+      if (needsApiKey || provider !== 'ollama') {
+        const { inputApiKey } = await inquirer.prompt([
           {
-            type: 'list',
-            name: 'chosenModel',
-            message: 'Choose a default model:',
-            choices: models,
+            type: 'password',
+            name: 'inputApiKey',
+            message: `Enter API Key for ${provider} (required for ${chosenModel}):`,
+            mask: '*',
+            validate: (input: string) => {
+              if (provider === 'ollama') return true;
+              return input.length > 0 || 'API key is required for this provider';
+            },
           },
         ]);
+        apiKey = inputApiKey;
+      }
 
-        // Now, update the config with the chosen model and set it as the default provider
-        upsertProviderConfig(provider, { model: chosenModel });
-        setProvider(provider);
+      // Step 4: Save configuration
+      upsertProviderConfig(provider, { ...preconfig, apiKey, model: chosenModel });
+      setProvider(provider);
 
-        console.log(`Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`);
+      console.log(`Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`);
 
-      } catch (error) {
-        console.log(`Error fetching models: ${error instanceof Error ? error.message : String(error)}`);
+      // Step 5: Verify configuration by testing the connection
+      if (apiKey && provider !== 'ollama') {
+        try {
+          console.log('Verifying configuration...');
+          const { models: verifiedModels } = await listModels(provider);
+          if (verifiedModels.length > 0) {
+            console.log(`✅ Configuration verified! Found ${verifiedModels.length} models.`);
+          }
+        } catch (error) {
+          console.log('⚠️ Configuration saved but could not verify connection. Please check your API key.');
+        }
       }
     });
 
