@@ -1,81 +1,246 @@
-# 🤖 SentinelTM: Local-First AI Orchestrator
+# 🤖 SentinelTM: AI-Powered Development Orchestrator
 
 [![npm version](https://img.shields.io/npm/v/sentineltm-cli)](https://www.npmjs.com/package/sentineltm-cli) [![Build Status](https://img.shields.io/badge/build-passing-brightgreen)](https://github.com/Amin-Azmoodehh/Sentinel) [![License](https://img.shields.io/badge/license-ISC-green)](https://github.com/Amin-Azmoodehh/Sentinel)
 
-SentinelTM (`st`) is a local-first AI agent orchestrator that combines a powerful CLI with an MCP (Model Control Protocol) server. It provides secure file operations, shell execution, code indexing, and quality gates—all controlled by your preferred AI provider via direct API calls.
+SentinelTM (`st`) is a next-generation AI orchestrator that combines a powerful CLI with MCP (Model Context Protocol) server capabilities. It provides secure file operations, intelligent shell execution, advanced code indexing, and automated quality gates—all powered by your choice of AI provider through direct API integration.
 
-## 🚀 Quick Start
+## ✨ What Makes SentinelTM Different?
 
-### 1. Installation
+- 🎯 **Zero Tolerance Quality**: Enforces strict coding standards with AI-powered validation
+- 🔐 **Security-First**: Sandboxed file system and controlled shell execution
+- 🤖 **Provider Agnostic**: Works with Ollama, OpenAI, Claude, Gemini, Mistral, OpenRouter, and any OpenAI-compatible API
+- 🚀 **Interactive Setup**: Guided configuration with smart defaults
+- 📊 **Quality Gates**: Automated code review and compliance checking
+- 🎨 **IDE Integration**: One-command setup for VS Code, Cursor, Zed, Windsurf, and more
+
+---
+
+## 🚀 Quick Start (2 Minutes)
+
+### 1️⃣ Install
 
 ```bash
 npm install -g sentineltm-cli@latest
 ```
 
-### 2. Configure an AI Provider (API-First)
+### 2️⃣ Configure Your AI Provider (Interactive)
 
-SentinelTM uses direct API calls for reliability. Choose one:
-
-#### Option A: Ollama (Local & Recommended)
+SentinelTM provides an interactive setup wizard for seamless configuration:
 
 ```bash
-# 1. Install Ollama (https://ollama.ai) and pull a model
+st set provider
+```
+
+This will guide you through:
+1. 📋 **Select Provider**: Choose from Ollama, OpenAI, Claude, Gemini, Mistral, or OpenRouter
+2. 🔑 **Enter API Key**: Provide your API credentials (or skip for Ollama)
+3. 🤖 **Select Model**: Pick from available models (auto-fetched from the provider)
+
+#### Example Providers:
+
+**Ollama (Local, Free)**
+```bash
+# Install Ollama first: https://ollama.ai
 ollama pull llama3
 
-# 2. Configure SentinelTM to use it
-st provider set ollama --type ollama --base-url http://localhost:11434 --model llama3
+# Then configure
+st set provider
+# → Select: ollama
+# → API Key: (leave blank)
+# → Model: llama3
 ```
 
-#### Option B: OpenAI, Claude, or other Cloud Providers
-
+**OpenRouter (Best for Production)**
 ```bash
-# Example for OpenAI
-st provider set openai --type openai-compatible --base-url https://api.openai.com --api-key sk-YOUR_KEY --model gpt-3.5-turbo
+st set provider
+# → Select: openrouter
+# → API Key: sk-or-v1-xxxxx
+# → Model: deepseek/deepseek-chat or x-ai/grok-2-latest
 ```
 
-This command updates your project's `.sentineltm/config/config.json` file.
+**OpenAI**
+```bash
+st set provider
+# → Select: openai
+# → API Key: sk-xxxxx
+# → Model: gpt-4-turbo
+```
 
-### 3. Verify Setup
+### 3️⃣ Set Up IDE Integration (Interactive)
+
+Configure your development environment with one command:
 
 ```bash
-# Check provider status (should show as available)
+st set ide
+```
+
+This will:
+1. ✅ **Select IDEs**: Choose from VS Code, Cursor, Zed, Windsurf, Continue, Cline, etc.
+2. 🤖 **Configure Provider**: Select AI provider and model (if not already set)
+3. 📜 **Apply Rules**: Optionally apply Zero Tolerance coding standards
+
+### 4️⃣ Verify Installation
+
+```bash
+# Check provider status
 st provider status
 
-# Run the Quality Gate to test AI integration
-st gate status
+# Run quality gate
+st gate run
 ```
 
-## 🎯 Core Features
+---
 
-- **API-Based Providers**: Reliable integration with Ollama, OpenAI, Claude, and any OpenAI-compatible endpoint.
-- **Secure File System**: Whitelist/blacklist for safe file access.
-- **Safe Shell Execution**: Adaptive syntax for secure commands.
-- **Code Indexing**: Advanced search and symbol indexing.
-- **Quality Gates**: Automated checks for code quality, including an AI-powered rule check.
-- **Task Management**: Create, list, and manage development tasks.
-- **Dashboard**: Project health and metrics monitoring.
+## 📚 Command Reference
 
-## 📚 Key Commands
+### 🤖 Provider Management
 
 | Command | Description |
-|---|---|
-| `st provider set <name> [flags]` | Configure an AI provider with API details. |
-| `st provider list` | List available models from the configured provider. |
-| `st gate status` | Run quality checks, including the AI Rule Check. |
-| `st index status` | View codebase index status. |
-| `st dashboard report` | Show a project health dashboard. |
-| `st fs ls` | List files in the project. |
-| `st task list` | Manage development tasks. |
-| `st ide set <name>` | Generate IDE configuration files. |
+|---------|-------------|
+| `st set provider` | **Interactive setup** for AI provider (recommended) |
+| `st provider configure` | Alternative interactive setup command |
+| `st provider set <name>` | Set existing provider as default |
+| `st provider list` | List available models from provider |
+| `st provider status` | Show current provider and model |
+| `st provider detect` | Auto-detect available providers |
 
-For detailed guides, see:
-- [**API Integration Guide**](./API_INTEGRATION.md)
-- [**Zero Tolerance Contract**](./ZERO_TOLERANCE_CONTRACT.md)
+### 🎨 IDE Configuration
+
+| Command | Description |
+|---------|-------------|
+| `st set ide` | **Interactive IDE setup** (recommended) |
+| `st ide set [names...]` | Configure specific IDEs |
+| `st ide list` | List all supported IDE targets |
+
+**Supported IDEs**: VS Code, Cursor, Zed, Windsurf, Continue, Cline, Codex, Claude, Gemini, OpenCode, Roo, Amp, Kilo, Trae, Kiro
+
+### ✅ Quality Gates
+
+| Command | Description |
+|---------|-------------|
+| `st gate run` | Run all quality checks |
+| `st gate run --min 90` | Run with custom passing score |
+
+**Built-in Checks**:
+- 🧪 Tests
+- 🎨 Linting & Formatting
+- 🏗️ Build Verification
+- 🔒 Security Scan
+- 📁 Project Structure
+- 🧹 Code Hygiene
+- 🤖 **AI Rule Check** (enforces Zero Tolerance standards)
+
+### 📂 File System Operations
+
+| Command | Description |
+|---------|-------------|
+| `st fs ls [path]` | List files and directories |
+| `st fs read <path>` | Read file contents |
+| `st fs write <path>` | Write to file |
+| `st fs search <query>` | Search across codebase |
+
+### 🔍 Code Indexing
+
+| Command | Description |
+|---------|-------------|
+| `st index build` | Build code index |
+| `st index status` | Show index statistics |
+| `st index search <query>` | Search indexed code |
+
+### 📊 Dashboard & Reporting
+
+| Command | Description |
+|---------|-------------|
+| `st dashboard report` | Full project health report |
+| `st dashboard metrics` | Key metrics summary |
+| `st status` | Quick project overview |
+
+### 🛠️ Task Management
+
+| Command | Description |
+|---------|-------------|
+| `st task list` | List all tasks |
+| `st task add <title>` | Create new task |
+| `st task done <id>` | Mark task as complete |
+
+---
+
+## 🎯 Zero Tolerance Contract
+
+SentinelTM enforces strict coding standards through its **Zero Tolerance Contract** system:
+
+- ✅ Type safety and hints required
+- ✅ No hardcoded values (strings, numbers, URLs)
+- ✅ Configuration externalized to YAML
+- ✅ Modular architecture (max 300 lines per file)
+- ✅ PEP8/ESLint compliance
+- ✅ Comprehensive error handling
+- ✅ Security best practices
+
+See [ZERO_TOLERANCE_CONTRACT.md](./ZERO_TOLERANCE_CONTRACT.md) for full details.
+
+---
+
+## 🔧 Configuration
+
+All configuration is stored in `.sentineltm/config/config.json`:
+
+```json
+{
+  "defaults": {
+    "provider": "openrouter",
+    "model": "deepseek/deepseek-chat"
+  },
+  "providers": {
+    "openrouter": {
+      "type": "openai-compatible",
+      "baseURL": "https://openrouter.ai/api",
+      "apiKey": "sk-or-v1-xxxxx"
+    }
+  }
+}
+```
+
+---
+
+## 📖 Advanced Guides
+
+- [**API Integration Guide**](./API_INTEGRATION.md) - Deep dive into provider configuration
+- [**Zero Tolerance Contract**](./ZERO_TOLERANCE_CONTRACT.md) - Complete coding standards
+- [**MCP Server Usage**](./docs/MCP.md) - Using SentinelTM as an MCP server
+
+---
+
+## 🆘 Troubleshooting
+
+**Provider not working?**
+```bash
+st provider status    # Check configuration
+st provider detect    # Auto-detect available providers
+```
+
+**IDE configuration not applying?**
+```bash
+st ide list          # Check supported IDEs
+st set ide           # Re-run interactive setup
+```
+
+**Quality gate failing?**
+```bash
+st gate run --min 70  # Lower threshold for testing
+```
+
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please open an issue or submit a pull request.
+We welcome contributions! Please:
+1. Fork the repository
+2. Create a feature branch
+3. Submit a pull request
+
+---
 
 ## 📄 License
 
-ISC License
+ISC License © 2025 Amin Azmoodeh

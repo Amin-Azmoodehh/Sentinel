@@ -1,53 +1,170 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema#",
   "title": "SentinelTM Zero Tolerance Contract",
-  "description": "A strict, non-negotiable contract for AI code generation, enforced by SentinelTM.",
-  "version": "3.0.0",
+  "description": "A comprehensive, strict, and non-negotiable contract for AI code generation enforced by SentinelTM. This contract ensures production-grade code quality across multiple languages and frameworks.",
+  "version": "4.0.0",
 
-  "definitions": {
-    "pythonContract": {
-      "type": "object",
-      "properties": {
-        "main_py_lines": { "const": 4 },
-        "no_hardcoded_strings": { "const": true },
-        "no_print_statements": { "const": true },
-        "type_hints_required": { "const": true },
-        "max_file_lines": { "const": 300 },
-        "pep8_line_length": { "const": 79 },
-        "absolute_imports_only": { "const": true },
-        "config_from_yaml_only": { "const": true },
-        "log_language": { "const": "en" },
-        "modular_architecture_required": { "const": true }
-      },
-      "required": [
-        "main_py_lines", "no_hardcoded_strings", "no_print_statements",
-        "type_hints_required", "max_file_lines", "pep8_line_length",
-        "absolute_imports_only", "config_from_yaml_only", "log_language",
-        "modular_architecture_required"
-      ]
-    }
+  "metadata": {
+    "author": "SentinelTM",
+    "lastUpdated": "2025-01-04",
+    "applicableTo": ["python", "typescript", "javascript", "go", "rust"]
   },
 
-  "properties": {
-    "contract": { "$ref": "#/definitions/pythonContract" },
-    "enforcement": {
-      "type": "object",
-      "properties": {
-        "level": { "const": "ZERO_TOLERANCE" },
-        "failureAction": { "const": "AUTOMATIC_REJECTION" },
-        "scoreRequired": { "const": "10/10" }
-      },
-      "required": ["level", "failureAction", "scoreRequired"]
+  "globalRules": {
+    "architecture": {
+      "maxFileLines": 300,
+      "maxFunctionLines": 50,
+      "maxFunctionComplexity": 10,
+      "modularity": "REQUIRED",
+      "separationOfConcerns": true,
+      "singleResponsibilityPrinciple": true
     },
-    "validation": {
-      "type": "object",
-      "properties": {
-        "preGenerationAcknowledgment": { "type": "string" },
-        "postGenerationSelfAssessment": { "type": "boolean", "const": true },
-        "evidenceRequired": { "type": "boolean", "const": true }
-      },
-      "required": ["preGenerationAcknowledgment", "postGenerationSelfAssessment", "evidenceRequired"]
+    "codeQuality": {
+      "noHardcodedValues": true,
+      "noMagicNumbers": true,
+      "descriptiveNaming": true,
+      "minVariableNameLength": 3,
+      "noSingleLetterVars": ["i", "j", "k", "x", "y", "z"]
+    },
+    "security": {
+      "noHardcodedCredentials": true,
+      "noHardcodedUrls": true,
+      "validateAllInputs": true,
+      "sanitizeOutputs": true,
+      "useEnvironmentVariables": true
+    },
+    "configuration": {
+      "externalizeConfig": true,
+      "configFormat": ["yaml", "json", "env"],
+      "noInlineConfig": true,
+      "versionedConfig": true
+    },
+    "errorHandling": {
+      "explicitErrorHandling": true,
+      "noSilentFailures": true,
+      "meaningfulErrorMessages": true,
+      "structuredLogging": true
+    },
+    "testing": {
+      "testCoverageMin": 80,
+      "unitTestsRequired": true,
+      "integrationTestsRecommended": true,
+      "e2eTestsForCriticalPaths": true
+    },
+    "documentation": {
+      "functionDocstrings": true,
+      "classDocstrings": true,
+      "moduleDocstrings": true,
+      "inlineCommentsForComplexLogic": true,
+      "readmeForProjects": true
     }
   },
-  "required": ["contract", "enforcement", "validation"]
+
+  "languageSpecific": {
+    "python": {
+      "entrypoint": {
+        "filename": "main.py",
+        "maxLines": 4,
+        "mustImportOnly": true,
+        "noLogic": true
+      },
+      "style": {
+        "standard": "PEP8",
+        "maxLineLength": 79,
+        "indentation": 4,
+        "quoteStyle": "single"
+      },
+      "typing": {
+        "typeHintsRequired": true,
+        "typeHintsCoverage": 100,
+        "strictMode": true
+      },
+      "imports": {
+        "absoluteOnly": true,
+        "noRelativeImports": true,
+        "noWildcardImports": true,
+        "sortedAlphabetically": true
+      },
+      "forbidden": {
+        "functions": ["print", "input"],
+        "modules": ["subprocess.Popen", "os.system", "eval", "exec"]
+      }
+    },
+    "typescript": {
+      "style": {
+        "standard": "ESLint",
+        "maxLineLength": 100,
+        "indentation": 2,
+        "quoteStyle": "single",
+        "semicolons": true
+      },
+      "typing": {
+        "strictMode": true,
+        "noImplicitAny": true,
+        "noExplicitAny": false
+      },
+      "imports": {
+        "pathMappings": true,
+        "noRelativePaths": false,
+        "sortedAlphabetically": true
+      },
+      "forbidden": {
+        "functions": ["eval", "Function constructor"],
+        "keywords": ["var"]
+      }
+    },
+    "javascript": {
+      "style": {
+        "standard": "ESLint",
+        "maxLineLength": 100,
+        "indentation": 2,
+        "quoteStyle": "single"
+      },
+      "modernSyntax": {
+        "useES6Plus": true,
+        "preferConst": true,
+        "arrowFunctions": true,
+        "templateLiterals": true,
+        "destructuring": true
+      },
+      "forbidden": {
+        "functions": ["eval", "Function constructor"],
+        "keywords": ["var"]
+      }
+    }
+  },
+
+  "enforcement": {
+    "level": "ZERO_TOLERANCE",
+    "failureAction": "AUTOMATIC_REJECTION",
+    "scoreRequired": "95/100",
+    "noExceptions": true,
+    "contractualBinding": true
+  },
+
+  "validation": {
+    "preGeneration": {
+      "acknowledgmentRequired": true,
+      "explicitRulesCheck": true,
+      "acknowledgmentText": "I acknowledge all SentinelTM rules and commit to following them without exception."
+    },
+    "postGeneration": {
+      "selfAssessmentRequired": true,
+      "evidenceRequired": true,
+      "validationCommandsRequired": true,
+      "scoreCalculationTransparent": true
+    },
+    "scoring": {
+      "totalRules": 12,
+      "passingScore": 95,
+      "failureThreshold": 70
+    }
+  },
+
+  "recommendedTools": {
+    "linters": ["pylint", "flake8", "eslint", "tslint", "rustfmt"],
+    "formatters": ["black", "prettier", "gofmt"],
+    "typeCheckers": ["mypy", "pyright", "typescript"],
+    "securityScanners": ["bandit", "safety", "snyk"]
+  }
 }
