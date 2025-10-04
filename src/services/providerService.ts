@@ -1,61 +1,15 @@
-import fs from 'node:fs';
-import path from 'node:path';
-import { spawnSync } from 'node:child_process';
-import { paths, systemPaths } from '../constants/paths.js';
 import { configService } from './configService.js';
-import { readJsonFile, writeJsonFile } from '../utils/fileSystem.js';
 import { log, formatHeading } from '../utils/logger.js';
 import chalk from 'chalk';
-
-const sleepSync = (ms: number): void => {
-  const end = Date.now() + ms;
-  while (Date.now() < end) {
-    // Busy wait
-  }
-};
-
-const executeProviderCommandWithRetry = (
-  commandPath: string,
-  args: string[],
-  options: { encoding: string; timeout: number; shell: boolean; windowsHide: boolean }
-) => {
-  const config = configService.load();
-  const retries = config.provider?.retry?.attempts ?? 3;
-  const initialDelay = config.provider?.retry?.delay ?? 1000;
-
-  let lastError: any = null;
-  for (let i = 0; i < retries; i++) {
-    try {
-      const result = spawnSync(commandPath, args, {
-        encoding: 'utf-8',
-        timeout: 7000,
-        shell: true,
-        windowsHide: true,
-      });
-      if (result.status === 0) {
-        return result;
-      }
-      lastError = result;
-      log.warn(
-        `Attempt ${i + 1}/${retries} failed for ${commandPath} with status ${result.status}. Retrying...`
-      );
-    } catch (error) {
-      lastError = error;
-      log.warn(`Attempt ${i + 1}/${retries} failed for ${commandPath} with error. Retrying...`);
-    }
-    if (i < retries - 1) {
-      sleepSync(initialDelay * Math.pow(2, i)); // Exponential backoff
-    }
-  }
-  log.error(`All ${retries} attempts failed for ${commandPath}.`);
-  return lastError;
-};
+import { Provider, Model, CompletionRequest, CompletionResponse } from '../providers/types.js';
+import { OllamaProvider } from '../providers/OllamaProvider.js';
+import { OpenAICompatibleProvider } from '../providers/OpenAICompatibleProvider.js';
 
 export interface ProviderInfo {
   name: string;
-  command: string;
-  path: string | null;
+  type: string;
   available: boolean;
+  path?: string; // Legacy compatibility - will be removed in future versions
 }
 
 export interface ProviderDetectResult {
@@ -63,114 +17,69 @@ export interface ProviderDetectResult {
   scanned: string[];
 }
 
-const PROVIDER_ALIASES: Record<string, string[]> = {
-  codex: ['codex', 'codex-cli'],
-  gemini: ['gemini', 'gemini-cli'],
-  qwen: ['qwen', 'qwen-cli'],
-  ollama: ['ollama'],
-};
+export interface ModelsListResult {
+  models: string[];
+  source: 'provider' | 'cache';
+}
 
-const PROVIDER_ALLOWLIST = Object.freeze(Object.keys(PROVIDER_ALIASES));
+// Factory to create provider instances based on config
+const createProvider = (name: string, config: any): Provider | null => {
+  const providerConfig = config.providers?.[name];
+  if (!providerConfig) {
+    return null;
+  }
+
+  const type = providerConfig.type || name;
+
+  try {
+    switch (type) {
+      case 'ollama':
+        return new OllamaProvider(providerConfig.baseUrl || 'http://localhost:11434');
+      
+      case 'openai':
+      case 'openai-compatible':
+      case 'gemini':
+      case 'qwen':
+      case 'codex':
+        if (!providerConfig.apiKey) {
+          log.warn(`Provider '${name}' requires an API key in config.`);
+          return null;
+        }
+        return new OpenAICompatibleProvider(
+          providerConfig.baseUrl || 'https://api.openai.com',
+          providerConfig.apiKey
+        );
+      
+      default:
+        log.warn(`Unknown provider type '${type}' for provider '${name}'.`);
+        return null;
+    }
+  } catch (error) {
+    log.error(`Failed to create provider '${name}': ${(error as Error).message}`);
+    return null;
+  }
+};
 
 export const normalizeProviderName = (provider: string): string => {
-  const trimmed = (provider || '').trim().toLowerCase();
-  if (!trimmed) {
-    return provider;
-  }
-  for (const [canonical, aliases] of Object.entries(PROVIDER_ALIASES)) {
-    if (aliases.some((alias) => alias.toLowerCase() === trimmed)) {
-      return canonical;
-    }
-  }
-  return provider;
-};
-
-const getProviderAliases = (provider: string): string[] => {
-  const canonical = normalizeProviderName(provider);
-  const aliases = PROVIDER_ALIASES[canonical];
-  if (aliases) {
-    return aliases;
-  }
-  return [provider];
-};
-
-const providersCachePath = paths.providersCache();
-
-const readProvidersCache = (): ProviderInfo[] =>
-  readJsonFile<ProviderInfo[]>(providersCachePath, []);
-
-const writeProvidersCache = (providers: ProviderInfo[]): void => {
-  writeJsonFile(providersCachePath, providers);
-};
-
-const findExecutableInDir = (dir: string, names: string[]): string | null => {
-  for (const name of names) {
-    for (const ext of systemPaths.shellExts()) {
-      const candidate = path.join(dir, name + ext);
-      if (fs.existsSync(candidate)) {
-        return candidate;
-      }
-    }
-  }
-  return null;
-};
-
-const locateExecutable = (names: string[]): string | null => {
-  const shimDir = paths.shimsDir();
-  if (fs.existsSync(shimDir)) {
-    const shimMatch = findExecutableInDir(shimDir, names);
-    if (shimMatch) {
-      return shimMatch;
-    }
-  }
-  for (const entry of systemPaths.pathEntries()) {
-    const match = findExecutableInDir(entry, names);
-    if (match) {
-      return match;
-    }
-  }
-  return null;
-};
-
-const execVersionCheck = (commandPath: string): boolean => {
-  const result = executeProviderCommandWithRetry(commandPath, ['--version'], {
-    encoding: 'utf-8',
-    timeout: 7000,
-    shell: true,
-    windowsHide: true,
-  });
-
-  if (!result || result.status !== 0) {
-    if (result) {
-      const stderr = result.stderr ? result.stderr.trim() : 'No stderr output';
-      log.warn(`--version check failed for ${commandPath}. Stderr: ${stderr}`);
-    } else {
-      log.warn(
-        `--version check failed for ${commandPath}. Command execution resulted in an error.`
-      );
-    }
-    return false;
-  }
-  return true;
+  return (provider || '').trim().toLowerCase();
 };
 
 export const detectProviders = (): ProviderDetectResult => {
+  const config = configService.load();
+  const providerConfigs = (config.providers as Record<string, any>) || {};
   const scanned: string[] = [];
   const providers: ProviderInfo[] = [];
 
-  Object.entries(PROVIDER_ALIASES).forEach(([name, aliases]) => {
-    const exePath = locateExecutable(aliases);
-    scanned.push(...aliases);
-    const available = exePath ? execVersionCheck(exePath) : false;
+  for (const name of Object.keys(providerConfigs)) {
+    scanned.push(name);
+    const provider = createProvider(name, config);
+    
     providers.push({
       name,
-      command: aliases[0],
-      path: exePath,
-      available,
+      type: providerConfigs[name]?.type || name,
+      available: provider !== null,
     });
-  });
-
-  writeProvidersCache(providers);
+  }
 
   return { providers, scanned };
 };
@@ -179,78 +88,42 @@ export const setProvider = (provider: string): void => {
   const config = configService.load();
   config.defaults.provider = provider;
   configService.save(config);
-  const aliases = getProviderAliases(provider);
-  const exePath = locateExecutable(aliases);
-  if (!exePath) {
-    log.warn('Provider ' + provider + ' command not found on PATH. Value kept in config.');
+  
+  const providerInstance = createProvider(provider, config);
+  if (!providerInstance) {
+    log.warn(`Provider '${provider}' is not available. Value kept in config.`);
     return;
   }
-  const ok = execVersionCheck(exePath);
-  if (!ok) {
-    log.warn('Provider ' + provider + ' is present but failed --version check.');
-  } else {
-    log.success('Provider ' + provider + ' set successfully.');
-  }
+  
+  log.success(`Provider '${provider}' set successfully.`);
 };
 
-export interface ModelsListResult {
-  models: string[];
-  source: 'provider' | 'cache';
-}
+export const listModels = async (providerName?: string): Promise<ModelsListResult> => {
+  const config = configService.load();
+  const selectedProvider = providerName || config.defaults.provider;
+  
+  if (!selectedProvider) {
+    log.warn('No provider specified and no default provider set.');
+    return { models: [], source: 'cache' };
+  }
 
-const runModelList = (commandPath: string): string[] | null => {
-  const result = executeProviderCommandWithRetry(
-    commandPath,
-    ['models', 'list', '--json'],
-    { encoding: 'utf-8', timeout: 20000, shell: true, windowsHide: true } // Increased timeout
-  );
-
-  if (!result || result.status !== 0) {
-    return null;
+  const provider = createProvider(selectedProvider, config);
+  if (!provider) {
+    log.warn(`Provider '${selectedProvider}' is not available.`);
+    return { models: [], source: 'cache' };
   }
 
   try {
-    const parsed = JSON.parse(result.stdout || '[]');
-    if (Array.isArray(parsed)) {
-      return parsed.map((value: unknown) => String(value));
-    }
-    if (Array.isArray(parsed.models)) {
-      return parsed.models.map((value: unknown) => String(value));
-    }
-  } catch (error) {
-    const message = 'Failed to parse model list: ' + (error as Error).message;
-    log.warn(message);
-  }
-  return null;
-};
-
-export const listModels = (provider?: string): ModelsListResult => {
-  const config = configService.load();
-  const currentProvider = config.defaults.provider;
-  const selectedProvider = provider || currentProvider;
-  const aliases = getProviderAliases(selectedProvider);
-  const canonical = normalizeProviderName(selectedProvider);
-  const exePath = locateExecutable(aliases);
-  if (!exePath) {
-    const cached = readJsonFile<string[]>(paths.modelsCache(canonical), []);
-    if (cached.length === 0) {
-      log.warn('No provider executable found and no cached models for ' + canonical + '.');
-    }
-    return { models: cached, source: 'cache' };
-  }
-  const models = runModelList(exePath);
-  if (models && models.length > 0) {
-    writeJsonFile(paths.modelsCache(canonical), models);
+    const modelsList = await provider.listModels();
+    const models = modelsList.map((m) => m.id);
     return { models, source: 'provider' };
+  } catch (error) {
+    log.error(`Failed to list models from '${selectedProvider}': ${(error as Error).message}`);
+    return { models: [], source: 'cache' };
   }
-  const cached = readJsonFile<string[]>(paths.modelsCache(canonical), []);
-  if (cached.length === 0) {
-    log.warn('Failed to list models from provider and no cache available.');
-  }
-  return { models: cached, source: 'cache' };
 };
 
-export const detectModels = (): ProviderDetectResult => {
+export const detectModels = async (): Promise<ProviderDetectResult> => {
   const result = detectProviders();
 
   if (result.providers.length === 0) {
@@ -261,18 +134,16 @@ export const detectModels = (): ProviderDetectResult => {
   log.raw(formatHeading('AI Provider Detection'));
   log.raw('');
 
-  result.providers.forEach((provider) => {
+  for (const provider of result.providers) {
     if (provider.available) {
-      const pathInfo = provider.path ? chalk.dim(` (${provider.path})`) : '';
-      log.provider(`${chalk.bold(provider.name)} ${chalk.green('✓ Available')}${pathInfo}`);
+      log.provider(`${chalk.bold(provider.name)} ${chalk.green('✓ Available')} (${provider.type})`);
     } else {
-      const reason = provider.path ? 'version check failed' : 'not found';
-      log.warn(`${chalk.bold(provider.name)} ${chalk.red('✗ ' + reason)}`);
+      log.warn(`${chalk.bold(provider.name)} ${chalk.red('✗ Not available')} (${provider.type})`);
     }
-  });
+  }
 
   log.raw('');
-  const availableCount = result.providers.filter((provider) => provider.available).length;
+  const availableCount = result.providers.filter((p) => p.available).length;
   if (availableCount === 0) {
     log.error('No AI providers are available!');
   } else {
@@ -286,43 +157,61 @@ export const detectModels = (): ProviderDetectResult => {
 
 export const statusModels = (): void => {
   const config = configService.load();
-  const providerInput = config.defaults.provider;
-  const provider = normalizeProviderName(providerInput);
+  const providerName = config.defaults.provider;
   const model = config.defaults.model;
-  const aliases = getProviderAliases(provider);
-  const exePath = locateExecutable(aliases);
-  if (!exePath) {
-    log.warn('Provider ' + providerInput + ' command not found on PATH.');
+  
+  if (!providerName) {
+    log.warn('No default provider set.');
     return;
   }
-  const ok = execVersionCheck(exePath);
-  if (!ok) {
-    log.warn('Provider ' + provider + ' is present but failed --version check.');
-  } else {
-    log.success('Provider ' + provider + ' and model ' + model + ' are set and available.');
+
+  const provider = createProvider(providerName, config);
+  if (!provider) {
+    log.warn(`Provider '${providerName}' is not available.`);
+    return;
   }
+
+  log.success(`Provider '${providerName}' and model '${model}' are set and available.`);
 };
 
 export const setModel = (model: string): void => {
   const config = configService.load();
   config.defaults.model = model;
   configService.save(config);
-  log.success('Default model set to ' + model + '.');
+  log.success(`Default model set to '${model}'.`);
 };
 
-export const loadProvidersFromCache = (): ProviderInfo[] => readProvidersCache();
+export const generateCompletion = async (request: CompletionRequest): Promise<CompletionResponse> => {
+  const config = configService.load();
+  const providerName = config.defaults.provider;
+  
+  if (!providerName) {
+    throw new Error('No default provider set.');
+  }
 
-export const getAllowedProviders = (): string[] => [...PROVIDER_ALLOWLIST];
+  const provider = createProvider(providerName, config);
+  if (!provider) {
+    throw new Error(`Provider '${providerName}' is not available.`);
+  }
+
+  return provider.generateCompletion(request);
+};
+
+export const getAllowedProviders = (): string[] => {
+  const config = configService.load();
+  return Object.keys(config.providers || {});
+};
 
 export const resolvePreferredProvider = (): ProviderInfo => {
   const config = configService.load();
-  const preferredRaw = config.defaults.provider || 'gemini';
-  const preferred = normalizeProviderName(preferredRaw);
+  const preferredName = config.defaults.provider || 'ollama';
   const detection = detectProviders();
-  const exact = detection.providers.find((p) => p.name === preferred && p.available);
+  
+  const exact = detection.providers.find((p) => p.name === preferredName && p.available);
   if (exact) {
     return exact;
   }
+
   const fallback = detection.providers.find((p) => p.available);
   if (fallback) {
     if (config.defaults.provider !== fallback.name) {
@@ -331,10 +220,16 @@ export const resolvePreferredProvider = (): ProviderInfo => {
     }
     return fallback;
   }
+
   return {
-    name: preferred,
-    command: (PROVIDER_ALIASES[preferred] || [preferred])[0],
-    path: null,
+    name: preferredName,
+    type: 'unknown',
     available: false,
   };
+};
+
+// Legacy compatibility - returns empty array since we don't use CLI paths anymore
+export const loadProvidersFromCache = (): any[] => {
+  log.warn('loadProvidersFromCache is deprecated. Use detectProviders() instead.');
+  return [];
 };

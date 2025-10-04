@@ -1,13 +1,10 @@
 import { spawnSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
-import os from 'node:os';
-import crypto from 'node:crypto';
 import fg from 'fast-glob';
 import { configService } from './configService.js';
 import { log, type SummaryRow } from '../utils/logger.js';
 import { ShellService } from './shellService.js';
-import { detectProviders, normalizeProviderName } from './providerService.js';
 
 interface GateCheck {
   name: string;
@@ -160,45 +157,37 @@ const hygieneCheck: GateCheck = {
     return true;
   },
 };
-
 const aiRuleCheck: GateCheck = {
   name: 'AI Rule Check',
   weight: 40,
   run: async () => {
     log.info('Starting AI Rule Check...');
-    const shellService = ShellService.getInstance();
     const config = configService.load();
-    const providerName = normalizeProviderName(config.defaults.provider || 'gemini-cli');
+    const providerName = config.defaults.provider;
+    const model = config.defaults.model;
 
-    const { providers } = detectProviders();
-    const activeProvider = providers.find((p) => p.name === providerName && p.available);
-
-    if (!activeProvider?.path) {
-      log.warn(`AI provider '${providerName}' is not available. Skipping AI Rule Check.`);
-      return true;
+    if (!providerName || !model) {
+      log.error('❌ No provider or model configured!');
+      log.warn('Please set a provider and model: st set provider <name> && st set model <model>');
+      return false;
     }
-
-    const tempFilePath = path.join(
-      os.tmpdir(),
-      `sentinel-prompt-${crypto.randomBytes(6).toString('hex')}.txt`
-    );
 
     try {
       const rulesPath = '.sentineltm/config/rules.json';
       const rules = fs.existsSync(rulesPath)
         ? fs.readFileSync(rulesPath, 'utf-8')
         : 'No project rules defined';
-
+      
       // Limit source files to avoid huge prompts
       const sourceFiles = fg.sync('src/**/*.ts', { ignore: ['**/*.test.ts', '**/*.spec.ts'] });
-      const maxFiles = 10; // Limit to first 10 files
+      const maxFiles = 5; // Reduced to 5 files for API limits
       const limitedFiles = sourceFiles.slice(0, maxFiles);
-
+      
       const fileContents = limitedFiles
         .map((file) => {
           const content = fs.readFileSync(file, 'utf-8');
-          // Limit each file to 500 lines
-          const lines = content.split('\n').slice(0, 500).join('\n');
+          // Limit each file to 200 lines for API
+          const lines = content.split('\n').slice(0, 200).join('\n');
           return `// --- ${file} ---\n${lines}`;
         })
         .join('\n\n');
@@ -214,33 +203,23 @@ const aiRuleCheck: GateCheck = {
         'Reply with ONLY: "Final Score: XX/100" where XX is your score.',
       ].join('\n');
 
-      fs.writeFileSync(tempFilePath, prompt, 'utf-8');
-
-      log.info(`Sending request to ${providerName}...`);
-
-      // Use a simple prompt that reads the file content
-      const simplePrompt = `Please review the code in this file and provide a score. ${fs.readFileSync(tempFilePath, 'utf-8').substring(0, 2000)}... Reply with: "Final Score: XX/100"`;
-
-      const command = `"${activeProvider.path}" -p "${simplePrompt.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`;
-
-      const result = await shellService.executeCommand(command, {
-        isProviderCommand: true,
+      log.info(`Sending request to ${providerName} (${model})...`);
+      
+      // Use the new API-based provider service
+      const { generateCompletion } = await import('./providerService.js');
+      const response = await generateCompletion({
+        prompt,
+        model,
+        temperature: 0,
+        maxTokens: 256,
       });
 
-      if (!result.success) {
-        log.error('❌ AI provider execution failed!');
-        log.warn('This indicates a problem with the AI provider configuration or availability.');
-        log.warn('Please check: 1) Provider is installed, 2) API keys are set, 3) Network connectivity');
-        // Fail the check - AI review is important for code quality
-        return false;
-      }
-
-      const output = result.stdout;
+      const output = response.content;
       const scoreMatch = output.match(/Final Score:\s*(\d+)\/100/i);
 
       if (scoreMatch?.[1]) {
         const score = parseInt(scoreMatch[1], 10);
-        log.info(`AI model returned a score of: ${score}/100`);
+        log.info(`✅ AI model returned a score of: ${score}/100`);
         return score >= 95;
       }
 
@@ -252,12 +231,10 @@ const aiRuleCheck: GateCheck = {
       return false;
     } catch (error) {
       log.error('❌ Error during AI Rule Check!');
+      log.error('This indicates a problem with the AI provider configuration or availability.');
+      log.warn('Please check: 1) Provider is configured in config.json, 2) API keys are set, 3) Network connectivity');
       log.warn(error instanceof Error ? error.message : String(error));
       return false;
-    } finally {
-      if (fs.existsSync(tempFilePath)) {
-        fs.unlinkSync(tempFilePath);
-      }
     }
   },
 };
