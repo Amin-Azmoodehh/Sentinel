@@ -93,9 +93,10 @@ export const registerProviderCommands = (program: Command) => {
         },
       ]);
 
-      // Filter out empty apiKey so it doesn't overwrite existing one
+      // Filter out empty apiKey and normalize type
       const options = {
         ...answers,
+        type: answers.type.toLowerCase(),
         apiKey: answers.apiKey ? answers.apiKey : undefined,
       };
 
