@@ -1,7 +1,53 @@
 {
   "defaults": {
     "provider": "ollama",
-    "model": "llama3"
+    "model": "deepseek/deepseek-chat-v3.1:free"
+  },
+  "providers": {
+    "ollama": {
+      "type": "ollama",
+      "baseURL": "http://localhost:11434"
+    },
+    "openai": {
+      "type": "openai-compatible",
+      "baseURL": "https://api.openai.com/v1",
+      "apiKey": ""
+    },
+    "claude": {
+      "type": "openai-compatible",
+      "baseURL": "https://api.anthropic.com/v1",
+      "apiKey": ""
+    },
+    "gemini": {
+      "type": "openai-compatible",
+      "baseURL": "https://generativelanguage.googleapis.com/v1beta/openai",
+      "apiKey": ""
+    },
+    "mistral": {
+      "type": "openai-compatible",
+      "baseURL": "https://api.mistral.ai/v1",
+      "apiKey": ""
+    },
+    "openrouter": {
+      "type": "openai-compatible",
+      "baseURL": "https://openrouter.ai/api/v1",
+      "apiKey": ""
+    },
+    "groq": {
+      "type": "openai-compatible",
+      "baseURL": "https://api.groq.com/openai/v1",
+      "apiKey": ""
+    },
+    "together": {
+      "type": "openai-compatible",
+      "baseURL": "https://api.together.xyz/v1",
+      "apiKey": ""
+    },
+    "deepseek": {
+      "type": "openai-compatible",
+      "baseURL": "https://api.deepseek.com/v1",
+      "apiKey": ""
+    }
   },
   "thresholds": {
     "gate": 95,
@@ -16,8 +62,15 @@
     }
   },
   "security": {
-    "forbidden": ["eval(", "exec(", "dangerouslySetInnerHTML"],
-    "requiredRootDirs": ["src", ".sentineltm"],
+    "forbidden": [
+      "eval(",
+      "exec(",
+      "dangerouslySetInnerHTML"
+    ],
+    "requiredRootDirs": [
+      "src",
+      ".sentineltm"
+    ],
     "shell": {
       "allowedCommands": [
         "ls",
@@ -99,21 +152,37 @@
         "swapoff"
       ]
     },
-    "allowedRootFiles": ["launcher.*"]
+    "allowedRootFiles": [
+      "launcher.*"
+    ]
   },
   "i18n": {
     "logs": "en",
     "chat": "en"
   },
+  "indexing": {
+    "include": [
+      "**/*"
+    ],
+    "ignore": [
+      "node_modules/**",
+      "dist/**",
+      ".git/**",
+      "*.log",
+      "*.lock",
+      ".DS_Store",
+      ".sentineltm/db/**"
+    ]
+  },
   "meta": {
     "gate": {
       "lastRun": {
-        "timestamp": 1759580767665,
-        "score": 80,
-        "threshold": 95,
-        "success": false,
+        "timestamp": 1759610716924,
+        "score": 40,
+        "threshold": 1,
+        "success": true,
         "source": "internal",
-        "attempts": 5,
+        "attempts": 1,
         "fallback": false
       }
     }
