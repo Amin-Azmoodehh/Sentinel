@@ -19,6 +19,7 @@ export const registerFsCommands = (program: Command): void => {
 
   fsCommand
     .command('ls [pattern]')
+    .alias('list')
     .description('List files optionally by glob pattern')
     .action(async (pattern?: string) => {
       const files = await listFiles(pattern);
@@ -37,6 +38,7 @@ export const registerFsCommands = (program: Command): void => {
 
   fsCommand
     .command('cp <source> <destination>')
+    .alias('copy')
     .description('Copy files or directories')
     .action(async (source: string, destination: string) => {
       await copyPath(source, destination);
@@ -45,6 +47,7 @@ export const registerFsCommands = (program: Command): void => {
 
   fsCommand
     .command('rm <target>')
+    .alias('delete')
     .description('Remove files or directories')
     .option('--force', 'Ignore missing files')
     .action(async (target: string, options: { force?: boolean }) => {

@@ -62,7 +62,84 @@ export const registerIndexCommands = (program: Command): void => {
   indexCommand
     .command('search <query>')
     .description('Search indexed code')
-    .action((query: string) => {
+    .option('--limit <n>', 'Limit results', '20')
+    .option('--files', 'Search only in file names')
+    .action((query: string, options: { limit?: string; files?: boolean }) => {
+      if (options.files) {
+        // Search in file names using new indexing service
+        const allFiles = indexingService.getFiles();
+        const matchingFiles = allFiles.filter(file => 
+          file.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        if (matchingFiles.length === 0) {
+          log.info('No files found matching query.');
+          return;
+        }
+        
+        const limit = options.limit ? Number(options.limit) : 20;
+        const limitedFiles = matchingFiles.slice(0, limit);
+        
+        const table = renderTable({
+          head: ['File Path'],
+          rows: limitedFiles.map(file => [file]),
+        });
+        log.raw(table);
+        
+        if (matchingFiles.length > limit) {
+          log.info(`Showing ${limit} of ${matchingFiles.length} results. Use --limit to see more.`);
+        }
+        return;
+      }
+      
+      // Search in file content (legacy)
+      const results = searchIndex(query);
+      if (results.length === 0) {
+        log.info('No results found.');
+        return;
+      }
+      const table = renderTable({
+        head: ['File', 'Line', 'Match'],
+        rows: results.map((r) => [r.file, String(r.line || '-'), r.content.substring(0, 60)]),
+      });
+      log.raw(table);
+    });
+
+  // Add standalone search command
+  const searchCommand = program
+    .command('search <query>')
+    .description('🔍 Search files and content')
+    .option('--limit <n>', 'Limit results', '20')
+    .option('--files', 'Search only in file names')
+    .action((query: string, options: { limit?: string; files?: boolean }) => {
+      if (options.files) {
+        // Search in file names using new indexing service
+        const allFiles = indexingService.getFiles();
+        const matchingFiles = allFiles.filter(file => 
+          file.toLowerCase().includes(query.toLowerCase())
+        );
+        
+        if (matchingFiles.length === 0) {
+          log.info('No files found matching query.');
+          return;
+        }
+        
+        const limit = options.limit ? Number(options.limit) : 20;
+        const limitedFiles = matchingFiles.slice(0, limit);
+        
+        const table = renderTable({
+          head: ['File Path'],
+          rows: limitedFiles.map(file => [file]),
+        });
+        log.raw(table);
+        
+        if (matchingFiles.length > limit) {
+          log.info(`Showing ${limit} of ${matchingFiles.length} results. Use --limit to see more.`);
+        }
+        return;
+      }
+      
+      // Search in file content (legacy)
       const results = searchIndex(query);
       if (results.length === 0) {
         log.info('No results found.');

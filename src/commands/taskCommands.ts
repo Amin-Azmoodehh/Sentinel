@@ -3,6 +3,7 @@ import chalk from 'chalk';
 import {
   addSubtask,
   createTask,
+  deleteTask,
   getTask,
   listSubtasks,
   listTasks,
@@ -129,6 +130,32 @@ export const registerTaskCommands = (program: Command): void => {
         return;
       }
       log.success('Task updated.');
+    });
+
+  taskCommand
+    .command('delete <id>')
+    .description('Delete a task')
+    .option('--force', 'Skip confirmation prompt')
+    .action((id: string, options: { force?: boolean }) => {
+      const taskId = Number(id);
+      const task = getTask(taskId);
+      
+      if (!task) {
+        log.warn('Task not found: ' + id);
+        return;
+      }
+
+      if (!options.force) {
+        log.warn(`Are you sure you want to delete task "${task.title}"? Use --force to confirm.`);
+        return;
+      }
+
+      const success = deleteTask(taskId);
+      if (success) {
+        log.success(`Task "${task.title}" deleted successfully.`);
+      } else {
+        log.error('Failed to delete task.');
+      }
     });
 
   const subCommand = program.command('sub').description('📝 Manage subtasks');

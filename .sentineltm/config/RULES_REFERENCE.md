@@ -1,298 +1,547 @@
-# SentinelTM Rules Reference
+# 🛡️ SentinelTM Universal Rules Reference
+## Zero Tolerance • Military-Grade Quality Standards
 
-## 📋 Project Quality Rules
+> **BINDING CONTRACT**: These rules apply to ALL IDE profiles and programming languages.
+> **ENFORCEMENT**: Automatic rejection for ANY violation.
+> **SCOPE**: Universal standards for VS Code, Cursor, Windsurf, Zed, and all supported IDEs.
 
-### Entry Point Rules
+---
 
-- **Filename:** `main.py` (or configured alternative)
-- **Max Lines:** 4
-- **Content:** Import-only, no side effects
-- **Purpose:** Minimal entry point that delegates to core modules
+## 🎯 UNIVERSAL QUALITY STANDARDS
 
-### Style Rules
+### 🔥 Zero Tolerance Principles
 
-- **Max Line Length:** 79 characters (PEP8)
-- **No Side Effects on Import:** Modules must be importable without execution
-- **Absolute Imports Only:** No relative imports, no wildcards
-- **Type Hints:** Required for all function signatures
+1. **ABSOLUTE COMPLIANCE**: No exceptions, no negotiations
+2. **MILITARY PRECISION**: Every rule enforced automatically  
+3. **UNIVERSAL APPLICATION**: Same standards across ALL IDEs
+4. **IMMEDIATE REJECTION**: Any violation = automatic failure
 
-### Forbidden Patterns
+### 📊 Quality Gate Thresholds
 
-**Functions:**
+| Metric | Minimum | Action on Failure |
+|--------|---------|-------------------|
+| **Overall Score** | 95/100 | AUTOMATIC REJECTION |
+| **Code Quality** | 90/100 | MANDATORY REWRITE |
+| **Security Score** | 100/100 | IMMEDIATE BLOCK |
+| **Performance** | 85/100 | OPTIMIZATION REQUIRED |
 
-- `print(` - Use logging module instead
-- `eval(` - Security risk
-- `exec(` - Security risk
-- `compile(` - Security risk
+---
 
-**Modules:**
+## 🌐 MULTI-LANGUAGE STANDARDS
 
-- `subprocess` - Use controlled shell service
-- `os.system` - Use controlled shell service
-- `__import__` - Use standard imports
+### Python Projects
 
-### Externalization Rules
+**Entry Point Rules:**
+- **Filename**: `main.py` (EXACTLY 4 lines maximum)
+- **Content**: Import-only, zero side effects
+- **Structure**: Delegate to `app.core.main_runner`
 
-- **Texts Path:** `data/texts/*.json`
-- **Config Path:** `data/config/*.json`
-- **No Hardcoded Strings:** All user-facing text must be in JSON files
-- **Logging Keys:** Reference keys from `data/texts/en.json`
-- **Chat Messages:** Reference keys from `data/texts/fa.json`
+```python
+# ✅ COMPLIANT main.py (4 lines max)
+from app.core.main_runner import run_application
 
-### Logging Rules
-
-- **Console Language:** English (`en`)
-- **Chat Language:** Persian (`fa`)
-- **Only Logging Allowed:** No `print()` statements
-- **Log Levels:** Use appropriate levels (info, warn, error, debug)
-
-## 🔒 Security Rules
-
-### Shell Commands
-
-**Allowed:**
-
-```json
-["ls", "dir", "cat", "type", "echo", "npm", "git", "node", "python", "st"]
+if __name__ == "__main__":
+    run_application()
 ```
 
-**Blocked:**
+**Code Standards:**
+- **Line Length**: 79 characters (PEP8 STRICT)
+- **Type Hints**: MANDATORY for ALL functions
+- **Imports**: Absolute only, NO wildcards
+- **Logging**: English only, NO print() statements
 
-```json
-["rm", "del", "mv", "cp", "chmod", "sudo", "kill", "shutdown"]
+### TypeScript/JavaScript Projects
+
+**Entry Point Rules:**
+- **Filename**: `src/main.ts` or `src/index.ts`
+- **Max Lines**: 10 (including imports)
+- **Structure**: Clean separation of concerns
+
+```typescript
+// ✅ COMPLIANT main.ts
+import { Application } from './core/application';
+import { ConfigLoader } from './core/config-loader';
+
+async function main(): Promise<void> {
+  const config = await ConfigLoader.load();
+  const app = new Application(config);
+  await app.start();
+}
+
+main().catch(console.error);
 ```
 
-### File Operations
+**Code Standards:**
+- **Strict TypeScript**: NO `any` types allowed
+- **Interface Definitions**: Required for all data structures
+- **Error Handling**: Comprehensive try-catch blocks
+- **Async/Await**: Preferred over Promises
 
-- **Workspace-Relative Paths Only:** No absolute paths
-- **Allowed Roots:** `src/`, `data/`, `.sentineltm/`, `project/`
-- **Max File Size:** 5MB (configurable)
-- **Auto-Split:** Files > 300 lines split automatically
+### Go Projects
 
-### Code Patterns
+**Entry Point Rules:**
+- **Filename**: `cmd/main.go`
+- **Package**: `package main`
+- **Structure**: Minimal main function
 
-**Forbidden in Production:**
+```go
+// ✅ COMPLIANT main.go
+package main
 
-- `console.log(` - Use logger
-- `eval(` - Security risk
-- `exec(` - Security risk
-- `dangerouslySetInnerHTML` - XSS risk
+import (
+    "github.com/project/internal/app"
+    "github.com/project/internal/config"
+)
 
-## 🎯 Quality Thresholds
+func main() {
+    cfg := config.Load()
+    app.Run(cfg)
+}
+```
 
-### Gate Scores
+### Rust Projects
 
-- **Minimum:** 95/100
-- **Retries:** 5 attempts
-- **Fallback:** Allowed if all attempts fail
+**Entry Point Rules:**
+- **Filename**: `src/main.rs`
+- **Error Handling**: Result<T, E> pattern
+- **Memory Safety**: Zero unsafe blocks
 
-### File Limits
+```rust
+// ✅ COMPLIANT main.rs
+use crate::app::Application;
+use crate::config::Config;
 
-- **Max Size:** 5MB
-- **Max Lines:** 300 (before auto-split)
-- **Max TODO Count:** 10
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let config = Config::load()?;
+    let app = Application::new(config);
+    app.run()
+}
+```
 
-### Index Limits
+---
 
-- **Max Lines per File:** 300
-- **Auto-Split:** Enabled
-- **Skip Patterns:** `_parts`, `.part`
+## 🔒 UNIVERSAL SECURITY STANDARDS
 
-## 📁 Project Structure Rules
+### 🚫 FORBIDDEN PATTERNS (ALL LANGUAGES)
 
-### Required Directories
+**High-Risk Functions:**
+```
+❌ eval()          ❌ exec()          ❌ system()
+❌ shell_exec()    ❌ passthru()      ❌ proc_open()
+❌ dangerouslySetInnerHTML            ❌ innerHTML
+❌ document.write() ❌ setTimeout(string) ❌ setInterval(string)
+```
+
+**Dangerous Modules/Packages:**
+```
+❌ subprocess (Python)     ❌ os.system (Python)
+❌ child_process (Node.js)  ❌ vm (Node.js)  
+❌ unsafe (Rust)           ❌ reflect (Go)
+```
+
+### 🛡️ SECURITY REQUIREMENTS
+
+**Authentication:**
+- API keys in environment variables ONLY
+- NO hardcoded credentials anywhere
+- Secure token rotation mechanisms
+
+**Data Validation:**
+- Input sanitization for ALL user data
+- SQL injection prevention (parameterized queries)
+- XSS protection (output encoding)
+
+**File Operations:**
+- Workspace-relative paths ONLY
+- Path traversal prevention (`../` blocked)
+- File size limits enforced
+
+---
+
+## 📁 UNIVERSAL PROJECT ARCHITECTURE
+
+### 🏗️ MANDATORY DIRECTORY STRUCTURE
 
 ```
 project/
-├── app/
-│   ├── core/       # Core business logic
-│   ├── utils/      # Utility functions
-│   ├── filters/    # Data filters
-│   └── class/      # Class definitions
-├── data/
-│   ├── config/     # Configuration files
-│   └── texts/      # Localized text files
-└── main.py         # Entry point (< 4 lines)
+├── src/                    # Source code (ALL languages)
+│   ├── core/              # Core business logic
+│   ├── services/          # External service integrations  
+│   ├── utils/             # Utility functions
+│   ├── types/             # Type definitions
+│   └── main.*             # Entry point
+├── data/                  # Configuration & localization
+│   ├── config/            # App configuration files
+│   │   ├── settings.yml   # Main settings
+│   │   └── logging.yml    # Logging configuration
+│   └── texts/             # Localized text files
+│       ├── en.yml         # English (logs/console)
+│       └── fa.yml         # Persian (UI/chat)
+├── tests/                 # Test files
+├── docs/                  # Documentation
+├── .sentineltm/           # SentinelTM configuration
+│   ├── config/
+│   │   └── rules.json     # Quality rules
+│   └── db/                # Local database
+└── README.md              # Project documentation
 ```
 
-### File Naming
+### 📋 CONFIGURATION STANDARDS
 
-- **Entry Point:** `main.py` or `launcher.py`
-- **Modules:** `snake_case.py`
-- **Classes:** `PascalCase` in files
-- **Functions:** `snake_case`
-- **Constants:** `UPPER_SNAKE_CASE`
+**settings.yml (Universal Format):**
+```yaml
+app:
+  name: "ProjectName"
+  version: "1.0.0"
+  environment: "development"
 
-## 🔧 Development Rules
+providers:
+  openai:
+    type: "openai-compatible"
+    baseURL: "https://api.openai.com/v1"
+    apiKey: "${OPENAI_API_KEY}"
+  
+  openrouter:
+    type: "openai-compatible" 
+    baseURL: "https://openrouter.ai/api/v1"
+    apiKey: "${OPENROUTER_API_KEY}"
 
-### TypeScript/JavaScript
-
-```typescript
-// ✅ GOOD
-interface Config {
-  provider: string;
-  model: string;
-}
-
-async function loadConfig(): Promise<Config> {
-  // Implementation
-}
-
-// ❌ BAD
-function loadConfig(): any {
-  // No 'any'
-  // Implementation
-}
+thresholds:
+  gate: 95
+  security: 100
+  performance: 85
 ```
 
-### Python
+---
 
+## 🌍 LOCALIZATION STANDARDS
+
+### 📝 TEXT EXTERNALIZATION (MANDATORY)
+
+**English (en.yml) - Console/Logs:**
+```yaml
+app:
+  start: "Application started successfully"
+  stop: "Application stopped gracefully"
+  error: "Critical error occurred: {error}"
+
+validation:
+  required_field: "Field '{field}' is required"
+  invalid_format: "Invalid format for '{field}'"
+  
+security:
+  auth_failed: "Authentication failed"
+  access_denied: "Access denied to resource"
+```
+
+**Persian (fa.yml) - UI/Chat:**
+```yaml
+ui:
+  welcome: "خوش آمدید"
+  goodbye: "خداحافظ"
+  loading: "در حال بارگذاری..."
+
+chat:
+  greeting: "سلام! چطور می‌تونم کمکتون کنم؟"
+  error: "متأسفانه خطایی رخ داده: {error}"
+  success: "عملیات با موفقیت انجام شد"
+
+validation:
+  required: "فیلد '{field}' اجباری است"
+  invalid: "فرمت '{field}' نامعتبر است"
+```
+
+### 🔧 USAGE PATTERNS
+
+**Python:**
 ```python
-# ✅ GOOD
-from app.core import config_loader
-from typing import Dict, List
+from app.core.config_loader import load_texts
 
-def load_config() -> Dict[str, str]:
-    return config_loader.load()
-
-# ❌ BAD
-from app.core import *  # No wildcards
-def load_config():      # No type hints
-    return config_loader.load()
+texts = load_texts()
+logger.info(texts['en']['app.start'])
+chat_response = texts['fa']['chat.greeting']
 ```
 
-## 🧪 Testing Rules
-
-### Coverage Requirements
-
-- **Minimum:** 80% overall
-- **Critical Paths:** 100%
-- **New Code:** 90%
-
-### Test Structure
-
+**TypeScript:**
 ```typescript
-describe('Feature', () => {
-  it('should handle success case', () => {
-    // Test
+import { loadTexts } from './core/config-loader';
+
+const texts = await loadTexts();
+console.log(texts.en.app.start);
+const chatMessage = texts.fa.chat.greeting;
+```
+
+---
+
+## 🧪 TESTING STANDARDS
+
+### 📊 COVERAGE REQUIREMENTS
+
+| Component | Minimum Coverage | Critical Paths |
+|-----------|------------------|----------------|
+| **Core Logic** | 95% | 100% |
+| **API Endpoints** | 90% | 100% |
+| **Utilities** | 85% | 95% |
+| **UI Components** | 80% | 90% |
+
+### 🔬 TEST STRUCTURE
+
+**TypeScript/JavaScript:**
+```typescript
+describe('UserService', () => {
+  beforeEach(() => {
+    // Setup
   });
 
-  it('should handle error case', () => {
-    // Test
+  describe('createUser', () => {
+    it('should create user with valid data', async () => {
+      // Test success case
+    });
+
+    it('should reject invalid email format', async () => {
+      // Test validation
+    });
+
+    it('should handle database errors gracefully', async () => {
+      // Test error handling
+    });
   });
 });
 ```
 
-## 📊 Performance Rules
-
-### Response Times
-
-- **MCP Simple Operations:** < 1s
-- **File Operations:** < 500ms
-- **Index Operations:** < 5s
-- **Gate Execution:** < 30s
-
-### Resource Limits
-
-- **Memory:** < 100MB for CLI
-- **CPU:** < 50% sustained
-- **Disk I/O:** Batched when possible
-
-## 🌐 Localization Rules
-
-### Text Files
-
-**English (`data/texts/en.json`):**
-
-```json
-{
-  "app.start": "Application started",
-  "app.stop": "Application stopped",
-  "error.file_not_found": "File not found: {path}"
-}
-```
-
-**Persian (`data/texts/fa.json`):**
-
-```json
-{
-  "chat.welcome": "خوش آمدید",
-  "chat.goodbye": "خداحافظ",
-  "chat.error": "خطا: {message}"
-}
-```
-
-### Usage
-
+**Python:**
 ```python
-# Logging (English)
-logger.info(texts['en']['app.start'])
-
-# Chat (Persian)
-chat_message = texts['fa']['chat.welcome']
+class TestUserService:
+    def setup_method(self):
+        # Setup for each test
+        pass
+    
+    def test_create_user_success(self):
+        # Test success case
+        assert result.is_success()
+    
+    def test_create_user_invalid_email(self):
+        # Test validation
+        with pytest.raises(ValidationError):
+            service.create_user(invalid_data)
 ```
-
-## 🔄 MCP Integration Rules
-
-### Tool Naming
-
-- **Correct:** `mcp0_sentinel_task` with actions
-- **Wrong:** `mcp0_task_update` (doesn't exist)
-
-### Path Handling
-
-```javascript
-// ✅ GOOD
-mcp0_file_read({ path: 'project/src/file.ts' });
-
-// ❌ BAD
-mcp0_file_read({ path: 'd:\\project\\file.ts' });
-```
-
-### Index Scoping
-
-```javascript
-// ✅ GOOD
-mcp0_index_build({ root: 'project' });
-
-// ❌ BAD
-mcp0_index_build(); // Missing root
-```
-
-## 📝 Documentation Rules
-
-### Code Comments
-
-- **JSDoc/Docstrings:** Required for public APIs
-- **Inline Comments:** For complex logic only
-- **TODO Comments:** Max 10 per project
-
-### README Sections
-
-1. Installation
-2. Quick Start
-3. Configuration
-4. API Reference
-5. Troubleshooting
-6. Contributing
-
-## 🚀 Release Rules
-
-### Version Numbering
-
-- **Major:** Breaking changes
-- **Minor:** New features
-- **Patch:** Bug fixes
-
-### Pre-Release Checklist
-
-- [ ] All tests pass
-- [ ] Gate score ≥ 95
-- [ ] Documentation updated
-- [ ] CHANGELOG updated
-- [ ] Version bumped
-- [ ] Git tagged
 
 ---
 
-**These rules are enforced by `.sentineltm/config/rules.json` and quality gates.**
+## 🚀 IDE-SPECIFIC INTEGRATIONS
+
+### VS Code Configuration
+```json
+{
+  "sentineltm.enabled": true,
+  "sentineltm.qualityGate": true,
+  "sentineltm.autoIndex": true,
+  "sentineltm.strictMode": true
+}
+```
+
+### Cursor Configuration  
+```json
+{
+  "cursor.sentineltm.integration": true,
+  "cursor.sentineltm.realTimeValidation": true
+}
+```
+
+### Windsurf MCP Integration
+```json
+{
+  "mcpServers": {
+    "sentineltm": {
+      "command": "st",
+      "args": ["serve", "--mcp-stdio"],
+      "env": {
+        "SENTINEL_LOG_LEVEL": "info",
+        "SENTINEL_AUTO_INDEX": "true"
+      }
+    }
+  }
+}
+```
+
+### Zed Configuration
+```json
+{
+  "assistant.default": "sentinel",
+  "assistant.providers": {
+    "sentinel": {
+      "command": "st",
+      "args": ["serve", "--mcp-stdio"]
+    }
+  }
+}
+```
+
+---
+
+## ⚡ PERFORMANCE STANDARDS
+
+### 🎯 RESPONSE TIME REQUIREMENTS
+
+| Operation | Maximum Time | Optimization Required |
+|-----------|-------------|----------------------|
+| **File Read** | 100ms | Caching |
+| **Index Build** | 5s | Incremental updates |
+| **Quality Gate** | 30s | Parallel processing |
+| **MCP Response** | 500ms | Async operations |
+
+### 💾 RESOURCE LIMITS
+
+- **Memory Usage**: < 100MB for CLI operations
+- **CPU Usage**: < 50% sustained load
+- **Disk I/O**: Batched operations preferred
+- **Network**: Connection pooling for API calls
+
+---
+
+## 🔄 CONTINUOUS INTEGRATION
+
+### 🛠️ PRE-COMMIT HOOKS
+
+```bash
+#!/bin/sh
+# .git/hooks/pre-commit
+
+echo "🛡️ SentinelTM Quality Gate"
+st gate run --strict
+
+if [ $? -ne 0 ]; then
+    echo "❌ Quality gate failed - commit rejected"
+    exit 1
+fi
+
+echo "✅ Quality gate passed"
+```
+
+### 🚀 DEPLOYMENT PIPELINE
+
+1. **Code Quality Check**: `st gate run`
+2. **Security Scan**: `st security validate`
+3. **Performance Test**: `st benchmark run`
+4. **Integration Test**: Full test suite
+5. **Documentation Update**: Auto-generated docs
+6. **Version Bump**: Semantic versioning
+7. **Release**: Automated deployment
+
+---
+
+## 📚 DOCUMENTATION REQUIREMENTS
+
+### 📖 MANDATORY SECTIONS
+
+1. **Installation Guide**: Step-by-step setup
+2. **Quick Start**: 5-minute tutorial
+3. **API Reference**: Complete function documentation
+4. **Configuration**: All options explained
+5. **Troubleshooting**: Common issues & solutions
+6. **Contributing**: Development guidelines
+7. **Changelog**: Version history
+
+### 📝 CODE DOCUMENTATION
+
+**Function Documentation (Required):**
+```typescript
+/**
+ * Processes user authentication with multi-factor validation
+ * @param credentials - User login credentials
+ * @param options - Authentication options
+ * @returns Promise resolving to authentication result
+ * @throws AuthenticationError when credentials are invalid
+ * @example
+ * ```typescript
+ * const result = await authenticateUser(creds, { mfa: true });
+ * ```
+ */
+async function authenticateUser(
+  credentials: UserCredentials,
+  options: AuthOptions
+): Promise<AuthResult> {
+  // Implementation
+}
+```
+
+---
+
+## 🎖️ COMPLIANCE VERIFICATION
+
+### ✅ AUTOMATED CHECKS
+
+- **Code Quality**: ESLint, Prettier, Black, Rustfmt
+- **Security**: Bandit, ESLint Security, Clippy
+- **Performance**: Benchmarks, Memory profiling
+- **Documentation**: Doc coverage, Link validation
+
+### 📋 MANUAL REVIEW CHECKLIST
+
+- [ ] All functions have type hints/annotations
+- [ ] No hardcoded strings or configuration
+- [ ] Error handling covers all edge cases
+- [ ] Tests cover critical paths (100%)
+- [ ] Documentation is complete and accurate
+- [ ] Security review completed
+- [ ] Performance benchmarks pass
+
+---
+
+## 🚨 VIOLATION CONSEQUENCES
+
+### ⚡ IMMEDIATE ACTIONS
+
+| Violation Type | Action | Recovery |
+|---------------|--------|----------|
+| **Security Risk** | BLOCK IMMEDIATELY | Security review required |
+| **Quality < 95** | REJECT COMMIT | Rewrite mandatory |
+| **Missing Tests** | BUILD FAILURE | Add comprehensive tests |
+| **Hardcoded Values** | AUTO-REJECT | Externalize to config |
+
+### 🔄 REMEDIATION PROCESS
+
+1. **Automatic Detection**: SentinelTM identifies violation
+2. **Immediate Block**: Operation halted instantly  
+3. **Detailed Report**: Specific issues highlighted
+4. **Guided Fix**: Step-by-step remediation
+5. **Re-validation**: Automatic re-check after fix
+6. **Approval**: Only after 100% compliance
+
+---
+
+**⚖️ LEGAL NOTICE**: These rules constitute a binding quality contract. Compliance is mandatory for all code contributions across ALL supported IDEs and programming languages.
+
+**🛡️ ENFORCEMENT**: Powered by SentinelTM Quality Gates - Zero Tolerance, Military-Grade Standards.
+
+---
+
+## 🎯 QUICK REFERENCE CHECKLIST
+
+### ✅ Before Every Commit
+- [ ] Code quality score ≥ 95/100
+- [ ] Security scan passes (100/100)
+- [ ] All tests pass with required coverage
+- [ ] No hardcoded strings or credentials
+- [ ] Documentation updated
+- [ ] Performance benchmarks meet standards
+
+### ✅ Before Every Release
+- [ ] Full integration test suite passes
+- [ ] All IDE configurations validated
+- [ ] Localization files updated
+- [ ] Version bumped according to semver
+- [ ] Changelog updated with all changes
+- [ ] Security review completed
+
+### ✅ Multi-Language Compliance
+- [ ] **Python**: PEP8, type hints, 4-line main.py
+- [ ] **TypeScript**: Strict mode, no `any`, proper interfaces
+- [ ] **Go**: Standard formatting, minimal main function
+- [ ] **Rust**: Memory safety, Result<T,E> patterns
+
+---
+
+**📞 SUPPORT**: For questions about these standards, run `st help rules` or visit the SentinelTM documentation.
+
+**🔄 UPDATES**: This document is automatically synchronized across all IDE profiles and updated with each SentinelTM release.
