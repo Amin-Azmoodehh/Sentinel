@@ -74,8 +74,25 @@ const uniqueStrings = (items: string[]): string[] => {
 export const listFiles = async (pattern?: string): Promise<string[]> => {
   const cwd = process.cwd();
   if (!pattern) {
-    const entries = fs.readdirSync(cwd);
-    return entries.sort();
+    try {
+      const entries = fs.readdirSync(cwd, { withFileTypes: true });
+      return entries
+        .map(entry => {
+          const name = entry.name;
+          if (entry.isDirectory()) {
+            return `${name}/`;
+          } else if (entry.isFile()) {
+            const stats = fs.statSync(path.join(cwd, name));
+            const size = stats.size;
+            const sizeStr = size > 1024 ? `${Math.round(size/1024)}KB` : `${size}B`;
+            return `${name} (${sizeStr})`;
+          }
+          return name;
+        })
+        .sort();
+    } catch (error) {
+      throw new Error(`Failed to list directory: ${error instanceof Error ? error.message : String(error)}`);
+    }
   }
   if (path.isAbsolute(pattern) || pattern.includes('..')) {
     throw new Error('Glob pattern must stay inside workspace');

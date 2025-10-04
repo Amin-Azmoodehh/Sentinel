@@ -1,119 +1,327 @@
 {
-  "$schema": "https://json-schema.org/draft-07/schema",
-  "version": "1.6.1",
+  "version": "2.0.8",
   "contract": {
-    "version": "3.0",
-    "name": "Zero Tolerance Python Contract",
+    "version": "4.0",
+    "name": "SentinelTM Universal Zero Tolerance Contract",
     "enforcement": "MANDATORY",
     "binding": "ABSOLUTE",
-    "violations": "AUTOMATIC_REJECTION"
+    "violations": "AUTOMATIC_REJECTION",
+    "scope": "ALL_IDE_PROFILES",
+    "applicability": "UNIVERSAL"
   },
-  "entrypoint": {
-    "filename": "main.py",
-    "maxLines": 4,
-    "mustImportOnly": true,
-    "noLogic": true,
-    "noSideEffects": true
+  "metadata": {
+    "title": "🛡️ SentinelTM Universal Quality Standards",
+    "description": "Zero Tolerance • Military-Grade Quality Standards for ALL IDE profiles",
+    "supportedIDEs": [
+      "VS Code", "Cursor", "Windsurf", "Zed", "Trae", "Kiro", "Continue", 
+      "Cline", "Codex", "Claude", "Gemini", "OpenCode", "Roo", "JetBrains",
+      "Sublime", "Atom", "Vim", "Neovim", "Emacs", "Eclipse", "NetBeans",
+      "Android Studio", "Xcode"
+    ],
+    "supportedLanguages": ["Python", "TypeScript", "JavaScript", "Go", "Rust", "Java", "C#", "C++"],
+    "lastUpdated": "2025-01-04T21:36:00+03:30"
   },
-  "style": {
-    "maxLineLength": 79,
-    "pep8Compliant": true,
-    "noSideEffectsOnImport": true,
-    "absoluteImportsOnly": true,
-    "noRelativeImports": true,
-    "noWildcardImports": true
+  "principles": {
+    "zeroTolerance": {
+      "enabled": true,
+      "description": "No exceptions, no negotiations, no compromises",
+      "enforcement": "AUTOMATIC_REJECTION"
+    },
+    "militaryGrade": {
+      "enabled": true,
+      "description": "Military precision in code quality and standards",
+      "standardsLevel": "MAXIMUM"
+    },
+    "universalApplication": {
+      "enabled": true,
+      "description": "Same standards across ALL IDEs and languages",
+      "consistency": "ABSOLUTE"
+    }
   },
-  "typing": {
-    "typeHintsRequired": true,
-    "typeHintsCoverage": 100,
-    "enforceEverywhere": true
+  "qualityGates": {
+    "overallScore": {
+      "minimum": 95,
+      "action": "AUTOMATIC_REJECTION"
+    },
+    "codeQuality": {
+      "minimum": 90,
+      "action": "MANDATORY_REWRITE"
+    },
+    "securityScore": {
+      "minimum": 100,
+      "action": "IMMEDIATE_BLOCK"
+    },
+    "performance": {
+      "minimum": 85,
+      "action": "OPTIMIZATION_REQUIRED"
+    }
   },
-  "forbidden": {
-    "functions": ["print(", "eval(", "exec(", "console.log("],
-    "modules": ["subprocess", "os.system"],
-    "hardcodedStrings": true,
-    "hardcodedNumbers": true,
-    "hardcodedUrls": true,
-    "hardcodedRegex": true
+  "languages": {
+    "python": {
+      "entrypoint": {
+        "filename": "main.py",
+        "maxLines": 4,
+        "mustImportOnly": true,
+        "noLogic": true,
+        "noSideEffects": true,
+        "structure": "from app.core.main_runner import run_application"
+      },
+      "style": {
+        "maxLineLength": 79,
+        "pep8Compliant": true,
+        "absoluteImportsOnly": true,
+        "noWildcardImports": true
+      },
+      "typing": {
+        "typeHintsRequired": true,
+        "coverage": 100,
+        "enforceEverywhere": true
+      },
+      "forbidden": {
+        "functions": ["print(", "eval(", "exec(", "compile("],
+        "modules": ["subprocess", "os.system", "__import__"]
+      }
+    },
+    "typescript": {
+      "entrypoint": {
+        "filename": "src/main.ts",
+        "maxLines": 10,
+        "structure": "Clean separation with Application class"
+      },
+      "style": {
+        "strictMode": true,
+        "noAnyTypes": true,
+        "interfaceDefinitions": "REQUIRED"
+      },
+      "forbidden": {
+        "functions": ["eval(", "setTimeout(string)", "setInterval(string)"],
+        "patterns": ["any", "dangerouslySetInnerHTML", "innerHTML"]
+      }
+    },
+    "javascript": {
+      "entrypoint": {
+        "filename": "src/main.js",
+        "maxLines": 10,
+        "structure": "ES6+ modules with proper imports"
+      },
+      "style": {
+        "es6Plus": true,
+        "noVar": true,
+        "constPreferred": true
+      },
+      "forbidden": {
+        "functions": ["eval(", "document.write(", "setTimeout(string)"],
+        "patterns": ["var ", "innerHTML", "dangerouslySetInnerHTML"]
+      }
+    },
+    "go": {
+      "entrypoint": {
+        "filename": "cmd/main.go",
+        "package": "main",
+        "structure": "Minimal main function with config loading"
+      },
+      "style": {
+        "gofmt": true,
+        "golint": true,
+        "govet": true
+      },
+      "forbidden": {
+        "packages": ["unsafe", "reflect"],
+        "patterns": ["panic(", "recover()"]
+      }
+    },
+    "rust": {
+      "entrypoint": {
+        "filename": "src/main.rs",
+        "errorHandling": "Result<T, E>",
+        "memorySafety": "ZERO_UNSAFE_BLOCKS"
+      },
+      "style": {
+        "rustfmt": true,
+        "clippy": true,
+        "edition": "2021"
+      },
+      "forbidden": {
+        "keywords": ["unsafe"],
+        "patterns": ["unwrap()", "expect()"]
+      }
+    }
   },
-  "externalization": {
-    "textsPath": "data/texts/*.yml",
-    "configPath": "data/config/*.yml",
-    "enforceNoHardcodedStrings": true,
-    "enforceNoHardcodedNumbers": true,
-    "allConfigFromYaml": true
+  "security": {
+    "forbidden": {
+      "highRiskFunctions": [
+        "eval()", "exec()", "system()", "shell_exec()", "passthru()", 
+        "proc_open()", "dangerouslySetInnerHTML", "innerHTML", "document.write()",
+        "setTimeout(string)", "setInterval(string)"
+      ],
+      "dangerousModules": [
+        "subprocess", "os.system", "child_process", "vm", "unsafe", "reflect"
+      ]
+    },
+    "requirements": {
+      "authentication": "ENVIRONMENT_VARIABLES_ONLY",
+      "dataValidation": "ALL_USER_INPUT",
+      "fileOperations": "WORKSPACE_RELATIVE_ONLY",
+      "pathTraversal": "BLOCKED"
+    }
   },
   "architecture": {
-    "maxFileLines": 300,
-    "modularOnly": true,
-    "separationOfConcerns": true
+    "directoryStructure": {
+      "required": [
+        "src/", "data/config/", "data/texts/", "tests/", "docs/", ".sentineltm/"
+      ],
+      "forbidden": [
+        "hardcoded-configs/", "temp/", "cache/"
+      ]
+    },
+    "fileNaming": {
+      "entryPoint": ["main.*", "index.*", "app.*"],
+      "modules": "snake_case",
+      "classes": "PascalCase",
+      "functions": "camelCase",
+      "constants": "UPPER_SNAKE_CASE"
+    },
+    "limits": {
+      "maxFileLines": 300,
+      "maxFileSize": "5MB",
+      "autoSplit": true
+    }
   },
-  "i18n": {
-    "logsLanguage": "en",
-    "uiLanguage": "fa",
-    "enforceLogLanguage": true,
-    "enforceUiLanguage": true
+  "localization": {
+    "required": true,
+    "languages": {
+      "console": "en",
+      "ui": "fa",
+      "logs": "en",
+      "chat": "fa"
+    },
+    "externalization": {
+      "textsPath": "data/texts/*.yml",
+      "configPath": "data/config/*.yml",
+      "enforceNoHardcoded": true
+    }
   },
-  "quality": {
-    "minCoverage": 80,
-    "requireTests": true,
-    "requireDocs": true,
-    "scoreThreshold": 100,
-    "zeroTolerance": true
+  "testing": {
+    "coverage": {
+      "coreLogic": 95,
+      "apiEndpoints": 90,
+      "utilities": 85,
+      "uiComponents": 80
+    },
+    "required": {
+      "unitTests": true,
+      "integrationTests": true,
+      "e2eTests": "CRITICAL_PATHS"
+    }
+  },
+  "performance": {
+    "responseTime": {
+      "fileRead": "100ms",
+      "indexBuild": "5s",
+      "qualityGate": "30s",
+      "mcpResponse": "500ms"
+    },
+    "resourceLimits": {
+      "memory": "100MB",
+      "cpu": "50%",
+      "diskIO": "BATCHED"
+    }
+  },
+  "ideIntegrations": {
+    "vscode": {
+      "settings": {
+        "sentineltm.enabled": true,
+        "sentineltm.qualityGate": true,
+        "sentineltm.autoIndex": true,
+        "sentineltm.strictMode": true
+      }
+    },
+    "cursor": {
+      "settings": {
+        "cursor.sentineltm.integration": true,
+        "cursor.sentineltm.realTimeValidation": true
+      }
+    },
+    "windsurf": {
+      "mcpServers": {
+        "sentineltm": {
+          "command": "st",
+          "args": ["serve", "--mcp-stdio"],
+          "env": {
+            "SENTINEL_LOG_LEVEL": "info",
+            "SENTINEL_AUTO_INDEX": "true"
+          }
+        }
+      }
+    },
+    "zed": {
+      "assistant": {
+        "default": "sentinel",
+        "providers": {
+          "sentinel": {
+            "command": "st",
+            "args": ["serve", "--mcp-stdio"]
+          }
+        }
+      }
+    }
   },
   "validation": {
     "preGeneration": {
       "acknowledgmentRequired": true,
-      "explicitRulesCheck": true
+      "rulesCheck": "EXPLICIT",
+      "mandatoryStatement": "I acknowledge ALL SentinelTM Universal Zero Tolerance rules and will provide complete self-assessment."
     },
     "postGeneration": {
       "selfAssessmentRequired": true,
       "evidenceRequired": true,
-      "validationCommands": [
-        "wc -l main.py",
-        "grep -r 'print(' app/",
-        "grep -r '\".*\"' app/ | wc -l",
-        "find . -name '*.py' -exec wc -l {} \\;"
-      ]
+      "complianceTable": "MANDATORY",
+      "validationCommands": "LANGUAGE_SPECIFIC"
     },
     "scoring": {
-      "totalRules": 10,
-      "passingScore": 10,
-      "failureAction": "REJECT_AND_REWRITE"
-    }
-  },
-  "deliverables": {
-    "required": [
-      "Pre-Generation Acknowledgment",
-      "Generated Code",
-      "Self-Assessment Table",
-      "Validation Commands Output",
-      "Final Verdict (PASS/FAIL)"
-    ],
-    "mandatoryFormat": {
-      "preGeneration": "I acknowledge the following BINDING rules: ✓ main.py will be exactly ≤4 lines ✓ Zero hardcoded strings/numbers/URLs ✓ Zero print() statements ✓ All config from YAML files ✓ Type hints on every function ✓ PEP8 with ≤79 chars/line ✓ Files ≤300 lines maximum ✓ Absolute imports only ✓ English logs / Persian UI ✓ Modular architecture. I will provide self-assessment after generation.",
-      "selfAssessment": "MANDATORY_TABLE_WITH_EVIDENCE",
-      "finalVerdict": "Score: X/12, Grade: PASS ✅ / FAIL ❌"
+      "totalRules": 15,
+      "passingScore": 15,
+      "threshold": "100%",
+      "failureAction": "COMPLETE_REWRITE"
     }
   },
   "enforcement": {
-    "scoreRequired": 12,
-    "totalRules": 12,
-    "passingThreshold": "12/12",
-    "failureAction": "COMPLETE_REWRITE_REQUIRED",
+    "zeroTolerance": true,
     "noExceptions": true,
+    "noNegotiations": true,
+    "automaticRejection": true,
     "evidenceRequired": true,
-    "contractualBinding": true
+    "contractualBinding": true,
+    "militaryGrade": true
   },
-  "validationCommands": {
-    "mainPyLines": "wc -l main.py",
-    "hardcodedStrings": "grep -r '\".*\"' app/ | wc -l",
-    "printStatements": "grep -r 'print(' app/",
-    "fileLineLimits": "find . -name '*.py' -exec wc -l {} \\;",
-    "lineLength": "find app/ -name '*.py' -exec grep -n '.\\{80,\\}' {} +",
-    "relativeImports": "grep -r 'from \\.' app/",
-    "typeHints": "python -m mypy app/ --strict"
+  "compliance": {
+    "beforeCommit": [
+      "Code quality ≥ 95/100",
+      "Security scan passes (100/100)",
+      "All tests pass",
+      "No hardcoded values",
+      "Documentation updated"
+    ],
+    "beforeRelease": [
+      "Integration tests pass",
+      "All IDE configs validated",
+      "Localization complete",
+      "Version bumped",
+      "Security review completed"
+    ]
   },
-  "onlyLoggingAllowed": true,
-  "description": "Use logging module only; console in English, chat in Persian"
+  "violationConsequences": {
+    "securityRisk": "BLOCK_IMMEDIATELY",
+    "qualityBelow95": "REJECT_COMMIT",
+    "missingTests": "BUILD_FAILURE",
+    "hardcodedValues": "AUTO_REJECT"
+  },
+  "supportChannels": {
+    "documentation": "st help rules",
+    "website": "https://sentineltm.dev",
+    "issues": "GitHub Issues",
+    "community": "Discord Server"
+  },
+  "legalNotice": "These rules constitute a binding quality contract. Compliance is mandatory for all code contributions across ALL supported IDEs and programming languages.",
+  "enforcement_notice": "Powered by SentinelTM Quality Gates - Zero Tolerance, Military-Grade Standards."
 }
