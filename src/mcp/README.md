@@ -1,2 +1,2 @@
-export * from './README_parts/README.part1';
-export * from './README_parts/README.part2';
+export _ from './README_parts/README.part1';
+export _ from './README_parts/README.part2';

@@ -5,6 +5,7 @@
 ### Added
 
 #### 🔒 Path Security System
+
 - Whitelist/blacklist management for file paths
 - Automatic system path detection and blocking
 - Path validation before operations
@@ -12,6 +13,7 @@
 - MCP tool: `sentinel_security`
 
 #### 📊 Advanced Indexing
+
 - External project indexing support
 - Customizable file filters (include/exclude patterns)
 - File size limits for indexing
@@ -21,6 +23,7 @@
 - Enhanced MCP tool: `sentinel_index` with `advanced` and `searchAdvanced` actions
 
 #### 🖥️ Enhanced Shell Service
+
 - Preset commands for common operations (git, npm, system)
 - Adaptive command translation (Windows ↔ Linux)
 - Command pipeline execution with variable passing
@@ -28,6 +31,7 @@
 - Extended PowerShell support
 
 #### 📈 Project Dashboard
+
 - Real-time project metrics (files, tasks, quality, system)
 - Command history tracking
 - Report generation (Markdown format)
@@ -36,6 +40,7 @@
 - MCP tool: `sentinel_dashboard`
 
 #### 🔄 CI/CD Integration
+
 - GitHub Actions workflow generator
 - GitLab CI configuration generator
 - Local pipeline execution
@@ -47,16 +52,19 @@
 ### Enhanced
 
 #### File Operations
+
 - Path security validation integrated
 - Better error messages for path violations
 - Workspace boundary enforcement
 
 #### Shell Operations
+
 - Adaptive syntax for cross-platform compatibility
 - Preset command library
 - Pipeline support with output chaining
 
 #### Index Operations
+
 - Advanced filtering options
 - External project support
 - Better performance for large codebases
@@ -93,11 +101,13 @@ New configuration options in `.sentineltm/config/config.json`:
 ### MCP Tools
 
 New MCP tools available:
+
 - `sentinel_security` - Path security management
 - `sentinel_dashboard` - Project monitoring
 - `sentinel_cicd` - CI/CD integration
 
 Enhanced MCP tools:
+
 - `sentinel_index` - Now supports advanced indexing and filtering
 - `sentinel_shell` - Adaptive command execution
 

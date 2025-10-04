@@ -80,11 +80,13 @@ npm install -g sentineltm-cli
 ### Windsurf
 
 **Config File Location:**
+
 - Windows: `%APPDATA%\Windsurf\User\globalStorage\codeium.windsurf\mcp.json`
 - macOS: `~/Library/Application Support/Windsurf/User/globalStorage/codeium.windsurf/mcp.json`
 - Linux: `~/.config/Windsurf/User/globalStorage/codeium.windsurf/mcp.json`
 
 **Configuration:**
+
 ```json
 {
   "mcpServers": {
@@ -100,11 +102,13 @@ npm install -g sentineltm-cli
 ### Cursor
 
 **Config File Location:**
+
 - Windows: `%APPDATA%\Cursor\User\globalStorage\rooveterinaryinc.roo-cline\settings\cline_mcp_settings.json`
 - macOS: `~/Library/Application Support/Cursor/User/globalStorage/rooveterinaryinc.roo-cline/settings/cline_mcp_settings.json`
 - Linux: `~/.config/Cursor/User/globalStorage/rooveterinaryinc.roo-cline/settings/cline_mcp_settings.json`
 
 **Configuration:**
+
 ```json
 {
   "mcpServers": {
@@ -120,11 +124,13 @@ npm install -g sentineltm-cli
 ### VS Code (with Cline extension)
 
 **Config File Location:**
+
 - Windows: `%APPDATA%\Code\User\globalStorage\rooveterinaryinc.roo-cline\settings\cline_mcp_settings.json`
 - macOS: `~/Library/Application Support/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/cline_mcp_settings.json`
 - Linux: `~/.config/Code/User/globalStorage/rooveterinaryinc.roo-cline/settings/cline_mcp_settings.json`
 
 **Configuration:**
+
 ```json
 {
   "mcpServers": {
@@ -140,9 +146,11 @@ npm install -g sentineltm-cli
 ### Zed
 
 **Config File Location:**
+
 - All platforms: Project root `.zed/settings.json`
 
 **Configuration:**
+
 ```json
 {
   "assistant.default": "sentinel",
@@ -207,15 +215,17 @@ npm install -g sentineltm-cli
 ### Server Not Starting
 
 1. **Check if SentinelTM is installed:**
+
    ```bash
    st -v
    ```
 
 2. **Try running the server manually:**
+
    ```bash
    st serve --mcp-stdio
    ```
-   
+
    You should see: `ℹ MCP Server connected and ready.`
 
 3. **Check IDE logs** for error messages
@@ -274,6 +284,7 @@ You can also specify default provider and model in the MCP config:
 ```
 
 **Supported Providers:**
+
 - `qwen` - Alibaba Qwen models (default)
 - `gemini` - Google Gemini models
 - `ollama` - Local LLM execution

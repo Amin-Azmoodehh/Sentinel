@@ -16,15 +16,8 @@
     }
   },
   "security": {
-    "forbidden": [
-      "eval(",
-      "exec(",
-      "dangerouslySetInnerHTML"
-    ],
-    "requiredRootDirs": [
-      "src",
-      ".sentineltm"
-    ],
+    "forbidden": ["eval(", "exec(", "dangerouslySetInnerHTML"],
+    "requiredRootDirs": ["src", ".sentineltm"],
     "shell": {
       "allowedCommands": [
         "ls",
@@ -106,9 +99,7 @@
         "swapoff"
       ]
     },
-    "allowedRootFiles": [
-      "launcher.*"
-    ]
+    "allowedRootFiles": ["launcher.*"]
   },
   "i18n": {
     "logs": "en",
@@ -117,7 +108,7 @@
   "meta": {
     "gate": {
       "lastRun": {
-        "timestamp": 1759543539653,
+        "timestamp": 1759580767665,
         "score": 80,
         "threshold": 95,
         "success": false,

@@ -3,15 +3,18 @@
 ## Quick Links
 
 ### Getting Started
+
 - [README.md](./README.md) - Main documentation
 - [QUICK_START.md](./QUICK_START.md) - Quick start guide
 
 ### Features
+
 - [ENHANCED_FEATURES.md](./ENHANCED_FEATURES.md) - New features (Persian)
 - [MCP_TOOLS_GUIDE.md](./MCP_TOOLS_GUIDE.md) - MCP tools reference
 - [TOOLS_COUNT.md](./TOOLS_COUNT.md) - Tools inventory
 
 ### Changelog
+
 - [CHANGELOG.md](./CHANGELOG.md) - Version history
 - [CHANGELOG_ENHANCED.md](./CHANGELOG_ENHANCED.md) - Enhanced features changelog
 
@@ -61,14 +64,14 @@ Each IDE has its own configuration:
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `README.md` | Complete documentation |
-| `QUICK_START.md` | Getting started guide |
+| File                   | Purpose                |
+| ---------------------- | ---------------------- |
+| `README.md`            | Complete documentation |
+| `QUICK_START.md`       | Getting started guide  |
 | `ENHANCED_FEATURES.md` | New features (Persian) |
-| `MCP_TOOLS_GUIDE.md` | All MCP tools |
-| `TOOLS_COUNT.md` | Tools statistics |
-| `CHANGELOG.md` | Version history |
+| `MCP_TOOLS_GUIDE.md`   | All MCP tools          |
+| `TOOLS_COUNT.md`       | Tools statistics       |
+| `CHANGELOG.md`         | Version history        |
 
 ## For Developers
 

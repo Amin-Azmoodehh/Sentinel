@@ -3,6 +3,7 @@
 ## پیش‌نیازها
 
 1. **حساب NPM:**
+
    ```bash
    npm adduser
    # یا
@@ -40,6 +41,7 @@ npm pack --dry-run
 ```
 
 خروجی باید شامل:
+
 - `dist/` - فایلهای build شده
 - `README.md` - مستندات
 - `LICENSE` - مجوز
@@ -152,11 +154,13 @@ npm publish --access public
 پکیج با scope `@sentineltm/cli` منتشر می‌شود:
 
 **مزایا:**
+
 - نام منحصر به فرد
 - گروه‌بندی پکیج‌ها
 - مدیریت بهتر
 
 **نصب:**
+
 ```bash
 npm install -g @sentineltm/cli
 ```
@@ -194,15 +198,19 @@ npm link @sentineltm/cli
 ## خطاهای رایج
 
 ### "Package name too similar"
+
 نام پکیج شبیه پکیج دیگری است. نام را تغییر دهید.
 
 ### "You must verify your email"
+
 ایمیل خود را در npm تأیید کنید.
 
 ### "402 Payment Required"
+
 برای scoped packages عمومی از `--access public` استفاده کنید.
 
 ### "403 Forbidden"
+
 مجوز انتشار ندارید. با `npm login` وارد شوید.
 
 ## منابع

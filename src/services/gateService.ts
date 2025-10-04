@@ -174,9 +174,7 @@ const aiRuleCheck: GateCheck = {
     const activeProvider = providers.find((p) => p.name === providerName && p.available);
 
     if (!activeProvider?.path) {
-      log.warn(
-        `AI provider '${providerName}' is not available. Skipping AI Rule Check.`
-      );
+      log.warn(`AI provider '${providerName}' is not available. Skipping AI Rule Check.`);
       return true;
     }
 
@@ -190,12 +188,12 @@ const aiRuleCheck: GateCheck = {
       const rules = fs.existsSync(rulesPath)
         ? fs.readFileSync(rulesPath, 'utf-8')
         : 'No project rules defined';
-      
+
       // Limit source files to avoid huge prompts
       const sourceFiles = fg.sync('src/**/*.ts', { ignore: ['**/*.test.ts', '**/*.spec.ts'] });
       const maxFiles = 10; // Limit to first 10 files
       const limitedFiles = sourceFiles.slice(0, maxFiles);
-      
+
       const fileContents = limitedFiles
         .map((file) => {
           const content = fs.readFileSync(file, 'utf-8');
@@ -219,12 +217,12 @@ const aiRuleCheck: GateCheck = {
       fs.writeFileSync(tempFilePath, prompt, 'utf-8');
 
       log.info(`Sending request to ${providerName}...`);
-      
+
       // Use a simple prompt that reads the file content
       const simplePrompt = `Please review the code in this file and provide a score. ${fs.readFileSync(tempFilePath, 'utf-8').substring(0, 2000)}... Reply with: "Final Score: XX/100"`;
-      
+
       const command = `"${activeProvider.path}" -p "${simplePrompt.replace(/"/g, '\\"').replace(/\n/g, ' ')}"`;
-      
+
       const result = await shellService.executeCommand(command, {
         isProviderCommand: true,
       });

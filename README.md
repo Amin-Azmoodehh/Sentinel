@@ -13,6 +13,7 @@ SentinelTM (`st`) is a local-first AI agent orchestrator that combines a powerfu
 **AI Provider Commands → SentinelTM Executes**
 
 Your AI model (Gemini, Claude, Qwen, Ollama) connects via MCP and controls SentinelTM's tools to:
+
 - 📁 Read/write files securely with whitelist/blacklist
 - 🖥️ Execute shell commands safely with adaptive syntax
 - 🔍 Index and search codebases with advanced filters
@@ -70,6 +71,7 @@ st serve --transport sse --port 8008
 Add to your IDE's MCP config file:
 
 **Using npx (recommended):**
+
 ```json
 {
   "mcpServers": {
@@ -83,6 +85,7 @@ Add to your IDE's MCP config file:
 ```
 
 **Using bunx:**
+
 ```json
 {
   "mcpServers": {
@@ -96,6 +99,7 @@ Add to your IDE's MCP config file:
 ```
 
 **Using pnpx:**
+
 ```json
 {
   "mcpServers": {
@@ -109,6 +113,7 @@ Add to your IDE's MCP config file:
 ```
 
 **Using global installation:**
+
 ```json
 {
   "mcpServers": {
@@ -130,6 +135,7 @@ Add to your IDE's MCP config file:
 ## 🛠️ Essential Commands
 
 ### 🤖 Provider Management
+
 ```bash
 st provider detect              # Show all available AI providers
 st set provider gemini   # Set default AI provider
@@ -138,12 +144,14 @@ st models set gemini-1.5-pro    # Set default model
 ```
 
 **Supported Providers:**
+
 - 🔥 **Gemini** - Google's Gemini models
-- 🧠 **Qwen** - Alibaba's Qwen models  
+- 🧠 **Qwen** - Alibaba's Qwen models
 - 🦙 **Ollama** - Local LLM execution
 - 🔧 **Codex** - OpenAI Codex models
 
 ### 📊 System Status
+
 ```bash
 st status                       # Show complete system status
 st status --json               # JSON format output
@@ -151,6 +159,7 @@ st status --watch 5            # Auto-refresh every 5 seconds
 ```
 
 ### 📁 File Operations
+
 ```bash
 st fs ls "src/**/*.ts"         # List TypeScript files
 st fs mkdir "app/models,app/views"  # Create multiple directories
@@ -161,6 +170,7 @@ st fs split large-file.ts --max 300  # Split files by line count
 ```
 
 ### 🖥️ Shell Execution (Secure)
+
 ```bash
 st shell run "npm test"        # Run npm commands
 st shell run "git status"      # Git operations
@@ -169,6 +179,7 @@ st shell run "ls -la" --timeout 30000  # With timeout
 ```
 
 ### 🔍 Code Indexing
+
 ```bash
 st index run                   # Index entire project
 st index status               # Show index statistics
@@ -183,22 +194,24 @@ st index clear-cache          # Clear index cache
 ```
 
 **MCP Index API:**
+
 ```javascript
 // ✅ REQUIRED: Always specify root to avoid EBUSY errors
-mcp0_index_build({ root: 'project' })  // Scope to project directory
-mcp0_index_build({ root: 'src' })      // Or specific subdirectory
+mcp0_index_build({ root: 'project' }); // Scope to project directory
+mcp0_index_build({ root: 'src' }); // Or specific subdirectory
 
 // ❌ WRONG: Will scan entire workspace including locked binaries
-mcp0_index_build()  // Missing root parameter
-mcp0_index_build({ root: '.' })  // Too broad
+mcp0_index_build(); // Missing root parameter
+mcp0_index_build({ root: '.' }); // Too broad
 ```
 
 ### 📋 Task Management
+
 st task create --title "Fix bug" --priority high --tags bug,urgent
-st task list --status open    # List open tasks
-st task next                  # Get next priority task
+st task list --status open # List open tasks
+st task next # Get next priority task
 st task update 1 --status done # Update task status
-st sub add --parent 1 --title "Write tests"  # Add subtask
+st sub add --parent 1 --title "Write tests" # Add subtask
 
 ```bash
 # Automatically parse a PRD file into structured tasks
@@ -215,6 +228,7 @@ st task add-dep --task 2 --depends-on 1
 ```
 
 **MCP Task API:**
+
 ```javascript
 // Correct usage via MCP
 {{ ... }}
@@ -228,12 +242,14 @@ mcp0_sentinel_task({ action: 'nextQueuedTask' })
 ```
 
 ### ✅ Quality Gates
+
 ```bash
 st gate run                   # Run all quality checks
 st gate run --min 90         # Set minimum score threshold
 ```
 
 ### 🔒 Security Management
+
 ```bash
 st security whitelist --add "src/**"  # Add to whitelist
 st security blacklist --add "node_modules" --reason "Dependencies"
@@ -242,6 +258,7 @@ st security validate "path"    # Validate path security
 ```
 
 ### 📊 Dashboard & Monitoring
+
 ```bash
 st dashboard show              # Show project metrics
 st dashboard show --json       # JSON output
@@ -250,6 +267,7 @@ st dashboard report --output report.md
 ```
 
 **Dashboard Output:**
+
 ```
 📊 SentinelTM Dashboard
 
@@ -278,6 +296,7 @@ st dashboard report --output report.md
 ```
 
 ### 🔄 CI/CD Integration
+
 ```bash
 st cicd init --provider github # Generate GitHub Actions
 st cicd init --provider gitlab # Generate GitLab CI
@@ -287,6 +306,7 @@ st cicd history --count 10     # Show CI/CD history
 ```
 
 ### 💻 IDE Integration
+
 ```bash
 st ide list                    # Show available IDE targets
 st ide set "VS Code,Cursor"    # Configure specific IDEs
@@ -295,6 +315,7 @@ st ide set windsurf            # Configure single IDE
 ```
 
 **Supported IDEs:**
+
 - **Code Editors:** VS Code, Cursor, Zed, Windsurf
 - **AI Extensions:** Continue, Cline, Codex, Claude, Gemini
 - **Specialized Tools:** Kiro, Trae, OpenCode, Roo, Amp, Kilo
@@ -326,27 +347,32 @@ st serve --transport sse --port 8008
 AI agents can call these tools via MCP:
 
 **📁 File Operations:**
+
 - `file_read` - Read file contents
-- `file_write` - Write/append to files  
+- `file_write` - Write/append to files
 - `file_delete` - Delete files/directories
 - `file_mkdir` - Create directories
 
 **🖥️ Shell Operations:**
+
 - `shell_execute` - Run commands safely
 - `shell_detect` - Detect available shells
 - `shell_list` - List allowed commands
 
 **🔍 Code Intelligence:**
+
 - `index_build` - Index project files
 - `index_query` - Search code/symbols/docs
 
 **📋 Task Management:**
+
 - `task_create` - Create new tasks
 - `task_list` - List tasks with filters
 - `task_next` - Get next priority task
 - `task_expand` - Get task details + subtasks
 
 **⚙️ System Control:**
+
 - `gate_run` - Execute quality gates
 - `sentinel.provider` - Manage AI providers
 - `sentinel.status` - Get system status
@@ -394,24 +420,24 @@ Create `.sentineltm/config/rules.json` to enforce project standards:
 
 ### Key Settings
 
-| Setting | Description | Default |
-|---------|-------------|---------|
-| `defaults.provider` | Active AI provider | `qwen` |
-| `defaults.model` | Default model name | `qwen-coder-flash` |
-| `thresholds.gate` | Minimum quality score | `95` |
-| `thresholds.maxFileSizeMB` | File size limit | `5` |
-| `security.shell.allowedCommands` | Safe shell commands | `["npm","git","ls",...]` |
-| `security.forbidden` | Banned code patterns | `["console.log(","eval("]` |
-| `thresholds.maxIndexLines` | Max lines per file before split | `300` |
-| `provider.retry.attempts` | Number of retry attempts for provider commands | `3` |
-| `provider.retry.delay` | Initial delay between retries (ms) | `1000` |
+| Setting                          | Description                                    | Default                    |
+| -------------------------------- | ---------------------------------------------- | -------------------------- |
+| `defaults.provider`              | Active AI provider                             | `qwen`                     |
+| `defaults.model`                 | Default model name                             | `qwen-coder-flash`         |
+| `thresholds.gate`                | Minimum quality score                          | `95`                       |
+| `thresholds.maxFileSizeMB`       | File size limit                                | `5`                        |
+| `security.shell.allowedCommands` | Safe shell commands                            | `["npm","git","ls",...]`   |
+| `security.forbidden`             | Banned code patterns                           | `["console.log(","eval("]` |
+| `thresholds.maxIndexLines`       | Max lines per file before split                | `300`                      |
+| `provider.retry.attempts`        | Number of retry attempts for provider commands | `3`                        |
+| `provider.retry.delay`           | Initial delay between retries (ms)             | `1000`                     |
 
 ## 📂 Project Structure
 
 ```
 src/
 ├── commands/     # CLI command implementations
-├── mcp/         # MCP server and tool definitions  
+├── mcp/         # MCP server and tool definitions
 ├── services/    # Core business logic
 ├── utils/       # Shared utilities
 └── constants/   # Default configurations
@@ -426,24 +452,28 @@ src/
 ## 🔧 AI Provider Setup
 
 ### Gemini
+
 ```bash
 npm install -g @google/generative-ai-cli
 gemini config set apiKey YOUR_API_KEY
 ```
 
 ### Qwen
+
 ```bash
 npm install -g qwen-cli
 qwen config set apiKey YOUR_API_KEY
 ```
 
 ### Ollama
+
 ```bash
 # Install Ollama from https://ollama.ai
 ollama pull llama2
 ```
 
 ### Codex
+
 ```bash
 npm install -g codex-cli
 codex config set apiKey YOUR_OPENAI_KEY
@@ -472,16 +502,19 @@ npm run ci:check
 ## 🔧 Troubleshooting
 
 **🚫 Provider not found:**
+
 ```bash
 st provider detect  # Check if provider is in PATH
 ```
 
 **❌ Gate failing:**
+
 ```bash
 st gate run --min 95  # Run with retries
 ```
 
 **🔌 MCP connection issues:**
+
 ```bash
 st serve  # Ensure server is running
 st serve --mcp-stdio  # Use explicit stdio mode
@@ -489,6 +522,7 @@ DEBUG=sentineltm:* st serve  # Enable debug logging
 ```
 
 **⚠️ Provider timeout errors:**
+
 ```bash
 # The system automatically retries failed provider commands up to 3 times
 # with exponential backoff. You can configure this in config.json:
@@ -503,6 +537,7 @@ DEBUG=sentineltm:* st serve  # Enable debug logging
 ```
 
 **🔄 Dashboard cache blocking commands:**
+
 ```bash
 # Fixed in v1.4.3+
 # Dashboard no longer auto-refreshes and blocks CLI commands
@@ -511,6 +546,7 @@ npm install -g sentineltm-cli@latest
 ```
 
 **🛣️ Path errors ("must stay within workspace"):**
+
 ```bash
 # ❌ WRONG: Absolute paths fail
 mcp0_file_read({ path: 'd:\\project\\file.ts' })
@@ -521,16 +557,16 @@ mcp0_file_write({ path: 'project/src/new.ts', content: '...' })
 ```
 
 **📄 Large files:**
+
 ```bash
 st fs split large-file.ts --max 300  # Split before indexing
 ```
 
 **🪟 Windows-specific issues:**
+
 - Ensure PowerShell execution policy allows scripts
 - Use `st shell run "command" --shell powershell` for PowerShell commands
 - Provider detection improved for Windows PATH resolution
-
-
 
 ## 📄 License
 
@@ -570,4 +606,3 @@ pnpx sentineltm-cli serve
 - **Documentation**: [Full docs](./DOCUMENTATION.md)
 
 ---
-

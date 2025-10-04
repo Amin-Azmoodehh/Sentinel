@@ -6,12 +6,12 @@ modules:
     role: Core think_depth processing logic
     dependencies: []
     exports: [processThinkDepth]
-  
+
   - path: src/types/thinkDepth.ts
     role: Type definitions and risk calculation
     dependencies: []
     exports: [ThinkDepthRequest, ThinkDepthResponse, calculateRiskLevel]
-  
+
   - path: src/mcp/toolHandlers/thinkDepthHandler.ts
     role: MCP handler for agent_plan tool
     dependencies: [thinkDepthService, validation]
@@ -24,7 +24,7 @@ interfaces:
       context?: string
       think_depth: number (0-10)
     output: ThinkDepthResponse
-  
+
   ThinkDepthResponse:
     plan?: string
     design_decisions?: string[]
@@ -38,7 +38,7 @@ constraints:
   architecture: Service-oriented, MCP-first
   max_lines_per_file: 300
   forbidden_patterns: [eval, console.log in production]
-  
+
 tests:
   coverage: 0%
   status: pending
