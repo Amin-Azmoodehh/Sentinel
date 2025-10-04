@@ -127,6 +127,18 @@ export const registerProviderCommands = (program: Command) => {
     .description('Show current provider and model status')
     .action(() => statusModels());
 
-  program.addCommand(providerCommand);
+    program.addCommand(providerCommand);
+
+  // Alias for `st set provider`
+  let legacySetCommand = program.commands.find((cmd) => cmd.name() === 'set');
+  if (!legacySetCommand) {
+    legacySetCommand = program.command('set').description('⚙️ Quick configuration shortcuts');
+  }
+  legacySetCommand
+    .command('provider')
+    .description('Alias for `st provider configure`')
+    .action(async () => {
+      await providerCommand.commands.find(c => c.name() === 'configure')?.parseAsync(process.argv);
+    });
 };
 
