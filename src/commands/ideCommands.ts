@@ -64,9 +64,33 @@ export const registerIdeCommands = (program: Command): void => {
         },
       ]);
 
-      const provider = getProvider(providerName);
+      // Check if provider is properly configured
+      const providerConfig = (tempConfig.providers as Record<string, any>)?.[providerName];
+      if (!providerConfig || (providerName !== 'ollama' && !providerConfig.apiKey)) {
+        log.error(`Provider '${providerName}' is not configured or missing API key.`);
+        log.warn(`Please run: st provider configure ${providerName}`);
+        log.warn(`Or use: st set provider`);
+        return;
+      }
+
+      let provider;
+      try {
+        provider = getProvider(providerName);
+      } catch (error) {
+        log.error(`Failed to initialize provider '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
+        log.warn(`Please run: st provider configure ${providerName}`);
+        return;
+      }
+
       log.info(`Fetching models from ${providerName}...`);
-      const models = await provider.listModels();
+      let models;
+      try {
+        models = await provider.listModels();
+      } catch (error) {
+        log.error(`Failed to fetch models from '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
+        log.warn('Please check your API key and network connection.');
+        return;
+      }
 
       if (models.length === 0) {
         log.error(`No models found for provider '${providerName}'.`);
@@ -194,20 +218,57 @@ export const registerIdeCommands = (program: Command): void => {
         },
       ]);
 
-      const provider = getProvider(providerName);
-      const models = await provider.listModels();
+      // Check if provider is properly configured
+      const providerConfig = (currentConfig.providers as Record<string, any>)?.[providerName];
+      if (!providerConfig || (providerName !== 'ollama' && !providerConfig.apiKey)) {
+        log.error(`Provider '${providerName}' is not configured or missing API key.`);
+        log.warn(`Please run: st provider configure ${providerName}`);
+        log.warn(`Or use: st set provider`);
+        return;
+      }
+
+      let provider;
+      try {
+        provider = getProvider(providerName);
+      } catch (error) {
+        log.error(`Failed to initialize provider '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
+        log.warn(`Please run: st provider configure ${providerName}`);
+        return;
+      }
+
+      log.info(`Fetching models from ${providerName}...`);
+      let models;
+      try {
+        models = await provider.listModels();
+      } catch (error) {
+        log.error(`Failed to fetch models from '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
+        log.warn('Please check your API key and network connection.');
+        return;
+      }
 
       if (models.length === 0) {
         log.error(`No models found for provider '${providerName}'.`);
         return;
       }
 
+      log.success(`Found ${models.length} models`);
+
+      const modelChoices = models.map((m) => {
+        const isCurrentModel = m.id === currentModel && providerName === currentProvider;
+        return {
+          name: `${m.id}${isCurrentModel ? ' ⭐ current' : ''}`,
+          value: m.id,
+          short: m.id,
+        };
+      });
+
       const { modelId } = await inquirer.prompt([
         {
           type: 'list',
           name: 'modelId',
           message: `Select a model from ${providerName}:`,
-          choices: models.map((m) => m.id),
+          choices: modelChoices,
+          pageSize: 15,
         },
       ]);
 

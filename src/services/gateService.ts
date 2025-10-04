@@ -250,9 +250,35 @@ const aiRuleCheck: GateCheck = {
       return false;
     } catch (error) {
       log.error('❌ Error during AI Rule Check!');
-      log.error('This indicates a problem with the AI provider configuration or availability.');
-      log.warn('Please check: 1) Provider is configured in config.json, 2) API keys are set, 3) Network connectivity');
-      log.warn(error instanceof Error ? error.message : String(error));
+      
+      // Enhanced error messaging
+      if (error instanceof Error) {
+        const errorMsg = error.message.toLowerCase();
+        
+        if (errorMsg.includes('500') || errorMsg.includes('internal server error')) {
+          log.error('🔴 AI Server Error (500): The AI model server encountered an internal error.');
+          log.warn('Possible causes:');
+          log.warn('  1. Model not fully loaded or corrupted');
+          log.warn('  2. Insufficient server resources (RAM/VRAM)');
+          log.warn('  3. Model incompatibility with current server version');
+          log.warn(`\nTry: ollama pull ${model}  # Re-download the model`);
+        } else if (errorMsg.includes('404')) {
+          log.error('🔴 Model Not Found (404): The specified model does not exist.');
+          log.warn(`Run: ollama list  # Check available models`);
+          log.warn(`Or: ollama pull ${model}  # Download the model`);
+        } else if (errorMsg.includes('401') || errorMsg.includes('403')) {
+          log.error('🔴 Authentication Error: Invalid API key or insufficient permissions.');
+        } else {
+          log.error(`Error: ${error.message}`);
+        }
+      }
+      
+      log.warn('\nTroubleshooting:');
+      log.warn('  1. Check provider is configured: st provider status');
+      log.warn('  2. Verify model exists: ollama list (for Ollama)');
+      log.warn('  3. Check network connectivity');
+      log.warn('  4. Try a different model: st set provider');
+      
       return false;
     }
   },
