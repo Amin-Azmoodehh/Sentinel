@@ -1,10 +1,12 @@
 {
   "$schema": "https://json-schema.org/draft-07/schema",
-  "version": "1.0.0",
+  "version": "1.6.1",
   "contract": {
     "version": "3.0",
     "name": "Zero Tolerance Python Contract",
-    "enforcement": "MANDATORY"
+    "enforcement": "MANDATORY",
+    "binding": "ABSOLUTE",
+    "violations": "AUTOMATIC_REJECTION"
   },
   "entrypoint": {
     "filename": "main.py",
@@ -88,7 +90,30 @@
       "Validation Commands Output",
       "Final Verdict (PASS/FAIL)"
     ],
-    "onlyLoggingAllowed": true,
-    "description": "Use logging module only; console in English, chat in Persian"
-  }
+    "mandatoryFormat": {
+      "preGeneration": "I acknowledge the following BINDING rules: ✓ main.py will be exactly ≤4 lines ✓ Zero hardcoded strings/numbers/URLs ✓ Zero print() statements ✓ All config from YAML files ✓ Type hints on every function ✓ PEP8 with ≤79 chars/line ✓ Files ≤300 lines maximum ✓ Absolute imports only ✓ English logs / Persian UI ✓ Modular architecture. I will provide self-assessment after generation.",
+      "selfAssessment": "MANDATORY_TABLE_WITH_EVIDENCE",
+      "finalVerdict": "Score: X/12, Grade: PASS ✅ / FAIL ❌"
+    }
+  },
+  "enforcement": {
+    "scoreRequired": 12,
+    "totalRules": 12,
+    "passingThreshold": "12/12",
+    "failureAction": "COMPLETE_REWRITE_REQUIRED",
+    "noExceptions": true,
+    "evidenceRequired": true,
+    "contractualBinding": true
+  },
+  "validationCommands": {
+    "mainPyLines": "wc -l main.py",
+    "hardcodedStrings": "grep -r '\".*\"' app/ | wc -l",
+    "printStatements": "grep -r 'print(' app/",
+    "fileLineLimits": "find . -name '*.py' -exec wc -l {} \\;",
+    "lineLength": "find app/ -name '*.py' -exec grep -n '.\\{80,\\}' {} +",
+    "relativeImports": "grep -r 'from \\.' app/",
+    "typeHints": "python -m mypy app/ --strict"
+  },
+  "onlyLoggingAllowed": true,
+  "description": "Use logging module only; console in English, chat in Persian"
 }

@@ -11,7 +11,28 @@
     }
   },
   "defaults": {
-    "provider": "gemini",
-    "model": "qwen-coder-flash"
+    "provider": "ollama",
+    "model": "llama3"
+  },
+  "providers": {
+    "ollama": {
+      "type": "ollama",
+      "baseUrl": "http://localhost:11434"
+    },
+    "openai": {
+      "type": "openai-compatible",
+      "baseUrl": "https://api.openai.com",
+      "apiKey": "YOUR_OPENAI_API_KEY_HERE"
+    },
+    "claude": {
+      "type": "openai-compatible",
+      "baseUrl": "https://api.anthropic.com",
+      "apiKey": "YOUR_ANTHROPIC_KEY_HERE"
+    },
+    "gemini": {
+      "type": "openai-compatible",
+      "baseUrl": "https://generativelanguage.googleapis.com",
+      "apiKey": "YOUR_GOOGLE_API_KEY_HERE"
+    }
   }
 }

@@ -10,7 +10,7 @@ import {
 export const registerProviderCommands = (program: Command) => {
   // Create provider command with subcommands
   const providerCommand = new Command('provider');
-  providerCommand.description('🤖 Manage AI providers (Gemini, Qwen, Ollama, Codex)');
+  providerCommand.description('🤖 Manage AI providers via API (Ollama, OpenAI, Claude, Gemini)');
 
   providerCommand
     .command('set <provider>')
@@ -21,7 +21,7 @@ export const registerProviderCommands = (program: Command) => {
 
   providerCommand
     .command('detect')
-    .description('Detect available models')
+    .description('Detect available API-based providers (v1.6.0+)')
     .action(async () => {
       await detectModels();
     });

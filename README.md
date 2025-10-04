@@ -27,22 +27,72 @@ Your AI model (Gemini, Claude, Qwen, Ollama) connects via MCP and controls Senti
 ### Installation
 
 ```bash
-# NPM
-npm install -g sentineltm-cli
+# NPM (Recommended)
+npm install -g sentineltm-cli@latest
 
 # Yarn
-yarn global add sentineltm-cli
+yarn global add sentineltm-cli@latest
 
 # PNPM
-pnpm add -g sentineltm-cli
+pnpm add -g sentineltm-cli@latest
 
 # Bun
-bun add -g sentineltm-cli
+bun add -g sentineltm-cli@latest
 
 # Or use without installation
-npx sentineltm-cli --help
-bunx sentineltm-cli --help
-pnpx sentineltm-cli --help
+npx sentineltm-cli@latest --help
+```
+
+### 🔧 Provider Configuration (v1.6.0+)
+
+SentinelTM now uses **API-based providers** instead of CLI tools for better reliability:
+
+#### Option 1: Ollama (Local, Free)
+```bash
+# Install Ollama
+# Visit: https://ollama.ai
+
+# Pull a model
+ollama pull llama3
+
+# Configure SentinelTM
+st set provider ollama
+st set model llama3
+```
+
+#### Option 2: OpenAI
+```bash
+# Set your API key in config
+st set provider openai
+st set model gpt-3.5-turbo
+
+# Edit .sentineltm/config/config.json:
+{
+  "providers": {
+    "openai": {
+      "type": "openai-compatible",
+      "baseUrl": "https://api.openai.com", 
+      "apiKey": "sk-your-key-here"
+    }
+  }
+}
+```
+
+#### Option 3: Anthropic Claude
+```bash
+st set provider claude
+st set model claude-3-sonnet-20240229
+
+# Add to config.json:
+{
+  "providers": {
+    "claude": {
+      "type": "openai-compatible",
+      "baseUrl": "https://api.anthropic.com",
+      "apiKey": "sk-ant-your-key"
+    }
+  }
+}
 ```
 
 ### Basic Usage
