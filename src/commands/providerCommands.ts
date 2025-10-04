@@ -134,28 +134,24 @@ export const registerProviderCommands = (program: Command) => {
 
     program.addCommand(providerCommand);
 
-  // Alias for `st set provider`
-  let legacySetCommand = program.commands.find((cmd) => cmd.name() === 'set');
-  if (!legacySetCommand) {
-    legacySetCommand = program.command('set').description('⚙️ Quick configuration shortcuts');
-  }
-  legacySetCommand
+  // Register a completely separate 'set' command with 'provider' subcommand
+  const setCommand = new Command('set');
+  setCommand.description('⚙️ Quick configuration shortcuts');
+  
+  setCommand
     .command('provider')
-    .description('Alias for `st provider configure`')
-    .action(async (providerName) => {
-      // This is a direct copy of the 'configure' action to ensure identical behavior.
-      let provider = providerName;
-      if (!provider) {
-        const { chosenProvider } = await inquirer.prompt([
-          {
-            type: 'list',
-            name: 'chosenProvider',
-            message: 'Choose a provider to configure:',
-            choices: Object.keys(preconfiguredProviders),
-          },
-        ]);
-        provider = chosenProvider;
-      }
+    .description('Configure a provider interactively (alias for st provider configure)')
+    .action(async () => {
+      // Interactive provider selection
+      const { chosenProvider } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'chosenProvider',
+          message: 'Choose a provider to configure:',
+          choices: Object.keys(preconfiguredProviders),
+        },
+      ]);
+      const provider = chosenProvider;
 
       const preconfig = preconfiguredProviders[provider as keyof typeof preconfiguredProviders];
       if (!preconfig) {
@@ -163,6 +159,7 @@ export const registerProviderCommands = (program: Command) => {
         return;
       }
 
+      // Interactive API key input
       const { apiKey } = await inquirer.prompt([
         {
           type: 'password',
@@ -182,6 +179,7 @@ export const registerProviderCommands = (program: Command) => {
           return;
         }
 
+        // Interactive model selection
         const { chosenModel } = await inquirer.prompt([
           {
             type: 'list',
@@ -200,5 +198,7 @@ export const registerProviderCommands = (program: Command) => {
         console.log(`Error fetching models: ${error instanceof Error ? error.message : String(error)}`);
       }
     });
+  
+  program.addCommand(setCommand);
 };
 

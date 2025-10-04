@@ -104,4 +104,93 @@ export const registerIdeCommands = (program: Command): void => {
       });
       log.raw('\n💡 Usage: st ide set');
     });
+
+  // Register a completely separate 'set' command with 'ide' subcommand as an alias
+  const setCommand = new Command('set');
+  setCommand.description('⚙️ Quick configuration shortcuts');
+  
+  setCommand
+    .command('ide')
+    .description('Configure IDE profiles (alias for st ide set)')
+    .action(async () => {
+      // Interactive IDE selection
+      const availableIdes = getAvailableIdes();
+      const { chosenIdes } = await inquirer.prompt([
+        {
+          type: 'checkbox',
+          name: 'chosenIdes',
+          message: 'Select IDEs to configure:',
+          choices: availableIdes,
+        },
+      ]);
+      const targets = chosenIdes;
+
+      if (targets.length === 0) {
+        log.info('No IDEs selected. Exiting.');
+        return;
+      }
+
+      const availableProviders = getAvailableProviders();
+      if (availableProviders.length === 0) {
+        log.error('No providers configured. Please run `st provider configure` to add a provider.');
+        return;
+      }
+
+      const { providerName } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'providerName',
+          message: 'Select a provider:',
+          choices: availableProviders,
+        },
+      ]);
+
+      const provider = getProvider(providerName);
+      const models = await provider.listModels();
+
+      if (models.length === 0) {
+        log.error(`No models found for provider '${providerName}'.`);
+        return;
+      }
+
+      const { modelId } = await inquirer.prompt([
+        {
+          type: 'list',
+          name: 'modelId',
+          message: `Select a model from ${providerName}:`,
+          choices: models.map((m) => m.id),
+        },
+      ]);
+
+      const config = configService.load();
+      config.defaults.provider = providerName;
+      config.defaults.model = modelId;
+      configService.save(config);
+      log.success(`Set default provider to '${providerName}' and model to '${modelId}'.`);
+
+      const { applyRules } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'applyRules',
+          message: 'Apply Zero Tolerance rules to selected IDEs?',
+          default: true,
+        },
+      ]);
+
+      const applied = setIde(targets, applyRules, providerName);
+
+      if (applied.length === 0) {
+        log.warn('No IDE profiles were configured!');
+        return;
+      }
+
+      log.raw('\n🎯 IDE Configuration Complete');
+      applied.forEach((name) => {
+        log.success(`${name} → MCP profile ready`);
+      });
+
+      log.info(`\n📁 Generated ${applied.length} IDE configuration${applied.length > 1 ? 's' : ''}`);
+    });
+  
+  program.addCommand(setCommand);
 };
