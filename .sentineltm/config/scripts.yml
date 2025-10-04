@@ -1,0 +1,71 @@
+scripts:
+  # Basic development commands
+  install: npm install
+  test: npm test
+  build: npm run build
+  dev: npm run dev
+  lint: npm run lint
+  
+  # Git operations
+  status: git status
+  commit: git commit -m "$1"
+  push: git push origin main
+  pull: git pull origin main
+  
+  # SentinelTM operations
+  index: st index build
+  gate: st gate run
+  dashboard: st dashboard report
+  
+  # Parameterized commands
+  serve: npm run dev -- --port $1
+  test-file: npm test -- $1
+  commit-type: git commit -m "$1: $2"
+  
+  # Complex workflows
+  deploy:
+    - echo "🚀 Starting deployment workflow..."
+    - st task create --title "Deploy to production" --priority high
+    - npm run build
+    - npm test
+    - st gate run
+    - echo "✅ Deployment workflow completed"
+    
+  release:
+    - echo "📦 Starting release workflow..."
+    - npm run build
+    - npm test
+    - st gate run --min 95
+    - npm version patch
+    - git push origin main --tags
+    - npm publish
+    - echo "🎉 Release completed successfully"
+    
+  setup:
+    - echo "⚙️ Setting up development environment..."
+    - npm install
+    - st index build
+    - st task create --title "Setup completed" --priority low
+    - echo "✅ Development environment ready"
+
+# Security settings
+security:
+  allowedCommands:
+    - npm
+    - git
+    - st
+    - echo
+    - node
+  
+  blockedPatterns:
+    - rm -rf
+    - sudo
+    - chmod
+    - del /f
+    - format
+    
+  maxExecutionTime: 300 # 5 minutes
+  requireConfirmation:
+    - deploy
+    - release
+    - npm publish

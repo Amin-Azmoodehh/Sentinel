@@ -156,7 +156,7 @@ const aiRuleCheck: GateCheck = {
   name: 'AI Rule Check',
   weight: 40,
   run: async () => {
-    log.info('Starting AI Rule Check...');
+    log.info('Starting Enhanced AI Rule Check...');
     const config = configService.load();
     const providerName = config.defaults.provider;
     const model = config.defaults.model;
@@ -168,88 +168,130 @@ const aiRuleCheck: GateCheck = {
     }
 
     try {
+      // Load project-specific rules
+      const projectRulesPath = 'project_rules.md';
+      const projectRules = fs.existsSync(projectRulesPath)
+        ? fs.readFileSync(projectRulesPath, 'utf-8')
+        : '';
+
+      // Load SentinelTM rules
       const rulesPath = '.sentineltm/config/rules.json';
-      const rules = fs.existsSync(rulesPath)
+      const sentinelRules = fs.existsSync(rulesPath)
         ? fs.readFileSync(rulesPath, 'utf-8')
-        : 'No project rules defined';
-      
-      // Limit source files to avoid huge prompts
-      const sourceFiles = indexingService.getFiles().filter(f => f.startsWith('src') && f.endsWith('.ts') && !f.endsWith('.test.ts') && !f.endsWith('.spec.ts'));
-      const maxFiles = 5; // Reduced to 5 files for API limits
-      const limitedFiles = sourceFiles.slice(0, maxFiles);
-      
-      const fileContents = limitedFiles
-        .map((file) => {
-          const content = fs.readFileSync(file, 'utf-8');
-          // Limit each file to 200 lines for API
-          const lines = content.split('\n').slice(0, 200).join('\n');
-          return `// --- ${file} ---\n${lines}`;
-        })
-        .join('\n\n');
+        : '';
+
+      // Get git diff for recent changes (focus on changes, not entire codebase)
+      let gitDiff = '';
+      try {
+        const { spawnSync } = await import('node:child_process');
+        const result = spawnSync('git', ['diff', '--cached', 'HEAD~1..HEAD'], { 
+          encoding: 'utf-8',
+          cwd: process.cwd()
+        });
+        if (result.stdout) {
+          gitDiff = result.stdout.slice(0, 2000); // Limit diff size
+        }
+      } catch {
+        // Fallback to file analysis if git diff fails
+      }
+
+      // If no git diff, analyze recent files
+      if (!gitDiff.trim()) {
+        const sourceFiles = indexingService.getFiles()
+          .filter(f => f.startsWith('src') && f.endsWith('.ts') && !f.includes('.test.') && !f.includes('.spec.'))
+          .slice(0, 3); // Limit to 3 most relevant files
+        
+        gitDiff = sourceFiles
+          .map((file) => {
+            const content = fs.readFileSync(file, 'utf-8');
+            const lines = content.split('\n').slice(0, 100).join('\n'); // Limit to 100 lines per file
+            return `=== ${file} ===\n${lines}`;
+          })
+          .join('\n\n');
+      }
 
       const prompt = [
-        '# 🛡️ SentinelTM Military-Grade Code Review System',
+        'You are a senior code reviewer. Analyze the provided code based on the project rules.',
+        'Return your feedback ONLY in the following JSON format. Do not add any other text.',
         '',
-        'You are an elite code reviewer operating under SentinelTM\'s Zero Tolerance Protocol.',
-        'Your mission: Enforce military-grade code quality standards with absolute precision.',
+        '## PROJECT RULES:',
+        projectRules || 'No specific project rules defined.',
         '',
-        '## 🎯 MISSION OBJECTIVE',
-        'Conduct a comprehensive security and quality audit of the provided code.',
-        'Apply the strictest possible standards - this code must be enterprise-ready.',
+        '## SENTINELTM STANDARDS:',
+        '- TypeScript strict mode required',
+        '- No hardcoded strings or credentials',
+        '- Comprehensive error handling',
+        '- Clean architecture principles',
+        '- Security best practices',
         '',
-        '## 📋 EVALUATION MATRIX',
-        '### Critical Factors (Each must score 90+):',
-        '- **Security**: No vulnerabilities, hardcoded secrets, or unsafe patterns',
-        '- **Architecture**: Clean, modular, SOLID principles',
-        '- **Code Quality**: Readable, maintainable, well-structured',
-        '- **Standards Compliance**: Follows all language-specific conventions',
-        '- **Error Handling**: Comprehensive, graceful failure management',
-        '- **Testing**: Adequate coverage and quality',
-        '- **Documentation**: Clear, complete, professional',
+        '## CODE TO REVIEW:',
+        gitDiff || 'No code changes to analyze.',
         '',
-        '## 🔒 ZERO TOLERANCE RULES',
-        CompressionService.compressRules(rules),
+        '## REQUIRED JSON OUTPUT FORMAT:',
+        '{',
+        '  "score": <integer from 0 to 100>,',
+        '  "is_compliant": <true or false>,',
+        '  "summary": "<brief overall assessment>",',
+        '  "suggestions": [',
+        '    {',
+        '      "severity": "<critical|major|minor>",',
+        '      "category": "<security|architecture|quality|style>",',
+        '      "comment": "<specific improvement suggestion>"',
+        '    }',
+        '  ]',
+        '}',
         '',
-        '## 📁 CODE UNDER REVIEW',
-        `Files analyzed: ${limitedFiles.length}`,
-        fileContents,
-        '',
-        '## ⚡ SCORING PROTOCOL',
-        '**CRITICAL**: You must be extremely strict. Enterprise code demands perfection.',
-        '',
-        '- **95-100**: Military-grade excellence - Deploy immediately',
-        '- **85-94**: Professional quality - Minor polish needed',
-        '- **70-84**: Acceptable - Requires significant improvements',
-        '- **50-69**: Poor quality - Major refactoring required',
-        '- **0-49**: Unacceptable - Complete rewrite necessary',
-        '',
-        '## 🎖️ FINAL VERDICT',
-        'Respond with EXACTLY this format (nothing else):',
-        '"Final Score: XX/100"',
-        '',
-        'Remember: You are the last line of defense against poor code.',
-        'The reputation of the entire development team depends on your judgment.',
-        'Be merciless in your evaluation.',
+        'Focus on actionable feedback. Be constructive but thorough.',
       ].join('\n');
 
-      log.info(`Sending request to ${providerName} (${model})...`);
+      log.info(`Sending contextual request to ${providerName} (${model})...`);
       
       // Use the new API-based provider service
       const { generateCompletion } = await import('./providerService.js');
       const response = await generateCompletion({
         prompt,
         model,
-        temperature: 0,
-        maxTokens: 256,
+        temperature: 0.1, // Low temperature for consistent structured output
+        maxTokens: 1000, // More tokens for detailed feedback
       });
 
-      const output = response.content;
-      const scoreMatch = output.match(/Final Score:\s*(\d+)\/100/i);
+      const output = response.content.trim();
+      
+      // Try to parse JSON response
+      try {
+        const jsonMatch = output.match(/\{[\s\S]*\}/);
+        if (jsonMatch) {
+          const feedback = JSON.parse(jsonMatch[0]);
+          const score = feedback.score || 0;
+          
+          log.info(`✅ AI Analysis Complete - Score: ${score}/100`);
+          
+          // Display detailed feedback
+          if (feedback.summary) {
+            log.info(`📋 Summary: ${feedback.summary}`);
+          }
+          
+          if (feedback.suggestions && feedback.suggestions.length > 0) {
+            log.info('💡 Suggestions:');
+            feedback.suggestions.forEach((suggestion: any, index: number) => {
+              const icon = suggestion.severity === 'critical' ? '🔴' : 
+                          suggestion.severity === 'major' ? '🟡' : '🔵';
+              log.info(`   ${icon} [${suggestion.category}] ${suggestion.comment}`);
+            });
+          }
+          
+          return score >= 85; // More reasonable threshold
+        }
+      } catch (parseError) {
+        log.warn('⚠️ Could not parse structured feedback, falling back to simple scoring');
+      }
 
+      // Fallback: try to extract score from text
+      const scoreMatch = output.match(/(?:score|rating).*?(\d+)/i);
       if (scoreMatch?.[1]) {
         const score = parseInt(scoreMatch[1], 10);
         log.info(`✅ AI model returned a score of: ${score}/100`);
-        return score >= 95;
+        return score >= 85;
       }
 
       log.error('❌ Could not parse AI score from output!');

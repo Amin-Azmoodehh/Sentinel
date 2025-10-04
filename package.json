@@ -58,6 +58,7 @@
     "@ai-sdk/google": "^2.0.17",
     "@modelcontextprotocol/sdk": "^1.18.1",
     "@types/inquirer": "^9.0.9",
+    "@types/yaml": "^1.9.6",
     "axios": "^1.12.2",
     "chalk": "^5.3.0",
     "cli-table3": "^0.6.5",
@@ -69,7 +70,8 @@
     "ignore": "^5.3.1",
     "inquirer": "^12.9.6",
     "sql.js": "^1.13.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "yaml": "^2.8.1"
   },
   "devDependencies": {
     "@types/fs-extra": "^11.0.4",
