@@ -184,7 +184,10 @@ const aiRuleCheck: GateCheck = {
     );
 
     try {
-      const rules = fs.readFileSync('.taskmaster/rules/PROJECT_RULES.md', 'utf-8');
+      const rulesPath = '.sentineltm/config/rules.json';
+      const rules = fs.existsSync(rulesPath) 
+        ? fs.readFileSync(rulesPath, 'utf-8')
+        : 'No project rules defined';
       const sourceFiles = fg.sync('src/**/*.ts');
       const fileContents = sourceFiles
         .map((file) => `// --- ${file} ---\n${fs.readFileSync(file, 'utf-8')}`)

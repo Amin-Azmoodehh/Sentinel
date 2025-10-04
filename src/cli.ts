@@ -24,6 +24,7 @@ const args = process.argv;
 const hasHelp = args.includes('--help') || args.includes('-h');
 const isServeCommand = args.includes('serve');
 const hasJsonFlag = args.includes('--json');
+const isSubcommandHelp = args.length > 3 && hasHelp; // e.g., "st index --help"
 
 if (isServeCommand && !process.env.ST_FORCE_STDERR) {
   process.env.ST_FORCE_STDERR = '1';
@@ -34,7 +35,8 @@ if (hasJsonFlag) {
   process.env.ST_SUPPRESS_FOOTER = '1';
 }
 
-if (hasHelp && !hasJsonFlag) {
+// Only show banner for main help, not subcommand help
+if (hasHelp && !hasJsonFlag && !isSubcommandHelp) {
   printBanner();
 }
 
