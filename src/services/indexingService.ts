@@ -1,4 +1,6 @@
 import fg from 'fast-glob';
+import fs from 'node:fs';
+import path from 'node:path';
 import { configService } from './configService.js';
 import { log } from '../utils/logger.js';
 
@@ -33,8 +35,6 @@ class IndexingService {
 
   private saveIndexToFile(): void {
     try {
-      const fs = require('fs');
-      const path = require('path');
       const indexDir = path.join(process.cwd(), '.sentineltm', 'db');
       const indexFile = path.join(indexDir, 'index.json');
       
@@ -56,8 +56,6 @@ class IndexingService {
 
   private loadIndexFromFile(): void {
     try {
-      const fs = require('fs');
-      const path = require('path');
       const indexFile = path.join(process.cwd(), '.sentineltm', 'db', 'index.json');
       
       if (fs.existsSync(indexFile)) {
