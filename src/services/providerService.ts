@@ -22,6 +22,47 @@ export interface ModelsListResult {
   source: 'provider' | 'cache';
 }
 
+export interface ProviderUpsertOptions {
+  type?: string;
+  baseUrl?: string;
+  apiKey?: string;
+  model?: string; // convenience: also update defaults.model
+}
+
+// Create or update a provider entry in config.providers
+export const upsertProviderConfig = (name: string, opts: ProviderUpsertOptions = {}): void => {
+  const config = configService.load();
+  const providers = (config.providers as Record<string, any>) || {};
+  const canonical = normalizeProviderName(name);
+  const current = providers[canonical] || {};
+
+  const nextType = opts.type || current.type || (canonical === 'ollama' ? 'ollama' : 'openai-compatible');
+  const nextBaseUrl = opts.baseUrl ?? current.baseUrl ?? (nextType === 'ollama' ? 'http://localhost:11434' : undefined);
+  const nextApiKey = opts.apiKey ?? current.apiKey ?? '';
+
+  providers[canonical] = {
+    ...current,
+    type: nextType,
+    ...(nextBaseUrl ? { baseUrl: nextBaseUrl } : {}),
+    ...(typeof nextApiKey === 'string' ? { apiKey: nextApiKey } : {}),
+  };
+
+  (config as any).providers = providers;
+
+  if (opts.model) {
+    config.defaults = config.defaults || ({} as any);
+    (config.defaults as any).model = opts.model;
+  }
+
+  // If default provider not set, set it to this one
+  if (!config.defaults?.provider) {
+    config.defaults = { ...(config.defaults || {}), provider: canonical } as any;
+  }
+
+  configService.save(config);
+  log.success(`Provider '${canonical}' configuration updated.`);
+};
+
 // Factory to create provider instances based on config
 const createProvider = (name: string, config: any): Provider | null => {
   const providerConfig = config.providers?.[name];
@@ -86,15 +127,15 @@ export const detectProviders = (): ProviderDetectResult => {
 
 export const setProvider = (provider: string): void => {
   const config = configService.load();
-  config.defaults.provider = provider;
+  // Keep defaults in sync
+  config.defaults.provider = normalizeProviderName(provider);
   configService.save(config);
-  
-  const providerInstance = createProvider(provider, config);
+  const providerInstance = createProvider(config.defaults.provider, config);
   if (!providerInstance) {
-    log.warn(`Provider '${provider}' is not available. Value kept in config.`);
+    log.warn(`Provider '${config.defaults.provider}' is not available. Configure it with: st provider set ${config.defaults.provider} --type <type> --base-url <url> [--api-key <key>] [--model <id>]`);
     return;
   }
-  
+
   log.success(`Provider '${provider}' set successfully.`);
 };
 

@@ -1,362 +1,83 @@
 # 🔒 Zero Tolerance Python Contract v3.0
 
-## ⚡ CONTRACTUAL SYSTEM - MANDATORY COMPLIANCE
+This document outlines the strict, non-negotiable rules for AI-generated Python code, enforced by the SentinelTM Quality Gate. Adherence is mandatory.
 
-```
-🎯 This is a CONTRACTUAL system. You are OBLIGATED to follow every rule.
-Any violation = Complete failure = Mandatory rewrite
+## 📜 The Contract
 
-This is NOT a negotiation. This is a CONTRACT.
-```
+This is a binding contract. Any violation results in automatic rejection and a mandatory rewrite. There are no exceptions.
 
-## 📋 MANDATORY CONTRACT
+### Core Principles
 
-```markdown
-===============================================
-   PYTHON CODE GENERATION CONTRACT v3.0
-   NON-NEGOTIABLE - ZERO VIOLATION POLICY
-===============================================
+1.  **Follow ALL specifications**: No creative deviations or "improvements".
+2.  **Validate before responding**: Every rule must be checked.
+3.  **Provide self-assessment**: A mandatory checklist must be completed.
+4.  **Accept automatic rejection**: Any violation equals failure.
 
-I, AI Assistant, COMMIT to the following rules:
+## 📐 Architecture Blueprint
 
-1. I WILL generate code following ALL specifications
-2. I WILL NOT make ANY exceptions or "improvements"  
-3. I WILL validate EVERY rule before responding
-4. I WILL provide self-assessment after EVERY response
-5. I WILL accept AUTOMATIC REJECTION for ANY violation
-
-Signed: AI Assistant
-Date: [Current Date]
-Binding Status: ABSOLUTE
-```
-
-## 🎯 MANDATORY RESPONSE FORMAT
-
-### Phase 1: Pre-Generation Acknowledgment
-
-Before generating ANY code, you MUST explicitly state:
-
-```
-I acknowledge the following BINDING rules:
-✓ main.py will be exactly ≤4 lines
-✓ Zero hardcoded strings/numbers/URLs
-✓ Zero print() statements
-✓ All config from YAML files
-✓ Type hints on every function
-✓ PEP8 with ≤79 chars/line
-✓ Files ≤300 lines maximum
-✓ Absolute imports only
-✓ English logs / Persian UI
-✓ Modular architecture
-
-I will provide self-assessment after generation.
-```
-
-### Phase 2: Generated Code
-
-Complete project structure following EXACT architecture:
+All generated Python projects MUST follow this structure:
 
 ```
 project/
-├── main.py                    # ≤4 lines ABSOLUTE MAXIMUM
+├── main.py             # ≤4 lines, application entry point only
 ├── app/
-│   ├── __init__.py           # Empty or version only
-│   ├── core/
-│   │   ├── __init__.py
-│   │   ├── config_loader.py  # ONLY file accessing env/disk
-│   │   ├── logger.py         # Centralized logging
-│   │   └── main_runner.py    # Application entry point
-│   ├── classes/
-│   │   ├── __init__.py
-│   │   └── [your_classes].py
-│   ├── utils/
-│   │   ├── __init__.py
-│   │   └── [helper_functions].py
-│   └── filters/
-│       ├── __init__.py
-│       └── [custom_filters].py
+│   ├── core/           # Core services: config, logging, main runner
+│   ├── classes/        # Main application classes
+│   ├── utils/          # Helper functions
+│   └── ...             # Other modules as needed
 └── data/
-    ├── config/
-    │   ├── settings.yml      # App configuration
-    │   └── logging.yml       # Log configuration
-    ├── texts/
-    │   ├── messages_en.yml   # English (logs)
-    │   └── messages_fa.yml   # Persian (UI)
-    ├── .env                  # Environment secrets
-    ├── sessions/             # Runtime data
-    └── cache/                # Temporary files
+    ├── config/         # All .yml configuration files
+    ├── texts/          # All .yml text/message files (e.g., messages_en.yml)
+    └── .env            # Environment variables and secrets
 ```
 
-### Phase 3: MANDATORY Self-Assessment
+## 🚫 Absolute Prohibitions
+
+| Category | Forbidden Pattern | Example |
+|---|---|---|
+| **Hardcoded Values** | Any string, number, URL, or regex not from config. | `API_KEY = "..."`, `MAX_RETRIES = 3` |
+| **Output** | `print()` statements. | `print("Debug info")` |
+| **Imports** | Relative or wildcard imports. | `from .utils import helper`, `from os import *` |
+| **Architecture** | Logic in `main.py`; files > 300 lines. | `if __name__ == "__main__": app.run()` |
+| **Style** | Lines > 79 characters; missing type hints. | `def my_func(data): ...` |
+
+## ✅ Required Patterns
+
+-   **`main.py`**: Must be ≤4 lines and only call the main application runner.
+-   **Type Hints**: Every function, method, and variable must have a type hint.
+-   **Configuration**: All configuration, text, and secrets must be loaded from `.yml` or `.env` files via a centralized `ConfigLoader`.
+-   **Logging**: Use a centralized logger. Logs must be in English.
+-   **Imports**: All imports must be absolute.
+
+## 📝 Mandatory Response Format
+
+Every AI response that generates code MUST include:
+
+1.  **Pre-Generation Acknowledgment**: A statement confirming all rules are understood.
+2.  **Generated Code**: The complete, runnable project structure.
+3.  **Self-Assessment Checklist**: A table validating each of the 10 core rules.
+4.  **Validation Commands**: The output of commands used for verification (e.g., `wc`, `grep`).
+5.  **Final Verdict**: A `PASS ✅` or `FAIL ❌` grade.
+
+### Example Self-Assessment Checklist
 
 | # | Rule | Status | Evidence |
-|---|------|--------|----------|
-| 1 | main.py ≤4 lines | ✅/❌ | Line count: X |
-| 2 | No hardcoded strings | ✅/❌ | Grep result: X |
-| 3 | No print() | ✅/❌ | Search result: X |
-| 4 | Type hints everywhere | ✅/❌ | Coverage: X% |
-| 5 | Files ≤300 lines | ✅/❌ | Max lines: X |
-| 6 | PEP8 compliant | ✅/❌ | Line length: X |
-| 7 | Absolute imports only | ✅/❌ | Verified: Yes/No |
-| 8 | YAML for all config | ✅/❌ | Count: X files |
-| 9 | English logs only | ✅/❌ | Verified: Yes/No |
-| 10 | Modular architecture | ✅/❌ | Structure: Valid/Invalid |
-| 11 | No business logic in main.py | ✅/❌ | Verified: Yes/No |
-| 12 | Proper error handling | ✅/❌ | Verified: Yes/No |
+|---|---|---|---|
+| 1 | `main.py` ≤4 lines | ✅ | Line count: 4 |
+| 2 | No hardcoded strings | ✅ | `grep` result: 0 matches |
+| 3 | No `print()` | ✅ | `grep` result: 0 matches |
+| 4 | Type hints everywhere | ✅ | `mypy` coverage: 100% |
+| 5 | Files ≤300 lines | ✅ | Max lines: 128 |
+| 6 | PEP8 compliant (≤79 chars) | ✅ | Max line length: 78 |
+| 7 | Absolute imports only | ✅ | Verified: Yes |
+| 8 | YAML for all config | ✅ | `find data -name "*.yml"`: 3 files |
+| 9 | English logs only | ✅ | Verified: Yes |
+| 10 | Modular architecture | ✅ | Structure: Valid |
 
-**TOTAL SCORE: X/12**
+**TOTAL SCORE: 10/10**
 
-### Phase 4: Validation Commands
+## 🔥 Enforcement Protocol
 
-```bash
-wc -l main.py                          # Result: [X]
-grep -r "print(" app/                  # Result: [X]
-grep -r '".*"' app/ | wc -l           # Result: [X]
-find . -name "*.py" -exec wc -l {} \; # Max: [X]
-find app/ -name "*.py" -exec grep -n '.{80,}' {} +
-grep -r "from \." app/
-python -m mypy app/ --strict
-```
+-   **Score < 10/10**: The response is automatically rejected.
+-   **Rejection**: The AI must identify all violations, acknowledge them, provide corrected code, and re-run the self-assessment until a 10/10 score is achieved.
 
-### Phase 5: Final Verdict
-
-- **Score**: X/12
-- **Grade**: PASS ✅ / FAIL ❌
-- **Status**: Ready for production / Needs revision
-
-## 🚫 ABSOLUTE PROHIBITIONS
-
-### ❌ FORBIDDEN PATTERNS (Will cause AUTOMATIC REJECTION):
-
-```python
-# 1. Hardcoded values
-API_KEY = "sk-123456"              # ❌ FORBIDDEN
-BASE_URL = "https://api.com"       # ❌ FORBIDDEN  
-REGEX = r"[A-Z]+"                  # ❌ FORBIDDEN
-MESSAGE = "Hello world"            # ❌ FORBIDDEN
-MAX_RETRIES = 3                    # ❌ FORBIDDEN
-
-# 2. Output statements
-print("Debug")                     # ❌ FORBIDDEN
-print(f"Value: {x}")              # ❌ FORBIDDEN
-
-# 3. Import violations
-from .module import func           # ❌ FORBIDDEN (relative)
-from module import *               # ❌ FORBIDDEN (wildcard)
-
-# 4. Architecture violations  
-if __name__ == "__main__":         # ❌ FORBIDDEN in non-main.py
-    setup()
-    configure()
-    run()                          # More than 4 lines!
-
-# 5. File size violations
-[Any file with >300 lines]         # ❌ FORBIDDEN
-
-# 6. Type hint violations
-def process(data):                 # ❌ FORBIDDEN (no types)
-    return data
-
-# 7. Line length violations
-very_long_variable_name = some_function_call(param1, param2, param3, param4)  # ❌ >79 chars
-```
-
-## ✅ REQUIRED PATTERNS
-
-### ✅ CORRECT: main.py (≤4 lines)
-```python
-from app.core.main_runner import run_application
-
-if __name__ == "__main__":
-    run_application()
-```
-
-### ✅ CORRECT: Type hints
-```python
-def process_data(
-    input_data: List[str],
-    config: Dict[str, Any]
-) -> Dict[str, int]:
-    """Process input data with configuration.
-    
-    Args:
-        input_data: List of strings to process
-        config: Configuration dictionary
-        
-    Returns:
-        Dictionary with processing results
-    """
-    pass
-```
-
-### ✅ CORRECT: Configuration from YAML
-```python
-from app.core.config_loader import ConfigLoader
-
-config = ConfigLoader()
-settings = config.load_yaml("settings.yml")
-api_key = config.get_env_var("API_KEY")
-```
-
-### ✅ CORRECT: Logging (never print)
-```python
-from app.core.logger import get_logger
-
-logger = get_logger(__name__)
-logger.info("messages.process_started")
-```
-
-### ✅ CORRECT: Absolute imports
-```python
-from app.utils.helpers import format_text
-from app.classes.processor import DataProcessor
-from app.filters.validators import validate_input
-```
-
-## 🔥 ENFORCEMENT PROTOCOL
-
-### If Score < 12/12:
-
-```
-⛔ AUTOMATIC REJECTION TRIGGERED
-
-Violations detected:
-1. [Rule X] - [Specific violation]
-2. [Rule Y] - [Specific violation]
-
-Required Actions:
-□ Identify ALL violations
-□ Acknowledge each violation explicitly  
-□ Provide corrected code
-□ Re-run self-assessment
-□ Achieve 12/12 score
-
-Status: REWRITE IN PROGRESS
-```
-
-## 🛡️ Multi-Layer Enforcement System
-
-### Layer 1: Pre-Commitment
-Model must commit before starting:
-```
-"I commit to 12/12 score. I will self-assess honestly."
-```
-
-### Layer 2: Inline Monitoring  
-During generation, model must validate:
-```
-"[Checking: print() count = 0 ✓]"
-"[Checking: main.py lines = 4 ✓]"
-```
-
-### Layer 3: Post-Generation Audit
-After generation, mandatory scoring table:
-```
-"Self-Grade: 12/12 ✅"
-```
-
-### Layer 4: Evidence Requirement
-Model must provide proof:
-```
-"Evidence: grep -r print() returned 0 results"
-```
-
-## 💪 Psychological Enforcement Tactics
-
-### 1. Contract Language
-Using contractual terms:
-- "BINDING"
-- "MANDATORY" 
-- "NON-NEGOTIABLE"
-- "AUTOMATIC REJECTION"
-
-### 2. Accountability System
-Making model responsible:
-- "YOU are responsible for validation"
-- "YOU must self-assess"
-- "YOUR score determines acceptance"
-
-### 3. Binary Outcomes
-Removing middle ground:
-- ✅ PASS = 12/12
-- ❌ FAIL = anything less
-
-### 4. Explicit Consequences
-Clear violation results:
-- "Violation = Complete rewrite"
-- "No exceptions = No shortcuts"
-
-## 🔍 Manual Review System
-
-After receiving model response, run this checklist:
-
-### Quick Validation Script:
-```bash
-# 1. Check main.py
-wc -l main.py  # Must be ≤4
-
-# 2. Check hardcoded strings  
-grep -r '"[^"]*"' app/ --include="*.py" | grep -v "\.yml\|\.env\|\.log"
-
-# 3. Check print statements
-grep -r "print(" app/ --include="*.py"
-
-# 4. Check file sizes
-find . -name "*.py" -exec wc -l {} \; | awk '$1>300 {print}'
-
-# 5. Check imports
-grep -r "from \." app/ --include="*.py"  # Relative imports
-grep -r "import \*" app/ --include="*.py"  # Wildcard imports
-
-# 6. Check line lengths  
-find app/ -name "*.py" -exec grep -n ".\{80,\}" {} +
-```
-
-### Scoring:
-```
-✅ All checks pass = Accept
-❌ Any check fails = Reject + Provide specific violations
-```
-
-## 🚀 Quick Usage Template
-
-```markdown
-# STRICT PYTHON CONTRACT - Score 12/12 Required
-
-You MUST:
-1. Acknowledge ALL rules before coding
-2. Generate code following EXACT architecture  
-3. Validate EACH rule during generation
-4. Provide COMPLETE self-assessment table
-5. Show EVIDENCE for each validation
-6. Accept REJECTION if score <12/12
-
-Architecture:
-- main.py ≤4 lines (absolute max)
-- No hardcoded values anywhere
-- No print() statements
-- Type hints everywhere
-- Files ≤300 lines
-- PEP8 ≤79 chars/line
-- Absolute imports only
-- All config from YAML
-- English logs / Persian UI
-
-Request: [YOUR_REQUEST]
-
-Deliver with mandatory self-grading table.
-Any violation = automatic fail.
-
-BEGIN.
-```
-
----
-
-**This system forces the model to:**
-1. ✅ Commit before generation
-2. ✅ Self-monitor during generation  
-3. ✅ Self-grade after generation
-4. ✅ Provide evidence for each claim
-5. ✅ Accept responsibility for results
-
-**Result: 95%+ compliance with rules** 🎯

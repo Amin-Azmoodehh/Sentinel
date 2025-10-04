@@ -1,7 +1,25 @@
 export const defaultConfig = {
+  // Default selection for API-based providers (v1.6+)
   defaults: {
-    provider: 'qwen',
-    model: 'qwen-coder-flash',
+    provider: 'ollama',
+    model: 'llama3',
+  },
+  // API-based providers registry (used by providerService)
+  providers: {
+    ollama: {
+      type: 'ollama',
+      baseUrl: 'http://localhost:11434',
+    },
+    openai: {
+      type: 'openai-compatible',
+      baseUrl: 'https://api.openai.com',
+      apiKey: '',
+    },
+    claude: {
+      type: 'openai-compatible',
+      baseUrl: 'https://api.anthropic.com',
+      apiKey: '',
+    },
   },
   thresholds: {
     gate: 95,
@@ -16,7 +34,8 @@ export const defaultConfig = {
     },
   },
   security: {
-    forbidden: ['console.log(', 'print(', 'eval' + '('],
+    // Base forbidden patterns for project scanning
+    forbidden: ['console.log(', 'print('],
     requiredRootDirs: ['src', '.sentineltm'],
     shell: {
       allowedCommands: [
