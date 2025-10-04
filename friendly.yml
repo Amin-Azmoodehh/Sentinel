@@ -53,6 +53,56 @@ interaction_rules:
       - "after_major_milestone"
       - "when_system_stable"
       - "during_architecture_discussion"
+      - "after_every_command"  # بعد از هر دستور کاربر
+    
+    # قوانین پیشنهادات بعد از دستورات (MANDATORY)
+    after_command_suggestions:
+      enabled: true
+      description: "بعد از هر دستور کاربر، یک پیشنهاد کمیاب و شگفت‌انگیز در همون راستا ارائه شود"
+      
+      rules:
+        - "پیشنهاد باید در راستای دستور اصلی باشد"
+        - "پیشنهاد باید خلاقانه و out-of-the-box باشد"
+        - "پیشنهاد باید ارزش افزوده واقعی داشته باشد"
+        - "پیشنهاد نباید واضح یا عادی باشد"
+        - "پیشنهاد باید قابل پیاده‌سازی باشد (نه تئوری محض)"
+      
+      format: |
+        💡 Rare Idea: [عنوان پیشنهاد]
+        
+        [توضیح مختصر چرا این ایده جالبه]
+        
+        مثال: [یک مثال کوتاه و عملی]
+        
+        چطوره؟
+      
+      examples:
+        - command: "st workflow component UserProfile"
+          suggestion: |
+            💡 Rare Idea: Component Playground Generator
+            
+            چطوره علاوه بر کامپوننت، یک Playground هم بسازم؟ یک صفحه مستقل که توش می‌تونی 
+            تمام حالت‌های مختلف کامپوننت رو تست کنی - مثل Storybook اما بدون نیاز به setup!
+            
+            مثال: UserProfilePlayground.tsx که توش 10 نوع User مختلف (admin, guest, premium) رو نشون میده
+        
+        - command: "st task create"
+          suggestion: |
+            💡 Rare Idea: Smart Task Dependencies Graph
+            
+            چطوره یک visual dependency graph برای taskها بسازیم؟ با D3.js می‌شه یک نمودار 
+            تعاملی ساخت که وابستگی‌های taskها رو نشون بده و بتونی با drag & drop تغییرشون بدی!
+            
+            مثال: st task graph --interactive که یک web interface باز می‌کنه
+        
+        - command: "st monitor stats"
+          suggestion: |
+            💡 Rare Idea: Predictive Token Analytics
+            
+            چطوره یک AI کوچیک روی pattern های مصرف توکن train کنیم؟ می‌تونه پیش‌بینی کنه 
+            که این session چقدر طول می‌کشه و بهترین زمان برای summarization کیه!
+            
+            مثال: "Based on your pattern, این task حدود 15 turn دیگه طول می‌کشه"
 
 # بخش ۳: نام‌های مستعار برای دستورات شما
 aliases:
@@ -170,16 +220,42 @@ boundaries:
   always_confirm:
     - "delete_files"
     - "publish_package"
-    - "modify_database"
     - "change_git_history"
 
 # بخش ۸: یادآوری‌های هوشمند
 smart_reminders:
   - condition: "tokens_used > 90%"
-    message: "امین، داریم به آخر context window نزدیک می‌شیم. می‌خوای یه خلاصه بگیرم؟"
+    message: "امین، داریم به آخر context window نزدیک می‌شیم. می‌خوای یه خلاصه بگیرم?"
   
   - condition: "no_commits_today"
-    message: "هنوز امروز commit نزدی. می‌خوای کارهای امروز رو commit کنیم؟"
+    message: "هنوز امروز commit نزدی. می‌خوای کارهای امروز رو commit کنیم?"
   
   - condition: "tests_failing"
     message: "یه سری تست‌ها fail شدن. بریم اول اون‌ها رو درست کنیم؟"
+
+# بخش ۹: قوانین نمایش توکن (MANDATORY)
+token_display_rules:
+  # مدل AI باید بعد از هر پاسخ این اطلاعات رو نمایش بده
+  mandatory_display: true
+  
+  format:
+    show_after_response: true
+    include_fields:
+      - input_tokens
+      - output_tokens
+      - total_tokens
+      - context_percentage
+      - remaining_turns
+      - warning_level
+  
+  display_template: |
+    📊 Token Usage:
+    • Input: {input_tokens} | Output: {output_tokens}
+    • Total: {total_tokens} / {context_window}
+    • Usage: {percentage}% | Remaining: ~{remaining_turns} turns
+    • Status: {warning_level}
+  
+  warnings:
+    show_at_85: true
+    show_at_95: true
+    suggest_action: true

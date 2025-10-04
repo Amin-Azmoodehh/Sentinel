@@ -585,6 +585,9 @@ Real-time token tracking with MCP integration:
 - Smart warnings at 85% and 95%
 - MCP Tool: `sentinel_context_monitor`
 - Prevents context overflow
+- **MANDATORY**: AI models MUST display token usage after every response
+- Use `st monitor count <text>` to count tokens in any text
+- Automatic tracking with tiktoken for accuracy
 
 ### 🤝 Friendly Companion
 Personalized AI interaction through `friendly.yml`:
