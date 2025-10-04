@@ -142,8 +142,63 @@ export const registerProviderCommands = (program: Command) => {
   legacySetCommand
     .command('provider')
     .description('Alias for `st provider configure`')
-    .action(async () => {
-      await providerCommand.commands.find(c => c.name() === 'configure')?.parseAsync(process.argv);
+    .action(async (providerName) => {
+      // This is a direct copy of the 'configure' action to ensure identical behavior.
+      let provider = providerName;
+      if (!provider) {
+        const { chosenProvider } = await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'chosenProvider',
+            message: 'Choose a provider to configure:',
+            choices: Object.keys(preconfiguredProviders),
+          },
+        ]);
+        provider = chosenProvider;
+      }
+
+      const preconfig = preconfiguredProviders[provider as keyof typeof preconfiguredProviders];
+      if (!preconfig) {
+        console.log(`Unknown provider: ${provider}. Use one of: ${Object.keys(preconfiguredProviders).join(', ')}`);
+        return;
+      }
+
+      const { apiKey } = await inquirer.prompt([
+        {
+          type: 'password',
+          name: 'apiKey',
+          message: `Enter API Key for ${provider} (leave blank if not needed):`,
+          mask: '*',
+        },
+      ]);
+
+      upsertProviderConfig(provider, { ...preconfig, apiKey });
+
+      try {
+        console.log('Fetching models from provider...');
+        const { models } = await listModels(provider);
+        if (models.length === 0) {
+          console.log('Could not fetch models. Please check your API key and network connection.');
+          return;
+        }
+
+        const { chosenModel } = await inquirer.prompt([
+          {
+            type: 'list',
+            name: 'chosenModel',
+            message: 'Choose a default model:',
+            choices: models,
+          },
+        ]);
+
+        upsertProviderConfig(provider, { model: chosenModel });
+        setProvider(provider);
+
+        console.log(`Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`);
+
+      } catch (error) {
+        console.log(`Error fetching models: ${error instanceof Error ? error.message : String(error)}`);
+      }
     });
 };
 
