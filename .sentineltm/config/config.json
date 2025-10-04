@@ -154,6 +154,12 @@
     },
     "allowedRootFiles": [
       "launcher.*"
+    ],
+    "pathWhitelist": [
+      "./test.txt"
+    ],
+    "pathBlacklist": [
+      "C:\\Users\\amin"
     ]
   },
   "i18n": {

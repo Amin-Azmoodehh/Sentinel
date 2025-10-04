@@ -8,6 +8,25 @@ export const registerWorkflowCommands = (program: Command): void => {
     .alias('wf')
     .description('🏗️ High-level development workflows');
 
+  // List available workflows
+  workflowCommand
+    .command('list')
+    .description('List available workflow commands')
+    .action(() => {
+      const workflows = [
+        { name: 'analyze', description: 'Analyze project structure and patterns' },
+        { name: 'component <name>', description: 'Scaffold a new component with tests' },
+        { name: 'rename <oldName> <newName>', description: 'Rename a symbol across project' },
+        { name: 'api <name>', description: 'Create a new API endpoint' },
+        { name: 'batch', description: 'Execute multiple workflow operations' },
+      ];
+      
+      log.info('Available workflows:');
+      workflows.forEach(wf => {
+        log.raw(`  ${wf.name.padEnd(30)} - ${wf.description}`);
+      });
+    });
+
   // Analyze project command
   workflowCommand
     .command('analyze')
