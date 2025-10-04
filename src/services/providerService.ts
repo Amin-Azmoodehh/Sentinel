@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { Provider, Model, CompletionRequest, CompletionResponse } from '../providers/types.js';
 import { OllamaProvider } from '../providers/OllamaProvider.js';
 import { OpenAICompatibleProvider } from '../providers/OpenAICompatibleProvider.js';
+import { contextMonitorService } from './contextMonitorService.js';
 
 export interface ProviderInfo {
   name: string;
@@ -227,15 +228,49 @@ export const generateCompletion = async (request: CompletionRequest): Promise<Co
   const providerName = config.defaults.provider;
   
   if (!providerName) {
+    // Record input tokens even if configuration is missing
+    try {
+      contextMonitorService.recordUsageFromText(
+        request?.prompt ?? '',
+        '',
+        process.env.ST_COMMAND || 'ai_completion'
+      );
+    } catch {
+      // Ignore monitoring errors to avoid affecting main flow
+    }
     throw new Error('No default provider set.');
   }
 
   const provider = createProvider(providerName, config);
   if (!provider) {
+    // Record input tokens on provider resolution failure
+    try {
+      contextMonitorService.recordUsageFromText(
+        request?.prompt ?? '',
+        '',
+        process.env.ST_COMMAND || 'ai_completion'
+      );
+    } catch {
+      // Ignore monitoring errors
+    }
     throw new Error(`Provider '${providerName}' is not available.`);
   }
 
-  return provider.generateCompletion(request);
+  let completion: CompletionResponse | undefined;
+  try {
+    completion = await provider.generateCompletion(request);
+    return completion;
+  } finally {
+    // Always attempt to record token usage (success or failure)
+    try {
+      const promptText = request?.prompt ?? '';
+      const completionText = completion?.content ?? '';
+      const operation = process.env.ST_COMMAND || 'ai_completion';
+      contextMonitorService.recordUsageFromText(promptText, completionText, operation);
+    } catch {
+      // Swallow monitoring errors
+    }
+  }
 };
 
 export const getAllowedProviders = (): string[] => {
