@@ -76,7 +76,7 @@ export class IndexHandler {
       case 'search': {
         const query = ensureString(args.query, 'query');
         const limit = args.limit !== undefined ? ensureNumber(args.limit, 'limit') : undefined;
-        const results = indexService.searchIndexedFiles(query, limit);
+        const results = indexService.searchFileContents(query, limit);
         return successResponse({ results });
       }
       case 'symbols': {

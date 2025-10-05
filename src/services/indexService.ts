@@ -295,6 +295,56 @@ export const searchIndexedFiles = (query: string, limit?: number): IndexedFileRe
   return fuseResults.slice(0, capped);
 };
 
+export interface ContentSearchResult {
+  file: string;
+  line: number;
+  content: string;
+  matchCount: number;
+}
+
+export const searchFileContents = (query: string, limit?: number): ContentSearchResult[] => {
+  const term = query?.trim();
+  if (!term) {
+    return [];
+  }
+
+  const allFiles = sqliteService
+    .all('SELECT path FROM files')
+    .map((row) => String(row.path || ''));
+
+  const results: ContentSearchResult[] = [];
+  const lowerTerm = term.toLowerCase();
+  const capped = capLimit(limit) || 50;
+
+  for (const filePath of allFiles) {
+    if (results.length >= capped) break;
+    try {
+      const absPath = path.resolve(workspaceRoot, filePath);
+      if (!fs.existsSync(absPath)) continue;
+      const content = fs.readFileSync(absPath, 'utf-8');
+      const lines = content.split(/\r?\n/);
+      let matchCount = 0;
+      for (let i = 0; i < lines.length; i++) {
+        if (results.length >= capped) break;
+        const line = lines[i];
+        if (line.toLowerCase().includes(lowerTerm)) {
+          matchCount++;
+          results.push({
+            file: filePath,
+            line: i + 1,
+            content: line.trim(),
+            matchCount,
+          });
+        }
+      }
+    } catch {
+      continue;
+    }
+  }
+
+  return results;
+};
+
 export interface IndexedSymbolRecord {
   id: number;
   filePath: string;

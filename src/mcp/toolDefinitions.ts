@@ -337,17 +337,17 @@ export const buildIndexBuildToolDefinition = (): ExperimentalTool => ({
 
 export const buildIndexQueryToolDefinition = (): ExperimentalTool => ({
   name: 'index_query',
-  description: 'Query the project index for search results, symbols, or documents',
+  description: 'Query the project index for content search, symbols, or documents. Use kind="search" to search file contents (not just names).',
   inputSchema: {
     type: 'object',
     properties: {
-      kind: { type: 'string', enum: ['search', 'symbols', 'document'] },
-      query: { type: 'string' },
+      kind: { type: 'string', enum: ['search', 'symbols', 'document'], description: 'search=file content search, symbols=list symbols, document=get file content' },
+      query: { type: 'string', description: 'Search term for kind=search or symbols name filter' },
       limit: { type: 'number' },
-      filePath: { type: 'string' },
-      name: { type: 'string' },
-      symbolKind: { type: 'string' },
-      maxBytes: { type: 'number' },
+      filePath: { type: 'string', description: 'Filter symbols by file path' },
+      name: { type: 'string', description: 'Filter symbols by name (for kind=symbols)' },
+      symbolKind: { type: 'string', description: 'Filter symbols by kind (function, class, etc.)' },
+      maxBytes: { type: 'number', description: 'Max bytes to return for kind=document' },
     },
     required: ['kind'],
   },
