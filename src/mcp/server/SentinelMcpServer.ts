@@ -27,20 +27,20 @@ export class SentinelMcpServer {
     this.toolRegistry = new ToolRegistry();
   }
 
-  async start(): Promise<void> {
+  private async initialize(): Promise<void> {
     // Set workspace root from environment variable if provided
     if (process.env.SENTINEL_WORKSPACE) {
       try {
         const workspaceRoot = process.env.SENTINEL_WORKSPACE;
         log.info(`[MCP] Setting workspace root to: ${workspaceRoot}`);
-        
+
         // IMPORTANT: Update fsService FIRST, then change directory
         const { setWorkspaceRoot } = await import('../../services/fsService.js');
         setWorkspaceRoot(workspaceRoot);
-        
+
         // Change process working directory
         process.chdir(workspaceRoot);
-        
+
         log.info(`[MCP] Working directory changed to: ${process.cwd()}`);
       } catch (error) {
         log.error(`[MCP] Failed to set workspace root: ${error instanceof Error ? error.message : String(error)}`);
@@ -49,6 +49,11 @@ export class SentinelMcpServer {
       log.warn('[MCP] SENTINEL_WORKSPACE not set! File operations may fail. See MCP_SETUP.md');
       log.warn(`[MCP] Current working directory: ${process.cwd()}`);
     }
+  }
+
+  async start(): Promise<void> {
+    await this.initialize();
+
 
     const transport = new StdioServerTransport();
     const { name, version } = this.packageInfo.getInfo();
