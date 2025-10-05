@@ -81,3 +81,9 @@ Every AI response that generates code MUST include:
 -   **Score < 10/10**: The response is automatically rejected.
 -   **Rejection**: The AI must identify all violations, acknowledge them, provide corrected code, and re-run the self-assessment until a 10/10 score is achieved.
 
+## 🧹 Code Hygiene (Required Before Commit)
+
+- Run `st fmt` to auto-format code across common languages.
+- Run `st lint` to catch issues early. For Python, Ruff is used (`st py format`, `st py lint`).
+- Keep configurations minimal and centralized. Prefer `pyproject.toml` and `.prettierrc`.
+

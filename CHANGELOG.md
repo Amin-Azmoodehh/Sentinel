@@ -1,3 +1,25 @@
+## [2.3.10] - 2025-10-05
+
+### Added
+
+- Built-in multi-language formatting and linting commands:
+  - `st fmt [lang]` and `st lint [lang]` (JS/TS, Python, Go, Rust, Shell, MD/YAML/JSON)
+  - `st init-config [lang]` to generate minimal configs
+- Python helpers (Ruff):
+  - `st py init-config`, `st py format`, `st py lint`
+
+### Fixed
+
+- Reliable workspace handling for MCP (`--workspace` in args, absolute `SENTINEL_WORKSPACE`)
+- Safer FS path checks using `path.relative` (Windows-safe)
+
+### Changed
+
+- `st ide set` now generates ready-to-run `mcp.json` with absolute workspace path
+- Docs updated: README and MCP_SETUP include built-in fmt/lint usage
+
+---
+
 # Changelog
 
 All notable changes to SentinelTM will be documented in this file.

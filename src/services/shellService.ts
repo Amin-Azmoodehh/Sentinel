@@ -108,20 +108,30 @@ export class ShellService {
       const timeout = options.timeout || DEFAULT_TIMEOUT;
       const maxOutputSize = options.maxOutputSize || DEFAULT_MAX_OUTPUT_SIZE;
 
-      // Prepare shell arguments
+      // Prepare shell arguments (shell:false for precise control)
       let shellArgs: string[];
       let shellCommand: string;
 
       if (process.platform === 'win32') {
-        if (shell.toLowerCase().includes('powershell')) {
-          shellArgs = ['-Command', command];
+        const lower = shell.toLowerCase();
+        if (lower.includes('powershell')) {
+          shellCommand = shell;
+          shellArgs = [
+            '-NoProfile',
+            '-NonInteractive',
+            '-ExecutionPolicy',
+            'Bypass',
+            '-Command',
+            command,
+          ];
         } else {
-          shellArgs = ['/c', command];
+          // cmd.exe
+          shellCommand = shell;
+          shellArgs = ['/d', '/s', '/c', command];
         }
-        shellCommand = shell;
       } else {
-        shellArgs = ['-c', command];
         shellCommand = shell;
+        shellArgs = ['-c', command];
       }
 
       return await new Promise<ShellResult>((resolve) => {
@@ -133,12 +143,26 @@ export class ShellService {
         const childProcess = spawn(shellCommand, shellArgs, {
           cwd,
           env: { ...process.env },
-          timeout: timeout,
-          shell: true,
+          shell: false,
         });
 
         const processId = `${Date.now()}-${Math.random()}`;
         this.activeProcesses.set(processId, childProcess);
+
+        // Hard timeout guard: kill process and resolve
+        const timeoutTimer = setTimeout(() => {
+          try {
+            childProcess.kill();
+          } catch {}
+          this.activeProcesses.delete(processId);
+          resolve({
+            success: false,
+            stdout,
+            stderr: stderr + `\nCommand timed out`,
+            exitCode: null,
+            error: `Command timed out after ${timeout}ms`,
+          });
+        }, timeout);
 
         if (options.input) {
           childProcess.stdin?.write(options.input);
@@ -185,17 +209,7 @@ export class ShellService {
 
         childProcess.on('close', (code: number | null) => {
           this.activeProcesses.delete(processId);
-
-          if (Date.now() - startTime > timeout) {
-            resolve({
-              success: false,
-              stdout,
-              stderr: stderr + '\nCommand timed out',
-              exitCode: null,
-              error: `Command timed out after ${timeout}ms`,
-            });
-            return;
-          }
+          clearTimeout(timeoutTimer);
 
           resolve({
             success: code === 0,
@@ -207,6 +221,7 @@ export class ShellService {
 
         childProcess.on('error', (error: Error) => {
           this.activeProcesses.delete(processId);
+          clearTimeout(timeoutTimer);
           resolve({
             success: false,
             stdout,

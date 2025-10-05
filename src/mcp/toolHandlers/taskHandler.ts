@@ -107,7 +107,10 @@ export class TaskHandler {
         return successResponse({ id, deleted: true });
       }
       case 'createSubtask': {
-        const taskId = ensureNumber(payload.taskId, 'payload.taskId');
+        const taskId =
+          payload.taskId !== undefined
+            ? ensureNumber(payload.taskId, 'payload.taskId')
+            : ensureNumber(payload.parent, 'payload.parent');
         const title = ensureString(payload.title, 'payload.title');
         const description = payload.description
           ? ensureString(payload.description, 'payload.description', true)
@@ -116,7 +119,10 @@ export class TaskHandler {
         return successResponse(record);
       }
       case 'listSubtasks': {
-        const taskId = ensureNumber(payload.taskId, 'payload.taskId');
+        const taskId =
+          payload.taskId !== undefined
+            ? ensureNumber(payload.taskId, 'payload.taskId')
+            : ensureNumber(payload.parent, 'payload.parent');
         const records = taskService.listSubtasks(taskId);
         return successResponse(records);
       }
