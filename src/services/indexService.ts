@@ -136,7 +136,42 @@ const removeMissingFiles = (currentPaths: Set<string>): void => {
   });
 };
 
-const extractSymbolsFromFile = (filePath: string, content: string): ExtractedSymbol[] => {
+const extractPythonSymbols = (content: string): ExtractedSymbol[] => {
+  const symbols: ExtractedSymbol[] = [];
+  const lines = content.split(/\r?\n/);
+  
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lineNum = i + 1;
+    
+    // Match: def function_name(...)
+    const funcMatch = line.match(/^\s*def\s+(\w+)\s*\(/);
+    if (funcMatch) {
+      symbols.push({ name: funcMatch[1], kind: 'function', line: lineNum, col: line.indexOf('def') + 1 });
+      continue;
+    }
+    
+    // Match: class ClassName(...)
+    const classMatch = line.match(/^\s*class\s+(\w+)\s*[(:]/);  
+    if (classMatch) {
+      symbols.push({ name: classMatch[1], kind: 'class', line: lineNum, col: line.indexOf('class') + 1 });
+    }
+  }
+  
+  return symbols;
+};
+
+const extractSymbolsFromFile = (filePath: string, content: string, lang: string): ExtractedSymbol[] => {
+  // Python files
+  if (lang === 'python') {
+    return extractPythonSymbols(content);
+  }
+  
+  // TypeScript/JavaScript files
+  if (lang !== 'typescript' && lang !== 'javascript') {
+    return [];
+  }
+  
   const symbols: ExtractedSymbol[] = [];
   const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
 
@@ -217,8 +252,8 @@ const processFile = (
   const fileId = upsertFileMeta(meta);
   processed.add(meta.path);
 
-  if (fileId > 0 && meta.lang === 'typescript') {
-    const symbols = extractSymbolsFromFile(absPath, content);
+  if (fileId > 0 && (meta.lang === 'typescript' || meta.lang === 'javascript' || meta.lang === 'python')) {
+    const symbols = extractSymbolsFromFile(absPath, content, meta.lang);
     upsertSymbols(fileId, symbols);
   }
 };

@@ -98,7 +98,7 @@ export const buildFsToolDefinition = (): ExperimentalTool => ({
       payload: {
         type: 'object',
         properties: {
-          path: { type: 'string', description: 'Target path' },
+          path: { type: 'string', description: 'For list: directory path to list. For other actions: target path' },
           paths: {
             type: 'array',
             items: { type: 'string' },
@@ -106,7 +106,7 @@ export const buildFsToolDefinition = (): ExperimentalTool => ({
           },
           source: { type: 'string', description: 'Source path for copy/move' },
           destination: { type: 'string', description: 'Destination path for copy/move' },
-          pattern: { type: 'string', description: 'Glob pattern for list' },
+          pattern: { type: 'string', description: 'Glob pattern for list (alternative to path)' },
           maxLines: { type: 'number', description: 'Max lines per chunk for split' },
           force: { type: 'boolean', description: 'Force operation' },
         },

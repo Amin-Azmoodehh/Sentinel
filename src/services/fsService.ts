@@ -83,8 +83,37 @@ const uniqueStrings = (items: string[]): string[] => {
   });
 };
 
-export const listFiles = async (pattern?: string): Promise<string[]> => {
+export const listFiles = async (pattern?: string, targetPath?: string): Promise<string[]> => {
   const cwd = process.cwd();
+  
+  // If targetPath specified, list that directory
+  if (targetPath) {
+    const absPath = ensureWorkspacePath(targetPath);
+    try {
+      const entries = fs.readdirSync(absPath, { withFileTypes: true });
+      return entries
+        .map((entry) => {
+          const name = entry.name;
+          const fullPath = path.join(absPath, name);
+          if (entry.isDirectory()) {
+            return `${name}/`;
+          } else if (entry.isFile()) {
+            const stats = fs.statSync(fullPath);
+            const size = stats.size;
+            const sizeStr = size > 1024 ? `${Math.round(size / 1024)}KB` : `${size}B`;
+            return `${name} (${sizeStr})`;
+          }
+          return name;
+        })
+        .sort();
+    } catch (error) {
+      throw new Error(
+        `Failed to list directory '${targetPath}': ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+  
+  // No pattern: list current directory
   if (!pattern) {
     try {
       const entries = fs.readdirSync(cwd, { withFileTypes: true });
@@ -108,6 +137,8 @@ export const listFiles = async (pattern?: string): Promise<string[]> => {
       );
     }
   }
+  
+  // Glob pattern
   if (path.isAbsolute(pattern) || pattern.includes('..')) {
     throw new Error('Glob pattern must stay inside workspace');
   }

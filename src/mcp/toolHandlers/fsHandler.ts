@@ -23,8 +23,9 @@ export class FsHandler {
 
     switch (action) {
       case 'list': {
-        const pattern = ensureString(payload.pattern ?? '*', 'payload.pattern');
-        const result = await fsService.listFiles(pattern);
+        const pattern = payload.pattern !== undefined ? ensureString(payload.pattern, 'payload.pattern') : undefined;
+        const targetPath = payload.path !== undefined ? ensureString(payload.path, 'payload.path') : undefined;
+        const result = await fsService.listFiles(pattern, targetPath);
         return successResponse(result);
       }
       case 'move': {
