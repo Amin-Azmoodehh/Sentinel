@@ -93,17 +93,38 @@ export const registerTaskCommands = (program: Command): void => {
     .command('list')
     .description('List tasks')
     .option('--status <status>', 'Filter by status (open, in-progress, review, done, blocked)')
-    .action((options: { status?: 'open' | 'in-progress' | 'review' | 'done' | 'blocked' }) => {
+    .option('--simple', 'Use simple text output instead of table (better for Windows terminals)')
+    .action((options: { status?: 'open' | 'in-progress' | 'review' | 'done' | 'blocked'; simple?: boolean }) => {
       const records = listTasks(options.status);
-      const rows = records.map((task) => [
-        String(task.id),
-        task.title,
-        task.priority,
-        task.status,
-        task.tags.join(', '),
-      ]);
-      const table = renderTable({ head: ['ID', 'Title', 'Priority', 'Status', 'Tags'], rows });
-      log.raw(table);
+      
+      if (records.length === 0) {
+        log.info('No tasks found.');
+        return;
+      }
+
+      if (options.simple) {
+        // Simple text output for Windows terminals
+        log.info(`\nTasks (${records.length} total):\n`);
+        records.forEach((task) => {
+          log.info(`[${task.id}] ${task.title}`);
+          log.info(`    Status: ${task.status} | Priority: ${task.priority}`);
+          if (task.tags.length > 0) {
+            log.info(`    Tags: ${task.tags.join(', ')}`);
+          }
+          log.info('');
+        });
+      } else {
+        // Table output
+        const rows = records.map((task) => [
+          String(task.id),
+          task.title.length > 40 ? task.title.substring(0, 37) + '...' : task.title,
+          task.priority,
+          task.status,
+          task.tags.join(', '),
+        ]);
+        const table = renderTable({ head: ['ID', 'Title', 'Priority', 'Status', 'Tags'], rows });
+        log.raw(table);
+      }
     });
 
   taskCommand
