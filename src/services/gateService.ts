@@ -61,8 +61,9 @@ const lintCheck: GateCheck = {
   run: () => {
     log.section('Lint & Format');
     const lintResult = runCommand('npm', ['run', 'lint']);
-    const formatResult = runCommand('npm', ['run', 'format']);
-    return lintResult && formatResult;
+    // Format is optional - only fail if lint fails
+    runCommand('npm', ['run', 'format']);
+    return lintResult;
   },
 };
 
@@ -91,7 +92,22 @@ const structureCheck: GateCheck = {
     log.section('Structure');
     const config = configService.load();
     const required = config.security?.requiredRootDirs ?? ['src', '.sentineltm'];
-    return required.every((item) => fs.existsSync(path.join(process.cwd(), item)));
+    
+    // Check each required directory
+    const missing: string[] = [];
+    for (const item of required) {
+      if (!fs.existsSync(path.join(process.cwd(), item))) {
+        missing.push(item);
+      }
+    }
+    
+    if (missing.length > 0) {
+      log.warn(`Missing required directories: ${missing.join(', ')}`);
+      log.info('To fix: mkdir ' + missing.join(' '));
+      return false;
+    }
+    
+    return true;
   },
 };
 

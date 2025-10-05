@@ -52,9 +52,29 @@ export class OpenAICompatibleProvider implements Provider {
       const content = chat.data?.choices?.[0]?.message?.content ?? '';
       return { content: String(content) };
     } catch (error: any) {
-      // Handle 405 Method Not Allowed
-      if (error.response?.status === 405) {
-        throw new Error(`Provider ${this.baseURL} returned 405 Method Not Allowed. This usually means the API endpoint or HTTP method is incorrect. Please check the provider's API documentation.`);
+      // Enhanced error handling with status codes
+      const status = error.response?.status;
+      const statusText = error.response?.statusText;
+      const errorData = error.response?.data;
+      
+      if (status === 401 || status === 403) {
+        throw new Error(`Authentication failed (${status}): Invalid API key or insufficient permissions. Please check your API key.`);
+      }
+      
+      if (status === 404) {
+        throw new Error(`Model '${req.model}' not found (404). Please verify the model name or check available models.`);
+      }
+      
+      if (status === 405) {
+        throw new Error(`Method not allowed (405): The provider does not support the /v1/chat/completions endpoint.`);
+      }
+      
+      if (status === 429) {
+        throw new Error(`Rate limit exceeded (429): Too many requests. Please wait and try again.`);
+      }
+      
+      if (status >= 500) {
+        throw new Error(`Server error (${status}): The AI provider is experiencing issues. ${statusText || ''}`);
       }
       
       // Try fallback to legacy completions
@@ -69,8 +89,9 @@ export class OpenAICompatibleProvider implements Provider {
         const content = comp.data?.choices?.[0]?.text ?? '';
         return { content: String(content) };
       } catch (fallbackError: any) {
-        // If both fail, throw the original error with more context
-        throw new Error(`Both /v1/chat/completions and /v1/completions failed. Original error: ${error.message}. Fallback error: ${fallbackError.message}`);
+        // If both fail, throw detailed error
+        const details = errorData ? ` Details: ${JSON.stringify(errorData)}` : '';
+        throw new Error(`API request failed (${status || 'unknown'}): ${error.message}.${details}`);
       }
     }
   }
