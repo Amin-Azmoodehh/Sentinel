@@ -1,3 +1,8 @@
+# SentinelTM additions
+mcp_test_sandbox/
+dist/
+.DS_Store
+*.log
 # Dependencies
 node_modules/
 package-lock.json

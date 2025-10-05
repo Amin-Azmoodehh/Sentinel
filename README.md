@@ -21,6 +21,23 @@ SentinelTM (`st`) is a revolutionary AI-powered development guardian that transf
 - 📊 **Quality Gates**: Automated code review and compliance checking
 - 🎨 **IDE Integration**: One-command setup for VS Code, Cursor, Zed, Windsurf, and more
 
+## 🧹 Code Formatting & Linting (Built-in)
+
+SentinelTM now ships built-in helpers to keep your codebase clean without extra setup.
+
+- **Format (all/common languages)**
+  - `st fmt` (auto-detect) or `st fmt js|ts|py|go|rs|sh|md`
+- **Lint**
+  - `st lint` (auto-detect) or `st lint js|ts|py|sh`
+- **Python helpers (Ruff)**
+  - `st py init-config` → creates `pyproject.toml` (and optional pre-commit)
+  - `st py format` → `ruff format .`
+  - `st py lint` → `ruff check . --fix`
+
+Notes:
+- Tools are used if available (e.g., `prettier`, `eslint`, `ruff`, `gofmt`, `rustfmt`, `shfmt`). If not installed, helpful guidance is shown.
+- Minimal defaults, zero clutter. Use `st init-config` to generate minimal configs (`.eslintrc.json`, `.prettierrc`, `pyproject.toml`).
+
 ---
 
 ## 🚀 Quick Start (2 Minutes)

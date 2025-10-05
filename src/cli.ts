@@ -53,6 +53,8 @@ import { registerGateCommands } from './commands/gateCommands.js';
 import { registerServeCommand } from './commands/serveCommand.js';
 import { registerResearchCommand } from './commands/researchCommands.js';
 import { registerStatusCommands } from './commands/statusCommands.js';
+import { registerPythonCommands } from './commands/pythonCommands.js';
+import { registerFormatCommands } from './commands/formatCommands.js';
 import { registerOrchestratorCommands } from './commands/orchestratorCommands.js';
 import { registerAgentCommands } from './commands/agentCommands.js';
 import { registerWorkflowCommands } from './commands/workflowCommands.js';
@@ -229,6 +231,8 @@ securityCommands(program);
 dashboardCommands(program);
 cicdCommands(program);
 advancedIndexCommands(program);
+registerPythonCommands(program);
+registerFormatCommands(program);
 
 program.parse(process.argv);
 

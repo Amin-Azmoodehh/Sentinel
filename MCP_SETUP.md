@@ -128,6 +128,16 @@ Test that file operations work correctly in your project directory:
 
 If verification fails, check the logs and ensure `SENTINEL_WORKSPACE` is set correctly.
 
+## Keep Your Repo Clean (Recommended)
+
+Use built-in helpers before working with MCP tools:
+
+- `st fmt` → format common languages (auto-detect)
+- `st lint` → lint common languages (auto-detect)
+- Python specific:
+  - `st py init-config` (creates `pyproject.toml`)
+  - `st py format`, `st py lint`
+
 ### Environment Variables Reference
 
 - `SENTINEL_WORKSPACE`: Project root directory (REQUIRED for MCP server)
