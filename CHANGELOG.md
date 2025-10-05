@@ -1,3 +1,20 @@
+## [2.3.17] - 2025-10-05
+
+### Added
+
+- **Major**: `shell_execute` حالا از اجرای async پشتیبانی می‌کند
+  - پارامتر جدید `async: true` برای اجرای فرایندهای طولانی‌مدت
+  - برمی‌گرداند process ID برای monitoring
+  - رفع مشکل timeout برای web servers و سرویس‌ها
+
+### Fixed
+
+- **Critical**: MCP timeout از 15 ثانیه به 5 دقیقه افزایش یافت
+  - هماهنگ با shell service timeout
+  - فرایندهای طولانی‌مدت دیگر timeout نمی‌شوند
+
+---
+
 ## [2.3.16] - 2025-10-05
 
 ### Fixed
