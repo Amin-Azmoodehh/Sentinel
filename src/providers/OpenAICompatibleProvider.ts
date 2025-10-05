@@ -11,14 +11,21 @@ export class OpenAICompatibleProvider implements Provider {
       cleanBaseURL = cleanBaseURL.slice(0, -3);
     }
     
+    // Build headers - OpenRouter requires specific headers
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${this.apiKey}`,
+      'Content-Type': 'application/json',
+    };
+    
+    // Add OpenRouter-specific headers if this is OpenRouter
+    if (cleanBaseURL.includes('openrouter.ai')) {
+      headers['HTTP-Referer'] = 'https://sentineltm.dev';
+      headers['X-Title'] = 'SentinelTM CLI';
+    }
+    
     this.client = axios.create({
       baseURL: cleanBaseURL,
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-        'HTTP-Referer': 'https://sentineltm.dev',
-        'X-Title': 'SentinelTM',
-      },
+      headers,
       timeout: 30000,
     });
   }

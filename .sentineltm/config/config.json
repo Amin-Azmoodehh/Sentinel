@@ -1,7 +1,7 @@
 {
   "defaults": {
-    "provider": "ollama",
-    "model": "deepseek/deepseek-chat-v3.1:free"
+    "provider": "openrouter",
+    "model": "meituan/longcat-flash-chat:free"
   },
   "providers": {
     "ollama": {
@@ -31,7 +31,7 @@
     "openrouter": {
       "type": "openai-compatible",
       "baseURL": "https://openrouter.ai/api/v1",
-      "apiKey": ""
+      "apiKey": "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"
     },
     "groq": {
       "type": "openai-compatible",
