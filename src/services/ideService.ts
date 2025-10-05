@@ -7,7 +7,7 @@ import { log } from '../utils/logger.js';
 
 interface IdeTemplate {
   name: string;
-  apply: (providerName: string, applyRules: boolean) => void;
+  apply: (providerName: string, applyRules: boolean, workspacePath: string) => void;
 }
 
 interface CliInvocation {
@@ -67,28 +67,34 @@ const resolveCliServeInvocation = (): CliInvocation => {
   };
 };
 
-const createMcpConfig = (_providerName: string) => {
+const createMcpConfig = (_providerName: string, workspacePath: string) => {
   const invocation = resolveCliServeInvocation();
-  const workspacePath = process.cwd();
+  const argsWithWorkspace = [...invocation.args, '--workspace', workspacePath];
 
   return {
     mcpServers: {
       [CLI_SERVER_NAME]: {
         command: invocation.command,
-        args: invocation.args,
+        args: argsWithWorkspace,
         env: {
+          // Keep env for compatibility, but args take precedence
           SENTINEL_WORKSPACE: workspacePath,
           SENTINEL_LOG_LEVEL: 'info',
           SENTINEL_AUTO_INDEX: 'true',
         },
       },
     },
+    // Keep defaults to help IDEs that read provider/model from mcp.json
+    defaults: {
+      provider: _providerName,
+      model: (configService.load().defaults?.model as string) || 'llama3',
+    },
   };
 };
 
 type MutableJson = Record<string, unknown>;
 
-const ensureMcpConfig = (targetPath: string): void => {
+const ensureMcpConfig = (targetPath: string, workspacePath: string, providerName: string, model: string): void => {
   const invocation = resolveCliServeInvocation();
 
   let config: MutableJson = {};
@@ -115,8 +121,9 @@ const ensureMcpConfig = (targetPath: string): void => {
         updated = true;
       }
       const args = Array.isArray(server.args) ? (server.args as string[]) : undefined;
-      if (!args || !arraysEqual(args, invocation.args)) {
-        server.args = invocation.args;
+      const desiredArgs = [...invocation.args, '--workspace', workspacePath];
+      if (!args || !arraysEqual(args, desiredArgs)) {
+        server.args = desiredArgs;
         updated = true;
       }
       if (!server.env || typeof server.env !== 'object') {
@@ -127,7 +134,6 @@ const ensureMcpConfig = (targetPath: string): void => {
       // Ensure SENTINEL_WORKSPACE is set to absolute path
       const serverEnv = server.env as MutableJson;
       const currentWorkspace = typeof serverEnv.SENTINEL_WORKSPACE === 'string' ? serverEnv.SENTINEL_WORKSPACE : '';
-      const workspacePath = process.cwd();
       
       // If workspace is not set or is a variable, update it to absolute path
       if (!currentWorkspace || currentWorkspace.includes('${') || !path.isAbsolute(currentWorkspace)) {
@@ -176,8 +182,9 @@ const ensureMcpConfig = (targetPath: string): void => {
       updated = true;
     }
     const args = Array.isArray(server.args) ? (server.args as string[]) : undefined;
-    if (!args || !arraysEqual(args, invocation.args)) {
-      server.args = invocation.args;
+    const desiredArgs = [...invocation.args, '--workspace', workspacePath];
+    if (!args || !arraysEqual(args, desiredArgs)) {
+      server.args = desiredArgs;
       updated = true;
     }
     if (!server.env || typeof server.env !== 'object') {
@@ -188,7 +195,6 @@ const ensureMcpConfig = (targetPath: string): void => {
     // Ensure SENTINEL_WORKSPACE is set to absolute path
     const serverEnv = server.env as MutableJson;
     const currentWorkspace = typeof serverEnv.SENTINEL_WORKSPACE === 'string' ? serverEnv.SENTINEL_WORKSPACE : '';
-    const workspacePath = process.cwd();
     
     // If workspace is not set or is a variable, update it to absolute path
     if (!currentWorkspace || currentWorkspace.includes('${') || !path.isAbsolute(currentWorkspace)) {
@@ -228,15 +234,19 @@ const ensureMcpConfig = (targetPath: string): void => {
     config.mcpServers = { [CLI_SERVER_NAME]: server };
   }
 
-  // Remove deprecated defaults and providers from mcp.json (they belong in .sentineltm/config/config.json)
-  if (config.defaults !== undefined) {
-    delete config.defaults;
+  // Ensure defaults.provider/model are present to keep IDE behavior consistent
+  const defaults: MutableJson = (config.defaults && typeof config.defaults === 'object')
+    ? { ...(config.defaults as MutableJson) }
+    : {};
+  if (defaults.provider !== providerName) {
+    defaults.provider = providerName;
     updated = true;
   }
-  if (config.providers !== undefined) {
-    delete config.providers;
+  if (typeof defaults.model !== 'string' || defaults.model !== model) {
+    defaults.model = model;
     updated = true;
   }
+  (config as any).defaults = defaults;
 
   if (updated) {
     writeJsonFile(targetPath, config);
@@ -371,12 +381,14 @@ const applyIdeProfile = (
   profileName: string,
   targetDir: string,
   providerName: string,
-  applyRules: boolean
+  applyRules: boolean,
+  workspacePath: string
 ) => {
   ensureDir(targetDir);
   const mcpTargetPath = path.join(targetDir, 'mcp.json');
-  writeJsonFile(mcpTargetPath, createMcpConfig(providerName));
-  ensureMcpConfig(mcpTargetPath);
+  writeJsonFile(mcpTargetPath, createMcpConfig(providerName, workspacePath));
+  const model = (configService.load().defaults?.model as string) || 'llama3';
+  ensureMcpConfig(mcpTargetPath, workspacePath, providerName, model);
 
   // Copy or create rules.json
   const projectRulesPath = path.join(process.cwd(), 'rules.example.json');
@@ -443,7 +455,7 @@ const applyIdeProfile = (
   }
 };
 
-const applyVsCode = (providerName: string, applyRules: boolean): void => {
+const applyVsCode = (providerName: string, applyRules: boolean, workspacePath: string): void => {
   const root = process.cwd();
   const vscodeDir = path.join(root, '.vscode');
   ensureDir(vscodeDir);
@@ -466,16 +478,16 @@ const applyVsCode = (providerName: string, applyRules: boolean): void => {
     recommendations: ['ms-vscode.vscode-typescript-next'],
   });
 
-  applyIdeProfile('VS Code', vscodeDir, providerName, applyRules);
+  applyIdeProfile('VS Code', vscodeDir, providerName, applyRules, workspacePath);
 };
 
-const applyCursor = (providerName: string, applyRules: boolean): void => {
+const applyCursor = (providerName: string, applyRules: boolean, workspacePath: string): void => {
   const root = process.cwd();
   const cursorDir = path.join(root, '.cursor');
-  applyIdeProfile('Cursor', cursorDir, providerName, applyRules);
+  applyIdeProfile('Cursor', cursorDir, providerName, applyRules, workspacePath);
 };
 
-const applyZed = (providerName: string, applyRules: boolean): void => {
+const applyZed = (providerName: string, applyRules: boolean, workspacePath: string): void => {
   const root = process.cwd();
   const zedDir = path.join(root, '.zed');
   ensureDir(zedDir);
@@ -488,19 +500,19 @@ const applyZed = (providerName: string, applyRules: boolean): void => {
       },
     },
   });
-  applyIdeProfile('Zed', zedDir, providerName, applyRules);
+  applyIdeProfile('Zed', zedDir, providerName, applyRules, workspacePath);
 };
 
-const applyWindsurf = (providerName: string, applyRules: boolean): void => {
+const applyWindsurf = (providerName: string, applyRules: boolean, workspacePath: string): void => {
   const root = process.cwd();
   const windsurfDir = path.join(root, '.windsurf');
-  applyIdeProfile('Windsurf', windsurfDir, providerName, applyRules);
+  applyIdeProfile('Windsurf', windsurfDir, providerName, applyRules, workspacePath);
 };
 
-const applyProfile = (name: string, providerName: string, applyRules: boolean): void => {
+const applyProfile = (name: string, providerName: string, applyRules: boolean, workspacePath: string): void => {
   const root = process.cwd();
   const targetDir = path.join(root, `.${name.toLowerCase()}`);
-  applyIdeProfile(name, targetDir, providerName, applyRules);
+  applyIdeProfile(name, targetDir, providerName, applyRules, workspacePath);
 };
 
 const ideTemplates: IdeTemplate[] = [
@@ -510,64 +522,64 @@ const ideTemplates: IdeTemplate[] = [
   { name: 'Windsurf', apply: applyWindsurf },
   {
     name: 'Trae',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Trae', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Trae', providerName, applyRules, workspacePath),
   },
   {
     name: 'Kiro',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Kiro', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Kiro', providerName, applyRules, workspacePath),
   },
   {
     name: 'Continue',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Continue', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Continue', providerName, applyRules, workspacePath),
   },
   {
     name: 'Cline',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Cline', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Cline', providerName, applyRules, workspacePath),
   },
   {
     name: 'Codex',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Codex', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Codex', providerName, applyRules, workspacePath),
   },
   {
     name: 'Claude',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Claude', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Claude', providerName, applyRules, workspacePath),
   },
   {
     name: 'Gemini',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Gemini', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Gemini', providerName, applyRules, workspacePath),
   },
   {
     name: 'OpenCode',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('OpenCode', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('OpenCode', providerName, applyRules, workspacePath),
   },
   {
     name: 'Roo',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Roo', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Roo', providerName, applyRules, workspacePath),
   },
   {
     name: 'Amp',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Amp', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Amp', providerName, applyRules, workspacePath),
   },
   {
     name: 'Kilo',
-    apply: (providerName: string, applyRules: boolean) =>
-      applyProfile('Kilo', providerName, applyRules),
+    apply: (providerName: string, applyRules: boolean, workspacePath: string) =>
+      applyProfile('Kilo', providerName, applyRules, workspacePath),
   },
 ];
 
 export const getAvailableIdes = (): string[] => ideTemplates.map((t) => t.name);
 
-export const setIde = (targets: string[], applyRules: boolean, providerName: string): string[] => {
+export const setIde = (targets: string[], applyRules: boolean, providerName: string, workspacePath: string): string[] => {
   const allTemplates = targets.length === 0 || targets.includes('all');
   const templatesToApply = allTemplates
     ? ideTemplates
@@ -576,7 +588,7 @@ export const setIde = (targets: string[], applyRules: boolean, providerName: str
       );
 
   templatesToApply.forEach((template) => {
-    template.apply(providerName, applyRules);
+    template.apply(providerName, applyRules, workspacePath);
   });
 
   return templatesToApply.map((t) => t.name);
@@ -586,5 +598,6 @@ export const applyIdeTargets = (targets: string[]): string[] => {
   log.warn('`applyIdeTargets` is deprecated. For interactive setup, use `st ide set`.');
   const config = configService.load();
   const providerName = config.defaults.provider || 'ollama';
-  return setIde(targets, true, providerName);
+  const workspacePath = process.cwd();
+  return setIde(targets, true, providerName, workspacePath);
 };

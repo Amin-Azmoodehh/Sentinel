@@ -61,9 +61,10 @@ const ensureWorkspacePath = (input: string): string => {
 
   const resolved = path.normalize(path.resolve(resolvePath(cleaned)));
 
-  // Ensure path is within workspace (use current workspaceRoot value)
-  const currentWorkspaceRoot = getWorkspaceRoot();
-  if (!resolved.startsWith(currentWorkspaceRoot)) {
+  // Ensure path is within workspace using path.relative (robust on Windows/Linux)
+  const currentWorkspaceRoot = path.normalize(getWorkspaceRoot());
+  const rel = path.relative(currentWorkspaceRoot, resolved);
+  if (rel.startsWith('..') || path.isAbsolute(rel)) {
     throw new Error(`Path must stay within workspace. Path: ${resolved}, Workspace: ${currentWorkspaceRoot}`);
   }
 
