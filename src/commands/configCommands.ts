@@ -33,12 +33,4 @@ export const registerConfigCommands = (program: Command): void => {
       configService.setValue(key, parsed);
       log.success('Updated ' + key);
     });
-
-  configCommand
-    .command('show')
-    .description('Show entire configuration')
-    .action(() => {
-      const config = configService.load();
-      process.stdout.write(JSON.stringify(config, null, 2) + '\n');
-    });
 };

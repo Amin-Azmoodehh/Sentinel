@@ -19,7 +19,7 @@ export const preconfiguredProviders = {
     baseURL: 'http://localhost:1337/v1',
     apiKey: 'not-needed',
   },
-  
+
   // Major Cloud Providers
   openai: {
     type: 'openai-compatible',
@@ -41,7 +41,7 @@ export const preconfiguredProviders = {
     baseURL: 'https://api.mistral.ai/v1',
     apiKey: '',
   },
-  
+
   // Multi-Model Platforms
   openrouter: {
     type: 'openai-compatible',
@@ -63,7 +63,7 @@ export const preconfiguredProviders = {
     baseURL: 'https://api-inference.huggingface.co/v1',
     apiKey: '',
   },
-  
+
   // Fast Inference
   groq: {
     type: 'openai-compatible',
@@ -80,7 +80,7 @@ export const preconfiguredProviders = {
     baseURL: 'https://api.endpoints.anyscale.com/v1',
     apiKey: '',
   },
-  
+
   // Specialized Providers
   deepseek: {
     type: 'openai-compatible',
@@ -102,7 +102,7 @@ export const preconfiguredProviders = {
     baseURL: 'https://api.ai21.com/studio/v1',
     apiKey: '',
   },
-  
+
   // Enterprise
   azure: {
     type: 'openai-compatible',

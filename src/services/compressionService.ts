@@ -13,27 +13,27 @@ export class CompressionService {
 
     // Remove single-line comments
     compressed = compressed.replace(/\/\/.*$/gm, '');
-    
+
     // Remove multi-line comments but keep JSDoc for context
     compressed = compressed.replace(/\/\*(?!\*)[\s\S]*?\*\//g, '');
-    
+
     // Remove excessive empty lines (more than 1)
     compressed = compressed.replace(/\n\s*\n\s*\n/g, '\n\n');
-    
+
     // Remove trailing whitespace
     compressed = compressed.replace(/[ \t]+$/gm, '');
-    
+
     // Remove leading whitespace while preserving relative indentation
     const lines = compressed.split('\n');
     const minIndent = lines
-      .filter(line => line.trim().length > 0)
+      .filter((line) => line.trim().length > 0)
       .reduce((min, line) => {
         const indent = line.match(/^(\s*)/)?.[1].length || 0;
         return Math.min(min, indent);
       }, Infinity);
-    
+
     if (minIndent !== Infinity && minIndent > 0) {
-      compressed = lines.map(line => line.slice(minIndent)).join('\n');
+      compressed = lines.map((line) => line.slice(minIndent)).join('\n');
     }
 
     return compressed.trim();
@@ -45,12 +45,9 @@ export class CompressionService {
   public static compressRules(rulesJson: string): string {
     try {
       const rules = JSON.parse(rulesJson);
-      
+
       // Create compact summary
-      const compact: string[] = [
-        '## CODE QUALITY RULES',
-        '',
-      ];
+      const compact: string[] = ['## CODE QUALITY RULES', ''];
 
       // Global rules
       if (rules.globalRules) {
@@ -83,12 +80,14 @@ export class CompressionService {
       if (rules.languageSpecific) {
         compact.push('');
         compact.push('## LANGUAGE RULES');
-        
+
         Object.entries(rules.languageSpecific).forEach(([lang, spec]: [string, any]) => {
           compact.push(`\n### ${lang.toUpperCase()}`);
-          
+
           if (spec.style) {
-            compact.push(`- Style: ${spec.style.standard}, max ${spec.style.maxLineLength} chars/line`);
+            compact.push(
+              `- Style: ${spec.style.standard}, max ${spec.style.maxLineLength} chars/line`
+            );
           }
           if (spec.typing) {
             compact.push('- Type hints/annotations required');
@@ -119,16 +118,20 @@ export class CompressionService {
   /**
    * Create a compact file summary with only essential info
    */
-  public static createFileSummary(filePath: string, content: string, maxLines: number = 150): string {
+  public static createFileSummary(
+    filePath: string,
+    content: string,
+    maxLines: number = 150
+  ): string {
     const lines = content.split('\n');
     const compressed = this.compressCode(content);
     const compressedLines = compressed.split('\n');
-    
+
     // If still too long after compression, take top and bottom
     if (compressedLines.length > maxLines) {
       const topLines = compressedLines.slice(0, Math.floor(maxLines * 0.7));
       const bottomLines = compressedLines.slice(-Math.floor(maxLines * 0.3));
-      
+
       return [
         `// ${filePath} (${lines.length} lines, compressed to ${maxLines})`,
         ...topLines,
@@ -151,11 +154,7 @@ export class CompressionService {
   /**
    * Optimize prompt structure for better AI comprehension with fewer tokens
    */
-  public static optimizePrompt(sections: {
-    rules: string;
-    code: string;
-    task: string;
-  }): string {
+  public static optimizePrompt(sections: { rules: string; code: string; task: string }): string {
     const rulesTokens = this.estimateTokens(sections.rules);
     const codeTokens = this.estimateTokens(sections.code);
     const totalTokens = rulesTokens + codeTokens + 200; // +200 for prompt structure
@@ -186,30 +185,31 @@ export class CompressionService {
    */
   public static prioritizeFiles(files: string[], maxFiles: number = 5): string[] {
     // Priority scoring
-    const scores = files.map(file => {
+    const scores = files.map((file) => {
       let score = 0;
       const lower = file.toLowerCase();
-      
+
       // High priority
-      if (lower.includes('main.') || lower.includes('index.') || lower.includes('app.')) score += 10;
+      if (lower.includes('main.') || lower.includes('index.') || lower.includes('app.'))
+        score += 10;
       if (lower.includes('config')) score += 8;
       if (lower.includes('service')) score += 7;
       if (lower.includes('controller')) score += 6;
       if (lower.includes('model')) score += 6;
-      
+
       // Medium priority
       if (lower.includes('util')) score += 4;
       if (lower.includes('helper')) score += 4;
       if (lower.includes('handler')) score += 5;
-      
+
       // Lower priority
       if (lower.includes('test')) score -= 5;
       if (lower.includes('spec')) score -= 5;
       if (lower.includes('.d.ts')) score -= 3;
-      
+
       // Prefer shorter paths (likely more core)
       score -= file.split('/').length;
-      
+
       return { file, score };
     });
 
@@ -217,6 +217,6 @@ export class CompressionService {
     return scores
       .sort((a, b) => b.score - a.score)
       .slice(0, maxFiles)
-      .map(item => item.file);
+      .map((item) => item.file);
   }
 }

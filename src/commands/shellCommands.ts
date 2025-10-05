@@ -10,8 +10,6 @@ export const registerShellCommands = (program: Command): void => {
 
   shellCommand
     .command('run <command>')
-    .alias('exec')
-    .alias('execute')
     .description('Execute shell command')
     .option('--shell <shell>', 'Shell to use (powershell, cmd, bash, etc.)')
     .option('--timeout <ms>', 'Timeout in milliseconds', '30000')

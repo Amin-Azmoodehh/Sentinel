@@ -47,7 +47,7 @@ export const registerIdeCommands = (program: Command): void => {
         const type = providerConfig?.type || 'unknown';
         const isCurrent = name === tempProvider;
         const hasApiKey = providerConfig?.apiKey ? '🔑' : '🔓';
-        
+
         return {
           name: `${name} ${hasApiKey} (${type})${isCurrent ? ' ⭐ current' : ''}`,
           value: name,
@@ -71,7 +71,9 @@ export const registerIdeCommands = (program: Command): void => {
       try {
         provider = getProvider(providerName);
       } catch (error) {
-        log.error(`Failed to initialize provider '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
+        log.error(
+          `Failed to initialize provider '${providerName}': ${error instanceof Error ? error.message : String(error)}`
+        );
         log.warn(`Please run: st provider configure ${providerName}`);
         return;
       }
@@ -87,7 +89,7 @@ export const registerIdeCommands = (program: Command): void => {
       } catch (error) {
         log.warn(`Could not fetch models from ${providerName}. Showing popular models instead.`);
         needsApiKey = true;
-        
+
         // Import the function from providerCommands
         const { getPopularModelsForProvider } = await import('./providerCommands.js');
         const popularModels = getPopularModelsForProvider(providerName);
@@ -101,7 +103,7 @@ export const registerIdeCommands = (program: Command): void => {
 
       const modelChoices = models.map((m) => {
         const isCurrentModel = m.id === tempModel && providerName === tempProvider;
-        const suffix = isCurrentModel ? ' ⭐ current' : (needsApiKey ? ' (requires API key)' : '');
+        const suffix = isCurrentModel ? ' ⭐ current' : needsApiKey ? ' (requires API key)' : '';
         return {
           name: `${m.id}${suffix}`,
           value: m.id,
@@ -120,7 +122,13 @@ export const registerIdeCommands = (program: Command): void => {
       ]);
 
       // Step 3: Get API key if needed
-      if (needsApiKey || (providerName !== 'ollama' && providerName !== 'lmstudio' && providerName !== 'localai' && providerName !== 'jan')) {
+      if (
+        needsApiKey ||
+        (providerName !== 'ollama' &&
+          providerName !== 'lmstudio' &&
+          providerName !== 'localai' &&
+          providerName !== 'jan')
+      ) {
         const { apiKey } = await inquirer.prompt([
           {
             type: 'password',
@@ -174,7 +182,9 @@ export const registerIdeCommands = (program: Command): void => {
         log.success(`${name} → MCP profile ready`);
       });
 
-      log.info(`\n📁 Generated ${applied.length} IDE configuration${applied.length > 1 ? 's' : ''}`);
+      log.info(
+        `\n📁 Generated ${applied.length} IDE configuration${applied.length > 1 ? 's' : ''}`
+      );
     });
 
   ide
@@ -192,7 +202,7 @@ export const registerIdeCommands = (program: Command): void => {
   // Register a completely separate 'set' command with 'ide' subcommand as an alias
   const setCommand = new Command('set');
   setCommand.description('⚙️ Quick configuration shortcuts');
-  
+
   setCommand
     .command('ide')
     .description('Configure IDE profiles (alias for st ide set)')
@@ -230,7 +240,7 @@ export const registerIdeCommands = (program: Command): void => {
         const type = providerConfig?.type || 'unknown';
         const isCurrent = name === currentProvider;
         const hasApiKey = providerConfig?.apiKey ? '🔑' : '🔓';
-        
+
         return {
           name: `${name} ${hasApiKey} (${type})${isCurrent ? ' ⭐ current' : ''}`,
           value: name,
@@ -254,7 +264,9 @@ export const registerIdeCommands = (program: Command): void => {
       try {
         provider = getProvider(providerName);
       } catch (error) {
-        log.error(`Failed to initialize provider '${providerName}': ${error instanceof Error ? error.message : String(error)}`);
+        log.error(
+          `Failed to initialize provider '${providerName}': ${error instanceof Error ? error.message : String(error)}`
+        );
         log.warn(`Please run: st provider configure ${providerName}`);
         return;
       }
@@ -270,7 +282,7 @@ export const registerIdeCommands = (program: Command): void => {
       } catch (error) {
         log.warn(`Could not fetch models from ${providerName}. Showing popular models instead.`);
         needsApiKey = true;
-        
+
         // Import the function from providerCommands
         const { getPopularModelsForProvider } = await import('./providerCommands.js');
         const popularModels = getPopularModelsForProvider(providerName);
@@ -284,7 +296,7 @@ export const registerIdeCommands = (program: Command): void => {
 
       const modelChoices = models.map((m) => {
         const isCurrentModel = m.id === currentModel && providerName === currentProvider;
-        const suffix = isCurrentModel ? ' ⭐ current' : (needsApiKey ? ' (requires API key)' : '');
+        const suffix = isCurrentModel ? ' ⭐ current' : needsApiKey ? ' (requires API key)' : '';
         return {
           name: `${m.id}${suffix}`,
           value: m.id,
@@ -303,7 +315,13 @@ export const registerIdeCommands = (program: Command): void => {
       ]);
 
       // Step 3: Get API key if needed
-      if (needsApiKey || (providerName !== 'ollama' && providerName !== 'lmstudio' && providerName !== 'localai' && providerName !== 'jan')) {
+      if (
+        needsApiKey ||
+        (providerName !== 'ollama' &&
+          providerName !== 'lmstudio' &&
+          providerName !== 'localai' &&
+          providerName !== 'jan')
+      ) {
         const { apiKey } = await inquirer.prompt([
           {
             type: 'password',
@@ -357,8 +375,10 @@ export const registerIdeCommands = (program: Command): void => {
         log.success(`${name} → MCP profile ready`);
       });
 
-      log.info(`\n📁 Generated ${applied.length} IDE configuration${applied.length > 1 ? 's' : ''}`);
+      log.info(
+        `\n📁 Generated ${applied.length} IDE configuration${applied.length > 1 ? 's' : ''}`
+      );
     });
-  
+
   program.addCommand(setCommand);
 };

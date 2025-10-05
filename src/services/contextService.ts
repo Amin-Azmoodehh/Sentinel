@@ -57,7 +57,9 @@ export class ContextService {
       conventions: await this.extractConventions(),
     };
 
-    log.success(`✅ Context enriched: ${context.relevantFiles.length} files, ${context.patterns.length} patterns`);
+    log.success(
+      `✅ Context enriched: ${context.relevantFiles.length} files, ${context.patterns.length} patterns`
+    );
     return context;
   }
 
@@ -83,20 +85,20 @@ export class ContextService {
 
     // Score files based on relevance
     const scoredFiles = allFiles
-      .filter(file => {
+      .filter((file) => {
         // Filter by file types if specified
         if (query.fileTypes && query.fileTypes.length > 0) {
-          return query.fileTypes.some(type => file.endsWith(type));
+          return query.fileTypes.some((type) => file.endsWith(type));
         }
         return true;
       })
-      .map(file => {
+      .map((file) => {
         let score = 0;
         const fileName = path.basename(file).toLowerCase();
         const filePath = file.toLowerCase();
 
         // Score based on keywords in filename
-        query.keywords.forEach(keyword => {
+        query.keywords.forEach((keyword) => {
           if (fileName.includes(keyword.toLowerCase())) {
             score += 10;
           }
@@ -122,7 +124,7 @@ export class ContextService {
         if (fs.existsSync(file)) {
           const content = fs.readFileSync(file, 'utf-8');
           const type = this.determineFileType(file, content);
-          
+
           relevantFiles.push({
             path: file,
             content: content.slice(0, 2000), // Limit content size
@@ -137,10 +139,17 @@ export class ContextService {
     return relevantFiles;
   }
 
-  private determineFileType(filePath: string, content: string): CodeContext['relevantFiles'][0]['type'] {
+  private determineFileType(
+    filePath: string,
+    content: string
+  ): CodeContext['relevantFiles'][0]['type'] {
     const fileName = path.basename(filePath).toLowerCase();
-    
-    if (filePath.includes('components') || content.includes('export default function') || content.includes('React.FC')) {
+
+    if (
+      filePath.includes('components') ||
+      content.includes('export default function') ||
+      content.includes('React.FC')
+    ) {
       return 'component';
     }
     if (filePath.includes('services') || fileName.includes('service')) {
@@ -155,7 +164,7 @@ export class ContextService {
     if (fileName.includes('config') || fileName.includes('.json')) {
       return 'config';
     }
-    
+
     return 'utility';
   }
 
@@ -184,9 +193,11 @@ export class ContextService {
     return patterns;
   }
 
-  private async extractComponentPattern(files: string[]): Promise<CodeContext['patterns'][0] | null> {
-    const componentFiles = files.filter(f => 
-      f.includes('components') && (f.endsWith('.tsx') || f.endsWith('.jsx'))
+  private async extractComponentPattern(
+    files: string[]
+  ): Promise<CodeContext['patterns'][0] | null> {
+    const componentFiles = files.filter(
+      (f) => f.includes('components') && (f.endsWith('.tsx') || f.endsWith('.jsx'))
     );
 
     if (componentFiles.length === 0) return null;
@@ -194,11 +205,12 @@ export class ContextService {
     try {
       const sampleFile = componentFiles[0];
       const content = fs.readFileSync(sampleFile, 'utf-8');
-      
+
       return {
         type: 'React Component',
         example: content.slice(0, 500) + '...',
-        usage: 'Use this pattern for creating new React components with proper TypeScript types and exports.',
+        usage:
+          'Use this pattern for creating new React components with proper TypeScript types and exports.',
       };
     } catch (error) {
       return null;
@@ -206,20 +218,19 @@ export class ContextService {
   }
 
   private async extractServicePattern(files: string[]): Promise<CodeContext['patterns'][0] | null> {
-    const serviceFiles = files.filter(f => 
-      f.includes('services') && f.endsWith('.ts')
-    );
+    const serviceFiles = files.filter((f) => f.includes('services') && f.endsWith('.ts'));
 
     if (serviceFiles.length === 0) return null;
 
     try {
       const sampleFile = serviceFiles[0];
       const content = fs.readFileSync(sampleFile, 'utf-8');
-      
+
       return {
         type: 'Service Class',
         example: content.slice(0, 500) + '...',
-        usage: 'Use this pattern for creating new service classes with proper error handling and TypeScript types.',
+        usage:
+          'Use this pattern for creating new service classes with proper error handling and TypeScript types.',
       };
     } catch (error) {
       return null;
@@ -227,20 +238,19 @@ export class ContextService {
   }
 
   private async extractUtilityPattern(files: string[]): Promise<CodeContext['patterns'][0] | null> {
-    const utilityFiles = files.filter(f => 
-      f.includes('utils') && f.endsWith('.ts')
-    );
+    const utilityFiles = files.filter((f) => f.includes('utils') && f.endsWith('.ts'));
 
     if (utilityFiles.length === 0) return null;
 
     try {
       const sampleFile = utilityFiles[0];
       const content = fs.readFileSync(sampleFile, 'utf-8');
-      
+
       return {
         type: 'Utility Function',
         example: content.slice(0, 300) + '...',
-        usage: 'Use this pattern for creating utility functions with proper exports and documentation.',
+        usage:
+          'Use this pattern for creating utility functions with proper exports and documentation.',
       };
     } catch (error) {
       return null;
@@ -261,7 +271,7 @@ export class ContextService {
 
       // Analyze usage of key dependencies
       const keyDeps = ['react', 'axios', 'lodash', 'express', 'typescript'];
-      
+
       for (const dep of keyDeps) {
         if (allDeps[dep]) {
           const usage = await this.findDependencyUsage(dep);
@@ -283,12 +293,16 @@ export class ContextService {
     const files = indexingService.getFiles();
     const usage: string[] = [];
 
-    for (const file of files.slice(0, 10)) { // Limit to first 10 files for performance
+    for (const file of files.slice(0, 10)) {
+      // Limit to first 10 files for performance
       try {
         if (fs.existsSync(file)) {
           const content = fs.readFileSync(file, 'utf-8');
-          
-          if (content.includes(`from '${dependency}'`) || content.includes(`require('${dependency}')`)) {
+
+          if (
+            content.includes(`from '${dependency}'`) ||
+            content.includes(`require('${dependency}')`)
+          ) {
             // Extract import patterns
             const importRegex = new RegExp(`import\\s+.*?\\s+from\\s+['"]${dependency}['"]`, 'g');
             const matches = content.match(importRegex);
@@ -314,38 +328,40 @@ export class ContextService {
     };
 
     // Analyze naming conventions
-    const componentFiles = files.filter(f => f.includes('components'));
+    const componentFiles = files.filter((f) => f.includes('components'));
     if (componentFiles.length > 0) {
       conventions.naming.push('Components use PascalCase naming (e.g., UserProfile.tsx)');
     }
 
-    const serviceFiles = files.filter(f => f.includes('services'));
+    const serviceFiles = files.filter((f) => f.includes('services'));
     if (serviceFiles.length > 0) {
       conventions.naming.push('Services use camelCase with Service suffix (e.g., userService.ts)');
     }
 
     // Analyze structure conventions
-    if (files.some(f => f.includes('src/components'))) {
+    if (files.some((f) => f.includes('src/components'))) {
       conventions.structure.push('Components are organized in src/components/ directory');
     }
-    if (files.some(f => f.includes('src/services'))) {
+    if (files.some((f) => f.includes('src/services'))) {
       conventions.structure.push('Services are organized in src/services/ directory');
     }
-    if (files.some(f => f.includes('src/utils'))) {
+    if (files.some((f) => f.includes('src/utils'))) {
       conventions.structure.push('Utilities are organized in src/utils/ directory');
     }
 
     // Analyze import conventions
     try {
-      const sampleFile = files.find(f => f.endsWith('.ts') || f.endsWith('.tsx'));
+      const sampleFile = files.find((f) => f.endsWith('.ts') || f.endsWith('.tsx'));
       if (sampleFile && fs.existsSync(sampleFile)) {
         const content = fs.readFileSync(sampleFile, 'utf-8');
-        
+
         if (content.includes("import React from 'react'")) {
-          conventions.imports.push("Use 'import React from \"react\"' for React imports");
+          conventions.imports.push('Use \'import React from "react"\' for React imports');
         }
-        if (content.includes("import { ") && content.includes(" } from ")) {
-          conventions.imports.push("Use named imports with destructuring: import { Component } from 'library'");
+        if (content.includes('import { ') && content.includes(' } from ')) {
+          conventions.imports.push(
+            "Use named imports with destructuring: import { Component } from 'library'"
+          );
         }
       }
     } catch (error) {
@@ -367,15 +383,21 @@ ${originalPrompt}
 ${context.projectRules}
 
 ## Relevant Code Examples:
-${context.relevantFiles.map(file => `
+${context.relevantFiles
+  .map(
+    (file) => `
 ### ${file.path} (${file.type})
 \`\`\`
 ${file.content}
 \`\`\`
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 ## Established Patterns:
-${context.patterns.map(pattern => `
+${context.patterns
+  .map(
+    (pattern) => `
 **${pattern.type}:**
 ${pattern.usage}
 
@@ -383,12 +405,18 @@ Example:
 \`\`\`
 ${pattern.example}
 \`\`\`
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 ## Dependencies in Use:
-${context.dependencies.map(dep => `
+${context.dependencies
+  .map(
+    (dep) => `
 - **${dep.name}** (${dep.version}): ${dep.usage.join(', ')}
-`).join('\n')}
+`
+  )
+  .join('\n')}
 
 ## Project Conventions:
 **Naming:** ${context.conventions.naming.join(', ')}

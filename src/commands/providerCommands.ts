@@ -15,23 +15,23 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
     // OpenAI
     openai: [
       'gpt-4o',
-      'gpt-4o-mini', 
+      'gpt-4o-mini',
       'gpt-4-turbo',
       'gpt-4',
       'gpt-3.5-turbo',
       'o1-preview',
-      'o1-mini'
+      'o1-mini',
     ],
-    
+
     // Anthropic Claude
     claude: [
       'claude-3-5-sonnet-20241022',
       'claude-3-5-haiku-20241022',
       'claude-3-opus-20240229',
       'claude-3-sonnet-20240229',
-      'claude-3-haiku-20240307'
+      'claude-3-haiku-20240307',
     ],
-    
+
     // Google Gemini
     gemini: [
       'gemini-2.0-flash-exp',
@@ -40,9 +40,9 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
       'gemini-1.5-pro',
       'gemini-1.5-flash',
       'gemini-pro',
-      'gemini-pro-vision'
+      'gemini-pro-vision',
     ],
-    
+
     // Mistral AI
     mistral: [
       'mistral-large-latest',
@@ -51,9 +51,9 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
       'mistral-small-latest',
       'mistral-nemo',
       'codestral-latest',
-      'mixtral-8x7b-instruct'
+      'mixtral-8x7b-instruct',
     ],
-    
+
     // OpenRouter (Multi-Provider) - Free models prioritized
     openrouter: [
       // Free Models
@@ -77,9 +77,9 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
       'qwen/qwen-2.5-72b-instruct',
       'mistralai/mixtral-8x22b-instruct',
       'anthropic/claude-3-opus',
-      'cohere/command-r-plus'
+      'cohere/command-r-plus',
     ],
-    
+
     // Groq (Fast Inference)
     groq: [
       'llama-3.1-70b-versatile',
@@ -88,9 +88,9 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
       'llama-3.2-11b-text-preview',
       'mixtral-8x7b-32768',
       'gemma2-9b-it',
-      'whisper-large-v3'
+      'whisper-large-v3',
     ],
-    
+
     // Together AI
     together: [
       'meta-llama/Meta-Llama-3.1-70B-Instruct-Turbo',
@@ -98,76 +98,59 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
       'mistralai/Mixtral-8x7B-Instruct-v0.1',
       'mistralai/Mixtral-8x22B-Instruct-v0.1',
       'Qwen/Qwen2.5-72B-Instruct-Turbo',
-      'microsoft/DialoGPT-medium'
+      'microsoft/DialoGPT-medium',
     ],
-    
+
     // DeepSeek
-    deepseek: [
-      'deepseek-chat',
-      'deepseek-coder',
-      'deepseek-math',
-      'deepseek-reasoner'
-    ],
-    
+    deepseek: ['deepseek-chat', 'deepseek-coder', 'deepseek-math', 'deepseek-reasoner'],
+
     // Perplexity
     perplexity: [
       'llama-3.1-sonar-large-128k-online',
       'llama-3.1-sonar-small-128k-online',
       'llama-3.1-sonar-large-128k-chat',
-      'llama-3.1-sonar-small-128k-chat'
+      'llama-3.1-sonar-small-128k-chat',
     ],
-    
+
     // Cohere
-    cohere: [
-      'command-r-plus',
-      'command-r',
-      'command',
-      'command-nightly',
-      'command-light'
-    ],
-    
+    cohere: ['command-r-plus', 'command-r', 'command', 'command-nightly', 'command-light'],
+
     // AI21 Labs
-    ai21: [
-      'jamba-1.5-large',
-      'jamba-1.5-mini',
-      'j2-ultra',
-      'j2-mid',
-      'j2-light'
-    ],
-    
+    ai21: ['jamba-1.5-large', 'jamba-1.5-mini', 'j2-ultra', 'j2-mid', 'j2-light'],
+
     // Hugging Face
     huggingface: [
       'microsoft/DialoGPT-large',
       'microsoft/DialoGPT-medium',
       'facebook/blenderbot-400M-distill',
       'microsoft/GODEL-v1_1-large-seq2seq',
-      'EleutherAI/gpt-j-6b'
+      'EleutherAI/gpt-j-6b',
     ],
-    
+
     // Fireworks AI
     fireworks: [
       'accounts/fireworks/models/llama-v3p1-70b-instruct',
       'accounts/fireworks/models/llama-v3p1-8b-instruct',
       'accounts/fireworks/models/mixtral-8x7b-instruct',
-      'accounts/fireworks/models/qwen2p5-72b-instruct'
+      'accounts/fireworks/models/qwen2p5-72b-instruct',
     ],
-    
+
     // Anyscale
     anyscale: [
       'meta-llama/Llama-2-70b-chat-hf',
       'meta-llama/Llama-2-13b-chat-hf',
       'meta-llama/Llama-2-7b-chat-hf',
-      'mistralai/Mixtral-8x7B-Instruct-v0.1'
+      'mistralai/Mixtral-8x7B-Instruct-v0.1',
     ],
-    
+
     // Replicate
     replicate: [
       'meta/llama-2-70b-chat',
       'meta/llama-2-13b-chat',
       'meta/llama-2-7b-chat',
-      'mistralai/mixtral-8x7b-instruct-v0.1'
+      'mistralai/mixtral-8x7b-instruct-v0.1',
     ],
-    
+
     // Ollama (Local)
     ollama: [
       'llama3.2:latest',
@@ -183,44 +166,28 @@ export const getPopularModelsForProvider = (provider: string): string[] => {
       'deepseek-coder:latest',
       'phi3:latest',
       'gemma2:latest',
-      'nomic-embed-text:latest'
+      'nomic-embed-text:latest',
     ],
-    
+
     // LM Studio (Local)
     lmstudio: [
       'llama-3.1-8b-instruct',
       'llama-3.1-70b-instruct',
       'qwen2.5-7b-instruct',
       'mistral-7b-instruct',
-      'codellama-7b-instruct'
+      'codellama-7b-instruct',
     ],
-    
+
     // LocalAI (Local)
-    localai: [
-      'gpt-3.5-turbo',
-      'gpt-4',
-      'llama2-chat',
-      'codellama-instruct'
-    ],
-    
+    localai: ['gpt-3.5-turbo', 'gpt-4', 'llama2-chat', 'codellama-instruct'],
+
     // Jan (Local)
-    jan: [
-      'trinity-v1.2-7b',
-      'stealth-v1.2-7b',
-      'llama2-chat-7b',
-      'mistral-ins-7b-q4'
-    ],
-    
+    jan: ['trinity-v1.2-7b', 'stealth-v1.2-7b', 'llama2-chat-7b', 'mistral-ins-7b-q4'],
+
     // Azure OpenAI
-    azure: [
-      'gpt-4o',
-      'gpt-4-turbo',
-      'gpt-4',
-      'gpt-35-turbo',
-      'text-embedding-ada-002'
-    ]
+    azure: ['gpt-4o', 'gpt-4-turbo', 'gpt-4', 'gpt-35-turbo', 'text-embedding-ada-002'],
   };
-  
+
   return popularModels[provider] || ['gpt-4o', 'gpt-3.5-turbo'];
 };
 
@@ -259,11 +226,11 @@ export const registerProviderCommands = (program: Command) => {
       if (Object.keys(options).length > 0) {
         upsertProviderConfig(providerToSet, options);
       }
-      
+
       setProvider(providerToSet);
     });
 
-    providerCommand
+  providerCommand
     .command('configure [provider]')
     .description('Configure a provider interactively')
     .action(async (providerName) => {
@@ -282,7 +249,9 @@ export const registerProviderCommands = (program: Command) => {
 
       const preconfig = preconfiguredProviders[provider as keyof typeof preconfiguredProviders];
       if (!preconfig) {
-        console.log(`Unknown provider: ${provider}. Use one of: ${Object.keys(preconfiguredProviders).join(', ')}`);
+        console.log(
+          `Unknown provider: ${provider}. Use one of: ${Object.keys(preconfiguredProviders).join(', ')}`
+        );
         return;
       }
 
@@ -309,8 +278,8 @@ export const registerProviderCommands = (program: Command) => {
         {
           type: 'list',
           name: 'chosenModel',
-          message: needsApiKey 
-            ? `Choose a model for ${provider} (API key required):` 
+          message: needsApiKey
+            ? `Choose a model for ${provider} (API key required):`
             : `Choose a default model from ${provider}:`,
           choices: models,
         },
@@ -318,7 +287,7 @@ export const registerProviderCommands = (program: Command) => {
 
       // Step 3: Get API key if needed
       let apiKey = (preconfig as any).apiKey || '';
-      
+
       if (needsApiKey || provider !== 'ollama') {
         const { inputApiKey } = await inquirer.prompt([
           {
@@ -339,7 +308,9 @@ export const registerProviderCommands = (program: Command) => {
       upsertProviderConfig(provider, { ...preconfig, apiKey, model: chosenModel });
       setProvider(provider);
 
-      console.log(`Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`);
+      console.log(
+        `Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`
+      );
 
       // Step 5: Verify configuration by testing the connection
       if (apiKey && provider !== 'ollama') {
@@ -350,7 +321,9 @@ export const registerProviderCommands = (program: Command) => {
             console.log(`✅ Configuration verified! Found ${verifiedModels.length} models.`);
           }
         } catch (error) {
-          console.log('⚠️ Configuration saved but could not verify connection. Please check your API key.');
+          console.log(
+            '⚠️ Configuration saved but could not verify connection. Please check your API key.'
+          );
         }
       }
     });
@@ -358,12 +331,16 @@ export const registerProviderCommands = (program: Command) => {
   providerCommand
     .command('detect')
     .description('Detect available API-based providers')
-    .action(async () => { await detectModels(); });
+    .action(async () => {
+      await detectModels();
+    });
 
   providerCommand
     .command('list [provider]')
     .description('List models for a provider')
-    .action(async (provider) => { await listModels(provider); });
+    .action(async (provider) => {
+      await listModels(provider);
+    });
 
   providerCommand
     .command('set-model <model>')
@@ -375,12 +352,12 @@ export const registerProviderCommands = (program: Command) => {
     .description('Show current provider and model status')
     .action(() => statusModels());
 
-    program.addCommand(providerCommand);
+  program.addCommand(providerCommand);
 
   // Register a completely separate 'set' command with 'provider' subcommand
   const setCommand = new Command('set');
   setCommand.description('⚙️ Quick configuration shortcuts');
-  
+
   setCommand
     .command('provider')
     .description('Configure a provider interactively (alias for st provider configure)')
@@ -398,7 +375,9 @@ export const registerProviderCommands = (program: Command) => {
 
       const preconfig = preconfiguredProviders[provider as keyof typeof preconfiguredProviders];
       if (!preconfig) {
-        console.log(`Unknown provider: ${provider}. Use one of: ${Object.keys(preconfiguredProviders).join(', ')}`);
+        console.log(
+          `Unknown provider: ${provider}. Use one of: ${Object.keys(preconfiguredProviders).join(', ')}`
+        );
         return;
       }
 
@@ -435,13 +414,15 @@ export const registerProviderCommands = (program: Command) => {
         upsertProviderConfig(provider, { model: chosenModel });
         setProvider(provider);
 
-        console.log(`Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`);
-
+        console.log(
+          `Successfully configured '${provider}' with model '${chosenModel}' and set it as default.`
+        );
       } catch (error) {
-        console.log(`Error fetching models: ${error instanceof Error ? error.message : String(error)}`);
+        console.log(
+          `Error fetching models: ${error instanceof Error ? error.message : String(error)}`
+        );
       }
     });
-  
+
   program.addCommand(setCommand);
 };
-

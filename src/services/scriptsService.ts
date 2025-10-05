@@ -41,7 +41,7 @@ export class ScriptsService {
     }
 
     const configPath = path.join(process.cwd(), '.sentineltm', 'config', 'scripts.yml');
-    
+
     if (!fs.existsSync(configPath)) {
       log.warn('📜 No scripts.yml found. Creating default configuration...');
       this.createDefaultConfig(configPath);
@@ -52,7 +52,9 @@ export class ScriptsService {
       this.config = yaml.parse(content) as ScriptConfig;
       return this.config;
     } catch (error) {
-      log.error(`❌ Failed to load scripts configuration: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Failed to load scripts configuration: ${error instanceof Error ? error.message : String(error)}`
+      );
       return { scripts: {} };
     }
   }
@@ -82,7 +84,9 @@ export class ScriptsService {
       fs.writeFileSync(configPath, yaml.stringify(defaultConfig));
       log.success(`✅ Created default scripts configuration at ${configPath}`);
     } catch (error) {
-      log.error(`❌ Failed to create default config: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Failed to create default config: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -128,7 +132,7 @@ export class ScriptsService {
 
   private substituteParameters(command: string, args: string[] = []): string {
     let result = command;
-    
+
     // Replace $1, $2, etc. with provided arguments
     args.forEach((arg, index) => {
       const placeholder = `$${index + 1}`;
@@ -147,14 +151,14 @@ export class ScriptsService {
   private async confirmExecution(scriptName: string): Promise<boolean> {
     const config = this.loadConfig();
     const requireConfirmation = config.security?.requireConfirmation || [];
-    
+
     if (!requireConfirmation.includes(scriptName)) {
       return true; // No confirmation required
     }
 
     log.warn(`⚠️ Script "${scriptName}" requires confirmation.`);
     log.warn('This script may perform potentially destructive operations.');
-    
+
     // In a real implementation, you might want to use a proper prompt library
     // For now, we'll assume confirmation is given
     log.info('Use --force flag to skip confirmation in the future.');
@@ -163,7 +167,7 @@ export class ScriptsService {
 
   async executeScript(scriptName: string, options: ScriptExecutionOptions = {}): Promise<boolean> {
     const script = this.getScript(scriptName);
-    
+
     if (!script) {
       log.error(`❌ Script "${scriptName}" not found.`);
       log.info(`Available scripts: ${this.listScripts().join(', ')}`);
@@ -197,7 +201,9 @@ export class ScriptsService {
         return await this.executeSingleCommand(script, options.args);
       }
     } catch (error) {
-      log.error(`❌ Script execution failed: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Script execution failed: ${error instanceof Error ? error.message : String(error)}`
+      );
       return false;
     }
   }
@@ -206,7 +212,7 @@ export class ScriptsService {
     try {
       // Substitute parameters
       const resolvedCommand = this.substituteParameters(command, args);
-      
+
       // Validate security
       if (!this.validateSecurity(resolvedCommand)) {
         return false;
@@ -231,7 +237,9 @@ export class ScriptsService {
         return false;
       }
     } catch (error) {
-      log.error(`Command execution failed: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `Command execution failed: ${error instanceof Error ? error.message : String(error)}`
+      );
       return false;
     }
   }
@@ -240,17 +248,19 @@ export class ScriptsService {
     try {
       const config = this.loadConfig();
       config.scripts[name] = commands;
-      
+
       const configPath = path.join(process.cwd(), '.sentineltm', 'config', 'scripts.yml');
       fs.writeFileSync(configPath, yaml.stringify(config));
-      
+
       // Invalidate cache
       this.config = null;
-      
+
       log.success(`✅ Added script "${name}"`);
       return true;
     } catch (error) {
-      log.error(`❌ Failed to add script: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Failed to add script: ${error instanceof Error ? error.message : String(error)}`
+      );
       return false;
     }
   }
@@ -258,24 +268,26 @@ export class ScriptsService {
   removeScript(name: string): boolean {
     try {
       const config = this.loadConfig();
-      
+
       if (!config.scripts[name]) {
         log.warn(`Script "${name}" not found.`);
         return false;
       }
-      
+
       delete config.scripts[name];
-      
+
       const configPath = path.join(process.cwd(), '.sentineltm', 'config', 'scripts.yml');
       fs.writeFileSync(configPath, yaml.stringify(config));
-      
+
       // Invalidate cache
       this.config = null;
-      
+
       log.success(`✅ Removed script "${name}"`);
       return true;
     } catch (error) {
-      log.error(`❌ Failed to remove script: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Failed to remove script: ${error instanceof Error ? error.message : String(error)}`
+      );
       return false;
     }
   }

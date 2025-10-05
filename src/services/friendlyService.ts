@@ -78,7 +78,9 @@ export class FriendlyService {
       this.config = yaml.parse(content) as FriendlyConfig;
       return this.config;
     } catch (error) {
-      log.error(`❌ Failed to load friendly.yml: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Failed to load friendly.yml: ${error instanceof Error ? error.message : String(error)}`
+      );
       return null;
     }
   }
@@ -94,19 +96,22 @@ export class FriendlyService {
       if (input.startsWith(alias)) {
         // Extract arguments after alias
         const args = input.slice(alias.length).trim().split(' ');
-        
+
         // Replace $1, $2, etc. with actual arguments
         let translatedCommand = command;
         args.forEach((arg, index) => {
           translatedCommand = translatedCommand.replace(`$${index + 1}`, arg);
         });
-        
+
         // Handle ${N:-default} syntax
-        translatedCommand = translatedCommand.replace(/\$\{(\d+):-([^}]+)\}/g, (match, num, defaultVal) => {
-          const argIndex = parseInt(num) - 1;
-          return args[argIndex] || defaultVal;
-        });
-        
+        translatedCommand = translatedCommand.replace(
+          /\$\{(\d+):-([^}]+)\}/g,
+          (match, num, defaultVal) => {
+            const argIndex = parseInt(num) - 1;
+            return args[argIndex] || defaultVal;
+          }
+        );
+
         return translatedCommand;
       }
     }
@@ -126,7 +131,11 @@ export class FriendlyService {
     // Apply tone
     if (personality.tone === 'enthusiastic_partner' && personality.use_emojis) {
       // Message is already formatted, just ensure proper style
-      if (type === 'success' && !formattedMessage.includes('✅') && !formattedMessage.includes('🎉')) {
+      if (
+        type === 'success' &&
+        !formattedMessage.includes('✅') &&
+        !formattedMessage.includes('🎉')
+      ) {
         formattedMessage = `✅ ${formattedMessage}`;
       }
     } else if (personality.tone === 'formal') {
@@ -138,8 +147,8 @@ export class FriendlyService {
     if (interaction_rules.use_collaborative_language) {
       formattedMessage = formattedMessage
         .replace(/\bYou should\b/gi, "Let's")
-        .replace(/\bYou need to\b/gi, "We need to")
-        .replace(/\bYou can\b/gi, "We can");
+        .replace(/\bYou need to\b/gi, 'We need to')
+        .replace(/\bYou can\b/gi, 'We can');
     }
 
     return formattedMessage;
@@ -210,7 +219,10 @@ export class FriendlyService {
     return value ?? defaultValue;
   }
 
-  checkBoundary(operation: string, target: string): { allowed: boolean; needsConfirmation: boolean; reason?: string } {
+  checkBoundary(
+    operation: string,
+    target: string
+  ): { allowed: boolean; needsConfirmation: boolean; reason?: string } {
     const config = this.loadConfig();
     if (!config || !config.boundaries) {
       return { allowed: true, needsConfirmation: false };
@@ -277,12 +289,18 @@ export class FriendlyService {
         const actualValue = isPercent ? contextValue * 100 : contextValue;
 
         switch (operator) {
-          case '>': return actualValue > value;
-          case '<': return actualValue < value;
-          case '>=': return actualValue >= value;
-          case '<=': return actualValue <= value;
-          case '=': return actualValue === value;
-          default: return false;
+          case '>':
+            return actualValue > value;
+          case '<':
+            return actualValue < value;
+          case '>=':
+            return actualValue >= value;
+          case '<=':
+            return actualValue <= value;
+          case '=':
+            return actualValue === value;
+          default:
+            return false;
         }
       }
 
@@ -315,7 +333,7 @@ export class FriendlyService {
       return null;
     }
 
-    const workflow = config.context_awareness.common_workflows.find(w => w.name === name);
+    const workflow = config.context_awareness.common_workflows.find((w) => w.name === name);
     return workflow?.steps || null;
   }
 }

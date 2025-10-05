@@ -24,10 +24,7 @@ export async function handleContextMonitor(
       }
 
       case 'recordUsage': {
-        if (
-          typeof payload.inputTokens !== 'number' ||
-          typeof payload.outputTokens !== 'number'
-        ) {
+        if (typeof payload.inputTokens !== 'number' || typeof payload.outputTokens !== 'number') {
           return {
             success: false,
             error: 'inputTokens and outputTokens are required for recordUsage action',

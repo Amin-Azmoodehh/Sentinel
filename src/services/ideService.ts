@@ -25,15 +25,15 @@ const ensureDir = (dir: string): void => {
 
 const copyFolderRecursive = (source: string, target: string): void => {
   if (!fs.existsSync(source)) return;
-  
+
   ensureDir(target);
-  
+
   const files = fs.readdirSync(source);
-  
+
   for (const file of files) {
     const sourcePath = path.join(source, file);
     const targetPath = path.join(target, file);
-    
+
     if (fs.statSync(sourcePath).isDirectory()) {
       copyFolderRecursive(sourcePath, targetPath);
     } else {
@@ -308,7 +308,8 @@ const createDefaultRules = () => ({
       'Final Verdict (PASS/FAIL)',
     ],
     mandatoryFormat: {
-      preGeneration: 'I acknowledge the following BINDING rules: ✓ main.py will be exactly ≤4 lines ✓ Zero hardcoded strings/numbers/URLs ✓ Zero print() statements ✓ All config from YAML files ✓ Type hints on every function ✓ PEP8 with ≤79 chars/line ✓ Files ≤300 lines maximum ✓ Absolute imports only ✓ English logs / Persian UI ✓ Modular architecture. I will provide self-assessment after generation.',
+      preGeneration:
+        'I acknowledge the following BINDING rules: ✓ main.py will be exactly ≤4 lines ✓ Zero hardcoded strings/numbers/URLs ✓ Zero print() statements ✓ All config from YAML files ✓ Type hints on every function ✓ PEP8 with ≤79 chars/line ✓ Files ≤300 lines maximum ✓ Absolute imports only ✓ English logs / Persian UI ✓ Modular architecture. I will provide self-assessment after generation.',
       selfAssessment: 'MANDATORY_TABLE_WITH_EVIDENCE',
       finalVerdict: 'Score: X/12, Grade: PASS ✅ / FAIL ❌',
     },
@@ -401,7 +402,7 @@ const applyIdeProfile = (
     // Copy entire rules folder if it exists (for advanced configurations)
     const sourceRulesFolder = path.join(process.cwd(), '.windsurf', 'rules');
     const targetRulesFolder = path.join(targetDir, 'rules');
-    
+
     if (fs.existsSync(sourceRulesFolder)) {
       try {
         // Copy entire rules folder
@@ -479,27 +480,66 @@ const ideTemplates: IdeTemplate[] = [
   { name: 'Cursor', apply: applyCursor },
   { name: 'Zed', apply: applyZed },
   { name: 'Windsurf', apply: applyWindsurf },
-  { name: 'Trae', apply: (providerName: string, applyRules: boolean) => applyProfile('Trae', providerName, applyRules) },
-  { name: 'Kiro', apply: (providerName: string, applyRules: boolean) => applyProfile('Kiro', providerName, applyRules) },
-  { name: 'Continue', apply: (providerName: string, applyRules: boolean) => applyProfile('Continue', providerName, applyRules) },
-  { name: 'Cline', apply: (providerName: string, applyRules: boolean) => applyProfile('Cline', providerName, applyRules) },
-  { name: 'Codex', apply: (providerName: string, applyRules: boolean) => applyProfile('Codex', providerName, applyRules) },
-  { name: 'Claude', apply: (providerName: string, applyRules: boolean) => applyProfile('Claude', providerName, applyRules) },
-  { name: 'Gemini', apply: (providerName: string, applyRules: boolean) => applyProfile('Gemini', providerName, applyRules) },
-  { name: 'OpenCode', apply: (providerName: string, applyRules: boolean) => applyProfile('OpenCode', providerName, applyRules) },
-  { name: 'Roo', apply: (providerName: string, applyRules: boolean) => applyProfile('Roo', providerName, applyRules) },
-  { name: 'Amp', apply: (providerName: string, applyRules: boolean) => applyProfile('Amp', providerName, applyRules) },
-  { name: 'Kilo', apply: (providerName: string, applyRules: boolean) => applyProfile('Kilo', providerName, applyRules) },
+  {
+    name: 'Trae',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Trae', providerName, applyRules),
+  },
+  {
+    name: 'Kiro',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Kiro', providerName, applyRules),
+  },
+  {
+    name: 'Continue',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Continue', providerName, applyRules),
+  },
+  {
+    name: 'Cline',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Cline', providerName, applyRules),
+  },
+  {
+    name: 'Codex',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Codex', providerName, applyRules),
+  },
+  {
+    name: 'Claude',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Claude', providerName, applyRules),
+  },
+  {
+    name: 'Gemini',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Gemini', providerName, applyRules),
+  },
+  {
+    name: 'OpenCode',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('OpenCode', providerName, applyRules),
+  },
+  {
+    name: 'Roo',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Roo', providerName, applyRules),
+  },
+  {
+    name: 'Amp',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Amp', providerName, applyRules),
+  },
+  {
+    name: 'Kilo',
+    apply: (providerName: string, applyRules: boolean) =>
+      applyProfile('Kilo', providerName, applyRules),
+  },
 ];
 
 export const getAvailableIdes = (): string[] => ideTemplates.map((t) => t.name);
 
-export const setIde = (
-  targets: string[],
-  applyRules: boolean,
-  providerName: string
-): string[] => {
-  
+export const setIde = (targets: string[], applyRules: boolean, providerName: string): string[] => {
   const allTemplates = targets.length === 0 || targets.includes('all');
   const templatesToApply = allTemplates
     ? ideTemplates

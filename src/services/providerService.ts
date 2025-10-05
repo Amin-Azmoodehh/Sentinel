@@ -4,7 +4,6 @@ import chalk from 'chalk';
 import { Provider, Model, CompletionRequest, CompletionResponse } from '../providers/types.js';
 import { OllamaProvider } from '../providers/OllamaProvider.js';
 import { OpenAICompatibleProvider } from '../providers/OpenAICompatibleProvider.js';
-import { contextMonitorService } from './contextMonitorService.js';
 
 export interface ProviderInfo {
   name: string;
@@ -226,37 +225,17 @@ export const setModel = (model: string): void => {
 export const generateCompletion = async (request: CompletionRequest): Promise<CompletionResponse> => {
   const config = configService.load();
   const providerName = config.defaults.provider;
-  const promptText = request?.prompt ?? '';
-  const operation = process.env.ST_COMMAND || 'ai_completion';
-  let completionText = '';
-
-  try {
-    if (!providerName) {
-      throw new Error('No default provider set.');
-    }
-
-    const provider = createProvider(providerName, config);
-    if (!provider) {
-      throw new Error(`Provider '${providerName}' is not available.`);
-    }
-
-    const completion = await provider.generateCompletion(request);
-    completionText = completion.content;
-    return completion;
-
-  } catch (error) {
-    // Re-throw the error after ensuring usage is recorded in finally
-    throw error;
-  } finally {
-    // Always record usage, even on failure. completionText will be empty on error.
-    try {
-      log.info(`[ContextMonitor] Attempting to record usage for operation: ${operation}`);
-      contextMonitorService.recordUsageFromText(promptText, completionText, operation);
-    } catch (monitorError) {
-      // Swallow monitoring errors to not disrupt the main flow
-      log.warn('Could not record token usage: ' + (monitorError as Error).message);
-    }
+  
+  if (!providerName) {
+    throw new Error('No default provider set.');
   }
+
+  const provider = createProvider(providerName, config);
+  if (!provider) {
+    throw new Error(`Provider '${providerName}' is not available.`);
+  }
+
+  return provider.generateCompletion(request);
 };
 
 export const getAllowedProviders = (): string[] => {

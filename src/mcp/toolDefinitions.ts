@@ -61,7 +61,14 @@ const PROVIDER_ACTIONS = [
   'listModels',
 ] as const;
 const GATE_ACTIONS = ['run'] as const;
-const CONTEXT_MONITOR_ACTIONS = ['getStats', 'recordUsage', 'getWarning', 'getSummary', 'reset', 'exportStats'] as const;
+const CONTEXT_MONITOR_ACTIONS = [
+  'getStats',
+  'recordUsage',
+  'getWarning',
+  'getSummary',
+  'reset',
+  'exportStats',
+] as const;
 
 export const buildTaskToolDefinition = (): ExperimentalTool => ({
   name: 'sentinel_task',
@@ -416,14 +423,16 @@ export const buildCICDToolDefinition = (): ExperimentalTool => ({
 
 export const buildContextMonitorToolDefinition = (): ExperimentalTool => ({
   name: 'sentinel_context_monitor',
-  description: 'Real-time context window monitoring with token usage tracking and smart warnings. Track AI operations, get usage statistics, and receive alerts before hitting context limits.',
+  description:
+    'Real-time context window monitoring with token usage tracking and smart warnings. Track AI operations, get usage statistics, and receive alerts before hitting context limits.',
   inputSchema: {
     type: 'object',
     properties: {
-      action: { 
-        type: 'string', 
+      action: {
+        type: 'string',
         enum: [...CONTEXT_MONITOR_ACTIONS],
-        description: 'Action to perform: getStats (current usage), recordUsage (log tokens), getWarning (check alerts), getSummary (session report), reset (clear history), exportStats (JSON export)'
+        description:
+          'Action to perform: getStats (current usage), recordUsage (log tokens), getWarning (check alerts), getSummary (session report), reset (clear history), exportStats (JSON export)',
       },
       payload: {
         type: 'object',

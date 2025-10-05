@@ -66,7 +66,7 @@ export class WorkflowService {
 
     const projectRoot = process.cwd();
     const packageJsonPath = path.join(projectRoot, 'package.json');
-    
+
     // Detect framework
     let framework: WorkflowContext['framework'] = 'typescript';
     let styleFramework: WorkflowContext['styleFramework'];
@@ -105,7 +105,9 @@ export class WorkflowService {
       patterns,
     };
 
-    log.success(`✅ Project analysis complete: ${framework} with ${patterns.length} patterns detected`);
+    log.success(
+      `✅ Project analysis complete: ${framework} with ${patterns.length} patterns detected`
+    );
     return this.context;
   }
 
@@ -114,8 +116,8 @@ export class WorkflowService {
     const files = indexingService.getFiles();
 
     // Extract React component patterns
-    const componentFiles = files.filter(f => 
-      f.includes('components') && (f.endsWith('.tsx') || f.endsWith('.jsx'))
+    const componentFiles = files.filter(
+      (f) => f.includes('components') && (f.endsWith('.tsx') || f.endsWith('.jsx'))
     );
 
     if (componentFiles.length > 0) {
@@ -124,7 +126,7 @@ export class WorkflowService {
         const content = fs.readFileSync(sampleComponent, 'utf-8');
         const imports = this.extractImports(content);
         const exports = this.extractExports(content);
-        
+
         patterns.push({
           type: 'component',
           template: this.createComponentTemplate(content),
@@ -138,9 +140,7 @@ export class WorkflowService {
     }
 
     // Extract service patterns
-    const serviceFiles = files.filter(f => 
-      f.includes('services') && f.endsWith('.ts')
-    );
+    const serviceFiles = files.filter((f) => f.includes('services') && f.endsWith('.ts'));
 
     if (serviceFiles.length > 0) {
       const sampleService = serviceFiles[0];
@@ -165,11 +165,11 @@ export class WorkflowService {
     const importRegex = /import\s+.*?\s+from\s+['"]([^'"]+)['"];?/g;
     const imports: string[] = [];
     let match;
-    
+
     while ((match = importRegex.exec(content)) !== null) {
       imports.push(match[1]);
     }
-    
+
     return [...new Set(imports)];
   }
 
@@ -177,26 +177,26 @@ export class WorkflowService {
     const exportRegex = /export\s+(?:default\s+)?(?:class|function|const|interface|type)\s+(\w+)/g;
     const exports: string[] = [];
     let match;
-    
+
     while ((match = exportRegex.exec(content)) !== null) {
       exports.push(match[1]);
     }
-    
+
     return exports;
   }
 
   private extractDependencies(content: string): string[] {
     const deps: string[] = [];
-    
+
     // Extract React hooks usage
     if (content.includes('useState')) deps.push('useState');
     if (content.includes('useEffect')) deps.push('useEffect');
     if (content.includes('useContext')) deps.push('useContext');
-    
+
     // Extract common libraries
     if (content.includes('axios')) deps.push('axios');
     if (content.includes('lodash')) deps.push('lodash');
-    
+
     return [...new Set(deps)];
   }
 
@@ -204,21 +204,24 @@ export class WorkflowService {
     // Extract the basic structure and create a template
     const lines = content.split('\n');
     const template = lines
-      .map(line => {
+      .map((line) => {
         // Replace specific component names with placeholders
         return line
-          .replace(/export\s+(?:default\s+)?(?:function|const)\s+\w+/g, 'export default function {{COMPONENT_NAME}}')
+          .replace(
+            /export\s+(?:default\s+)?(?:function|const)\s+\w+/g,
+            'export default function {{COMPONENT_NAME}}'
+          )
           .replace(/interface\s+\w+Props/g, 'interface {{COMPONENT_NAME}}Props');
       })
       .join('\n');
-    
+
     return template;
   }
 
   private createServiceTemplate(content: string): string {
     const lines = content.split('\n');
     return lines
-      .map(line => {
+      .map((line) => {
         return line
           .replace(/class\s+\w+Service/g, 'class {{SERVICE_NAME}}Service')
           .replace(/export\s+const\s+\w+Service/g, 'export const {{SERVICE_NAME}}Service');
@@ -229,37 +232,37 @@ export class WorkflowService {
   async scaffoldComponent(options: ScaffoldComponentOptions): Promise<boolean> {
     try {
       log.info(`🏗️ Scaffolding ${options.framework} component: ${options.name}`);
-      
+
       const context = await this.analyzeProject();
-      const componentPattern = context.patterns.find(p => p.type === 'component');
-      
+      const componentPattern = context.patterns.find((p) => p.type === 'component');
+
       const componentDir = path.join(options.path, options.name);
       const componentFile = path.join(componentDir, `${options.name}.tsx`);
       const testFile = path.join(componentDir, `${options.name}.test.tsx`);
       const storyFile = path.join(componentDir, `${options.name}.stories.tsx`);
-      
+
       // Create directory
       fs.mkdirSync(componentDir, { recursive: true });
-      
+
       // Generate component content
       const componentContent = this.generateComponentContent(options, componentPattern);
       fs.writeFileSync(componentFile, componentContent);
       log.success(`✅ Created component: ${componentFile}`);
-      
+
       // Generate test file
       if (options.includeTest) {
         const testContent = this.generateTestContent(options, context);
         fs.writeFileSync(testFile, testContent);
         log.success(`✅ Created test: ${testFile}`);
       }
-      
+
       // Generate story file
       if (options.includeStory) {
         const storyContent = this.generateStoryContent(options);
         fs.writeFileSync(storyFile, storyContent);
         log.success(`✅ Created story: ${storyFile}`);
       }
-      
+
       // Update index file if exists
       const indexFile = path.join(options.path, 'index.ts');
       if (fs.existsSync(indexFile)) {
@@ -270,27 +273,36 @@ export class WorkflowService {
           log.success(`✅ Updated index exports`);
         }
       }
-      
+
       return true;
     } catch (error) {
-      log.error(`❌ Failed to scaffold component: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Failed to scaffold component: ${error instanceof Error ? error.message : String(error)}`
+      );
       return false;
     }
   }
 
-  private generateComponentContent(options: ScaffoldComponentOptions, pattern?: CodePattern): string {
+  private generateComponentContent(
+    options: ScaffoldComponentOptions,
+    pattern?: CodePattern
+  ): string {
     const { name, props = [] } = options;
-    
+
     // Generate props interface
-    const propsInterface = props.length > 0 ? `
+    const propsInterface =
+      props.length > 0
+        ? `
 interface ${name}Props {
-${props.map(prop => `  ${prop.name}${prop.optional ? '?' : ''}: ${prop.type};`).join('\n')}
+${props.map((prop) => `  ${prop.name}${prop.optional ? '?' : ''}: ${prop.type};`).join('\n')}
 }
-` : '';
+`
+        : '';
 
     // Generate component
     const propsParam = props.length > 0 ? `props: ${name}Props` : '';
-    const propsDestructure = props.length > 0 ? `const { ${props.map(p => p.name).join(', ')} } = props;` : '';
+    const propsDestructure =
+      props.length > 0 ? `const { ${props.map((p) => p.name).join(', ')} } = props;` : '';
 
     return `import React from 'react';
 ${options.style === 'styled-components' ? "import styled from 'styled-components';" : ''}
@@ -310,7 +322,7 @@ export default function ${name}(${propsParam}) {
 
   private generateTestContent(options: ScaffoldComponentOptions, context: WorkflowContext): string {
     const testFramework = context.testFramework || 'jest';
-    
+
     return `import React from 'react';
 import { render, screen } from '@testing-library/react';
 import ${options.name} from './${options.name}';
@@ -351,19 +363,17 @@ export const Default: Story = {
   async refactorRenameSymbol(options: RefactorRenameOptions): Promise<boolean> {
     try {
       log.info(`🔄 Refactoring: ${options.oldName} → ${options.newName}`);
-      
-      const files = options.scope === 'project' 
-        ? indexingService.getFiles() 
-        : [options.filePath];
-      
+
+      const files = options.scope === 'project' ? indexingService.getFiles() : [options.filePath];
+
       let filesChanged = 0;
-      
+
       for (const file of files) {
         if (!fs.existsSync(file)) continue;
-        
+
         const content = fs.readFileSync(file, 'utf-8');
         const regex = new RegExp(`\\b${options.oldName}\\b`, 'g');
-        
+
         if (regex.test(content)) {
           const newContent = content.replace(regex, options.newName);
           fs.writeFileSync(file, newContent);
@@ -371,7 +381,7 @@ export const Default: Story = {
           log.info(`  ✅ Updated: ${file}`);
         }
       }
-      
+
       log.success(`✅ Refactoring complete: ${filesChanged} files updated`);
       return true;
     } catch (error) {
@@ -383,33 +393,38 @@ export const Default: Story = {
   async createApiEndpoint(options: CreateApiEndpointOptions): Promise<boolean> {
     try {
       log.info(`🌐 Creating API endpoint: ${options.method} ${options.path}`);
-      
+
       const context = await this.analyzeProject();
       const endpointDir = path.join('src', 'api', 'endpoints');
       const endpointFile = path.join(endpointDir, `${options.name}.ts`);
-      
+
       fs.mkdirSync(endpointDir, { recursive: true });
-      
+
       const endpointContent = this.generateApiEndpointContent(options, context);
       fs.writeFileSync(endpointFile, endpointContent);
-      
+
       if (options.includeTest) {
         const testFile = path.join(endpointDir, `${options.name}.test.ts`);
         const testContent = this.generateApiTestContent(options);
         fs.writeFileSync(testFile, testContent);
       }
-      
+
       log.success(`✅ API endpoint created: ${endpointFile}`);
       return true;
     } catch (error) {
-      log.error(`❌ Failed to create API endpoint: ${error instanceof Error ? error.message : String(error)}`);
+      log.error(
+        `❌ Failed to create API endpoint: ${error instanceof Error ? error.message : String(error)}`
+      );
       return false;
     }
   }
 
-  private generateApiEndpointContent(options: CreateApiEndpointOptions, context: WorkflowContext): string {
+  private generateApiEndpointContent(
+    options: CreateApiEndpointOptions,
+    context: WorkflowContext
+  ): string {
     const { name, method, path: apiPath, requestType, responseType } = options;
-    
+
     return `import { Request, Response } from 'express';
 ${requestType ? `import { ${requestType} } from '../types/requests';` : ''}
 ${responseType ? `import { ${responseType} } from '../types/responses';` : ''}

@@ -13,7 +13,6 @@ export const dashboardCommands = (program: Command) => {
 
   dashboard
     .command('show')
-    .alias('stats')
     .description('Show dashboard metrics')
     .option('-j, --json', 'Output as JSON')
     .action(async (options) => {

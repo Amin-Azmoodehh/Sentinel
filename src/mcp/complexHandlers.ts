@@ -539,13 +539,13 @@ export class ComplexHandlers {
   async handleContextMonitorTool(args: Record<string, unknown>): Promise<McpResponse> {
     const action = ensureString(args.action, 'action');
     const payload = args.payload ? ensureObject(args.payload, 'payload') : {};
-    
+
     const result = await handleContextMonitor(action, payload);
-    
+
     if (!result.success) {
       throw new McpError(result.error || 'Context monitor operation failed');
     }
-    
+
     return successResponse(result.data);
   }
 }

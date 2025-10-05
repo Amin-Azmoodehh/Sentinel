@@ -7,7 +7,6 @@ import { ShellService } from './shellService.js';
 import { indexingService } from './indexingService.js';
 import { CompressionService } from './compressionService.js';
 import { contextService } from './contextService.js';
-import { generateCompletion } from './providerService.js';
 
 interface GateCheck {
   name: string;
@@ -61,9 +60,8 @@ const lintCheck: GateCheck = {
   run: () => {
     log.section('Lint & Format');
     const lintResult = runCommand('npm', ['run', 'lint']);
-    // Format is optional - only fail if lint fails
-    runCommand('npm', ['run', 'format']);
-    return lintResult;
+    const formatResult = runCommand('npm', ['run', 'format']);
+    return lintResult && formatResult;
   },
 };
 
@@ -92,22 +90,7 @@ const structureCheck: GateCheck = {
     log.section('Structure');
     const config = configService.load();
     const required = config.security?.requiredRootDirs ?? ['src', '.sentineltm'];
-    
-    // Check each required directory
-    const missing: string[] = [];
-    for (const item of required) {
-      if (!fs.existsSync(path.join(process.cwd(), item))) {
-        missing.push(item);
-      }
-    }
-    
-    if (missing.length > 0) {
-      log.warn(`Missing required directories: ${missing.join(', ')}`);
-      log.info('To fix: mkdir ' + missing.join(' '));
-      return false;
-    }
-    
-    return true;
+    return required.every((item) => fs.existsSync(path.join(process.cwd(), item)));
   },
 };
 
@@ -263,6 +246,9 @@ const aiRuleCheck: GateCheck = {
       ].join('\n');
 
       log.info(`Sending contextual request to ${providerName} (${model})...`);
+      
+      // Use the new API-based provider service
+      const { generateCompletion } = await import('./providerService.js');
       const response = await generateCompletion({
         prompt,
         model,

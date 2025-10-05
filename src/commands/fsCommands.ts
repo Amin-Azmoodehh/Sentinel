@@ -22,18 +22,10 @@ export const registerFsCommands = (program: Command): void => {
     .alias('list')
     .description('List files optionally by glob pattern')
     .action(async (pattern?: string) => {
-      try {
-        const files = await listFiles(pattern);
-        if (files.length === 0) {
-          log.info('No files found.');
-          return;
-        }
-        const rows = files.map((file) => [file]);
-        const table = renderTable({ head: ['Path'], rows });
-        log.raw(table);
-      } catch (error) {
-        log.error(`Failed to list files: ${(error as Error).message}`);
-      }
+      const files = await listFiles(pattern);
+      const rows = files.map((file) => [file]);
+      const table = renderTable({ head: ['Path'], rows });
+      log.raw(table);
     });
 
   fsCommand

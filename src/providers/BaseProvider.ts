@@ -10,7 +10,7 @@ export abstract class BaseProvider {
     // Assuming API keys are stored in config under provider name
     const providers = config.providers as Record<string, any> | undefined;
     this.apiKey = providers?.[providerName]?.apiKey || '';
-    
+
     if (!this.apiKey) {
       throw new Error(`API key for ${providerName} not found.`);
     }
@@ -18,7 +18,7 @@ export abstract class BaseProvider {
     this.client = axios.create({
       baseURL,
       headers: {
-        'Authorization': `Bearer ${this.apiKey}`,
+        Authorization: `Bearer ${this.apiKey}`,
         'Content-Type': 'application/json',
       },
     });

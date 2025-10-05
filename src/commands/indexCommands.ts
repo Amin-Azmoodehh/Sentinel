@@ -11,7 +11,6 @@ export const registerIndexCommands = (program: Command): void => {
 
   indexCommand
     .command('build')
-    .alias('refresh')
     .description('Build persistent project index')
     .action(() => {
       indexingService.buildIndex();

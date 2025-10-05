@@ -1,7 +1,7 @@
 {
   "defaults": {
     "provider": "openrouter",
-    "model": "meituan/longcat-flash-chat:free"
+    "model": "tngtech/deepseek-r1t2-chimera:free"
   },
   "providers": {
     "ollama": {
@@ -31,7 +31,8 @@
     "openrouter": {
       "type": "openai-compatible",
       "baseURL": "https://openrouter.ai/api/v1",
-      "apiKey": "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"
+      "apiKey": "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",
+      "baseUrl": "https://openrouter.ai/api"
     },
     "groq": {
       "type": "openai-compatible",
