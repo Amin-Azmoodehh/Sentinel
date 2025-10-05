@@ -1,3 +1,17 @@
+## [2.3.13] - 2025-10-05
+
+### Fixed
+
+- **Critical**: `sentinel_fs` با `action: list` حالا می‌تواند محتوای یک دایرکتوری خاص را لیست کند
+  - پارامتر جدید `payload.path` برای مشخص کردن مسیر دایرکتوری
+  - قبلاً فقط glob pattern پشتیبانی می‌شد و لیست کردن مستقیم یک پوشه کار نمی‌کرد
+- **Critical**: `index_query` حالا نمادهای (symbols) فایل‌های **پایتون** را extract می‌کند
+  - Parser جدید برای شناسایی `def function_name()` و `class ClassName`
+  - قبلاً فقط TypeScript/JavaScript پشتیبانی می‌شد
+  - جستجوی symbols در پروژه‌های پایتون حالا کار می‌کند
+
+---
+
 ## [2.3.12] - 2025-10-05
 
 ### Fixed
