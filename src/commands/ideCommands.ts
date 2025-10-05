@@ -376,7 +376,21 @@ export const registerIdeCommands = (program: Command): void => {
         },
       ]);
 
-      const applied = setIde(targets, applyRules, providerName);
+      // Ask for workspace absolute path to embed directly into IDE mcp.json
+      const { workspacePath } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'workspacePath',
+          message: 'Workspace absolute path to use in IDE mcp.json:',
+          default: process.cwd(),
+          validate: (input: string) =>
+            path.isAbsolute(input)
+              ? true
+              : 'Please provide an absolute path (e.g., D://Project or /home/user/Project)'.replace('//', '/'),
+        },
+      ]);
+
+      const applied = setIde(targets, applyRules, providerName, workspacePath);
 
       if (applied.length === 0) {
         log.warn('No IDE profiles were configured!');
