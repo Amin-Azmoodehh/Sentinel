@@ -54,16 +54,17 @@ const ensureWorkspacePath = (input: string): string => {
     throw new Error('Path contains invalid characters: ' + input);
   }
 
-  const resolved = path.normalize(path.resolve(resolvePath(cleaned)));
-
-  // Block path traversal attempts
+  // Block path traversal attempts BEFORE resolving
   if (cleaned.includes('..')) {
     throw new Error('Path traversal not allowed');
   }
 
-  // Ensure path is within workspace
-  if (!resolved.startsWith(workspaceRoot)) {
-    throw new Error('Path must stay within workspace');
+  const resolved = path.normalize(path.resolve(resolvePath(cleaned)));
+
+  // Ensure path is within workspace (use current workspaceRoot value)
+  const currentWorkspaceRoot = getWorkspaceRoot();
+  if (!resolved.startsWith(currentWorkspaceRoot)) {
+    throw new Error(`Path must stay within workspace. Path: ${resolved}, Workspace: ${currentWorkspaceRoot}`);
   }
 
   return resolved;
