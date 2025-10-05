@@ -25,8 +25,15 @@ export class GateHandler {
         const timeoutPromise = new Promise<never>((_, reject) =>
           setTimeout(() => reject(new McpError('Gate execution timeout (30s)')), 30000)
         );
-        const result: CliGateResult = await Promise.race([runGateViaCli(minScore), timeoutPromise]);
-        return successResponse(result);
+        const result = await Promise.race([runGate(minScore), timeoutPromise]);
+        return successResponse({
+          success: result.score >= result.threshold,
+          score: result.score,
+          threshold: result.threshold,
+          attempts: result.attempts,
+          results: result.results,
+          timestamp: Date.now()
+        });
       }
       default:
         throw new McpError('Unhandled gate action: ' + action);
