@@ -1,9 +1,8 @@
 {
   "mcpServers": {
     "sentineltm": {
-      "command": "node",
+      "command": "st",
       "args": [
-        "C:\\Users\\amin\\AppData\\Roaming\\npm\\node_modules\\sentineltm-cli\\dist\\cli.js",
         "serve",
         "--mcp-stdio"
       ],
