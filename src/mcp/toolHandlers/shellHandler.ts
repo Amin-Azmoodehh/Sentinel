@@ -58,11 +58,26 @@ export class ShellHandler {
       options.continueOnError = true;
     }
 
+    const isAsync = payload.async === true;
+
     switch (action) {
       case 'execute': {
         const command = ensureString(payload.command, 'payload.command');
-        const result = await this.shellService.executeCommand(command, options);
-        return successResponse(result);
+        
+        if (isAsync) {
+          // For async execution, start process and return immediately
+          const processId = await this.shellService.executeCommandAsync(command, options);
+          return successResponse({ 
+            async: true,
+            processId,
+            message: `Command started in background with PID ${processId}`,
+            command 
+          });
+        } else {
+          // Normal synchronous execution
+          const result = await this.shellService.executeCommand(command, options);
+          return successResponse(result);
+        }
       }
       case 'executeMany': {
         const commands = ensureStringArray(payload.commands, 'payload.commands');

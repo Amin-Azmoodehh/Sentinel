@@ -89,6 +89,44 @@ export class ShellService {
     }
   }
 
+  async executeCommandAsync(command: string, options: ShellCommandOptions = {}): Promise<number> {
+    // Start command in background and return process ID
+    const validation = this.validateCommand(command, options);
+    if (!validation.valid) {
+      throw new Error(validation.error || 'Command validation failed');
+    }
+
+    const shell = options.shell || this.getDefaultShell();
+    const cwd = options.cwd || process.cwd();
+
+    let shellArgs: string[];
+    let shellCommand: string;
+
+    if (process.platform === 'win32') {
+      const lower = shell.toLowerCase();
+      if (lower.includes('powershell')) {
+        shellCommand = shell;
+        shellArgs = ['-NoProfile', '-NonInteractive', '-ExecutionPolicy', 'Bypass', '-Command', command];
+      } else {
+        shellCommand = shell;
+        shellArgs = ['/c', command];
+      }
+    } else {
+      shellCommand = shell;
+      shellArgs = ['-c', command];
+    }
+
+    const { spawn } = await import('node:child_process');
+    const child = spawn(shellCommand, shellArgs, {
+      cwd,
+      detached: true,
+      stdio: 'ignore'
+    });
+
+    child.unref(); // Allow parent to exit without waiting for child
+    return child.pid || 0;
+  }
+
   async executeCommand(command: string, options: ShellCommandOptions = {}): Promise<ShellResult> {
     try {
       // Validate command

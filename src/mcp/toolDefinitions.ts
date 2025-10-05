@@ -302,6 +302,7 @@ export const buildShellExecuteToolDefinition = (): ExperimentalTool => ({
       maxOutputSize: { type: 'number' },
       continueOnError: { type: 'boolean' },
       input: { type: 'string' },
+      async: { type: 'boolean', description: 'Run command in background and return immediately' },
     },
     required: ['command'],
   },

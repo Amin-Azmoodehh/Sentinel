@@ -12,7 +12,7 @@ import { ShellService } from '../../services/shellService.js';
 import { PackageInfoLoader } from './PackageInfoLoader.js';
 import { ToolRegistry } from './ToolRegistry.js';
 
-const MCP_TIMEOUT = 15000; // 15 seconds
+const MCP_TIMEOUT = 300000; // 5 minutes (same as shell service)
 
 export class SentinelMcpServer {
   private shellService: ShellService;
