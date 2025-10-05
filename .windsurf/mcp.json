@@ -7,7 +7,11 @@
         "serve",
         "--mcp-stdio"
       ],
-      "env": {}
+      "env": {
+        "SENTINEL_WORKSPACE": "${workspaceFolder}",
+        "SENTINEL_LOG_LEVEL": "info",
+        "SENTINEL_AUTO_INDEX": "true"
+      }
     }
   },
   "defaults": {

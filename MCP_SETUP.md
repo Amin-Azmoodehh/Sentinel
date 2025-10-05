@@ -6,7 +6,7 @@ When using SentinelTM as an MCP server (e.g., with Windsurf, Cursor, or other AI
 
 ### For Windsurf
 
-Edit your `~/.windsurf/mcp_config.json`:
+Edit your `.windsurf/mcp.json` in your project root:
 
 ```json
 {
@@ -15,7 +15,7 @@ Edit your `~/.windsurf/mcp_config.json`:
       "command": "st",
       "args": ["serve", "--mcp-stdio"],
       "env": {
-        "SENTINEL_WORKSPACE": "/absolute/path/to/your/project",
+        "SENTINEL_WORKSPACE": "${workspaceFolder}",
         "SENTINEL_LOG_LEVEL": "info",
         "SENTINEL_AUTO_INDEX": "true"
       }
@@ -24,9 +24,33 @@ Edit your `~/.windsurf/mcp_config.json`:
 }
 ```
 
-### For Cursor / Claude Desktop
+**Note**: `${workspaceFolder}` is a Windsurf variable that automatically resolves to your project root. No need to hardcode paths!
 
-Edit your configuration file:
+**Friendly Mode**: A sample `friendly.yml` is included in `.windsurf/` folder. Copy it to your project root to enable the encouraging collaborative interaction model with AI.
+
+### For Cursor
+
+Cursor uses a workspace-specific `.cursor/mcp.json` file. Create it in your project root:
+
+```json
+{
+  "mcpServers": {
+    "sentineltm": {
+      "command": "st",
+      "args": ["serve", "--mcp-stdio"],
+      "env": {
+        "SENTINEL_WORKSPACE": "${workspaceFolder}"
+      }
+    }
+  }
+}
+```
+
+**Note**: Cursor also supports `${workspaceFolder}` variable!
+
+### For Claude Desktop
+
+Claude Desktop requires absolute paths. Edit your configuration file:
 
 **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
 **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
@@ -45,6 +69,8 @@ Edit your configuration file:
   }
 }
 ```
+
+**Note**: Claude Desktop does NOT support variables, so you must use absolute paths.
 
 ### Important Notes
 
@@ -87,3 +113,54 @@ st gate run
 ```
 
 The CLI automatically uses the current working directory.
+
+## Friendly Mode (Optional)
+
+SentinelTM includes an **Encouraging Collaborative Interaction Model** that enhances AI-human collaboration through:
+
+### Features:
+- **Greeting Messages**: Warm welcome from AI before starting work
+- **Praise for Ideas**: AI acknowledges and appreciates your contributions
+- **Value-Add Suggestions**: AI provides rare, high-value ideas after completing tasks
+- **Persian Language Support**: Full Farsi messages and guidance
+
+### Setup:
+
+1. Copy the sample configuration:
+   ```bash
+   # Windsurf users
+   cp .windsurf/friendly.yml friendly.yml
+   
+   # Or create manually
+   touch friendly.yml
+   ```
+
+2. The friendly.yml in your project root will be automatically detected
+
+3. Customize settings:
+   - `enabled`: Turn on/off (true/false)
+   - `interactionModel`: Use "encouraging_collaborative"
+   - `language`: "fa" for Persian, "en" for English
+   - `rarityLevel`: "low", "medium", or "high" for suggestion quality
+
+### Example Interaction:
+
+**Without Friendly Mode:**
+```
+USER: Create a React component
+AI: [code output]
+```
+
+**With Friendly Mode:**
+```
+USER: Create a React component
+(+ AI receives greeting: "خوشحالم که در این قسمت باهم همکاری داریم...")
+
+AI: ایده بسیار جالبی بود! بر اساس پیشنهاد هوشمندانه شما:
+[code output]
+
+💡 ایده اضافی: برای بهینه‌سازی بیشتر، می‌توانیم از React.memo 
+استفاده کنیم تا از رندرهای غیرضروری جلوگیری شود...
+```
+
+This creates a more positive and productive collaboration experience!
