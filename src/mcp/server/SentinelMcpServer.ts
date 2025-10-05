@@ -31,7 +31,16 @@ export class SentinelMcpServer {
     // Set workspace root from environment variable if provided
     if (process.env.SENTINEL_WORKSPACE) {
       try {
-        const workspaceRoot = process.env.SENTINEL_WORKSPACE;
+        let workspaceRoot = process.env.SENTINEL_WORKSPACE;
+        
+        // Handle ${workspaceFolder} variable that IDEs might not resolve
+        // Windsurf/Cursor may pass this as a literal string, so we resolve it to cwd
+        if (workspaceRoot.includes('${workspaceFolder}')) {
+          const resolved = workspaceRoot.replace('${workspaceFolder}', process.cwd());
+          log.info(`[MCP] Resolved ${workspaceRoot} to ${resolved}`);
+          workspaceRoot = resolved;
+        }
+        
         log.info(`[MCP] Setting workspace root to: ${workspaceRoot}`);
 
         // IMPORTANT: Update fsService FIRST, then change directory
