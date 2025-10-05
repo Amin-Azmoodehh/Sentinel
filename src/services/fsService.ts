@@ -1,11 +1,21 @@
 import fs from 'node:fs';
-import path from 'node:path';
-import fg from 'fast-glob';
 import fsExtra from 'fs-extra';
+import path from 'node:path';
 import { resolvePath } from '../utils/fileSystem.js';
 import { splitFile, SplitSummary } from './fileSplitService.js';
 
-const workspaceRoot = path.resolve(process.env.SENTINEL_WORKSPACE || process.cwd());
+// Get workspace root - prefer SENTINEL_WORKSPACE env var, fallback to cwd
+// When running as MCP server, Windsurf/Cursor should set this env var to project root
+let workspaceRoot = path.resolve(process.env.SENTINEL_WORKSPACE || process.cwd());
+
+// Export function to allow updating workspace root dynamically
+export const setWorkspaceRoot = (newRoot: string): void => {
+  workspaceRoot = path.resolve(newRoot);
+};
+
+export const getWorkspaceRoot = (): string => {
+  return workspaceRoot;
+};
 
 export type FileEncoding = BufferEncoding;
 
@@ -99,6 +109,7 @@ export const listFiles = async (pattern?: string): Promise<string[]> => {
   if (path.isAbsolute(pattern) || pattern.includes('..')) {
     throw new Error('Glob pattern must stay inside workspace');
   }
+  const { default: fg } = await import('fast-glob');
   const matches = await fg(pattern, { dot: true, cwd });
   return matches.sort();
 };
