@@ -131,8 +131,8 @@ export class ContextService {
             type,
           });
         }
-      } catch (error) {
-        log.warn(`Could not read file ${file}: ${error}`);
+      } catch {
+        log.warn(`Could not read file ${file}`);
       }
     }
 
@@ -212,7 +212,7 @@ export class ContextService {
         usage:
           'Use this pattern for creating new React components with proper TypeScript types and exports.',
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -232,7 +232,7 @@ export class ContextService {
         usage:
           'Use this pattern for creating new service classes with proper error handling and TypeScript types.',
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -252,7 +252,7 @@ export class ContextService {
         usage:
           'Use this pattern for creating utility functions with proper exports and documentation.',
       };
-    } catch (error) {
+    } catch {
       return null;
     }
   }
@@ -311,7 +311,7 @@ export class ContextService {
             }
           }
         }
-      } catch (error) {
+      } catch {
         // Skip files that can't be read
       }
     }

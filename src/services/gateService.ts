@@ -276,7 +276,7 @@ const aiRuleCheck: GateCheck = {
 
           if (feedback.suggestions && feedback.suggestions.length > 0) {
             log.info('💡 Suggestions:');
-            feedback.suggestions.forEach((suggestion: any) => {
+            feedback.suggestions.forEach((suggestion: { severity?: string; category?: string; comment?: string }) => {
               const icon =
                 suggestion.severity === 'critical'
                   ? '🔴'

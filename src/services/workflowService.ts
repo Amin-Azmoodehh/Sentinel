@@ -134,7 +134,7 @@ export class WorkflowService {
           exports,
           dependencies: this.extractDependencies(content),
         });
-      } catch (error) {
+      } catch {
         log.warn(`Could not analyze component pattern from ${sampleComponent}`);
       }
     }
@@ -153,7 +153,7 @@ export class WorkflowService {
           exports: this.extractExports(content),
           dependencies: this.extractDependencies(content),
         });
-      } catch (error) {
+      } catch {
         log.warn(`Could not analyze service pattern from ${sampleService}`);
       }
     }
@@ -285,7 +285,7 @@ export class WorkflowService {
 
   private generateComponentContent(
     options: ScaffoldComponentOptions,
-    pattern?: CodePattern
+    _pattern?: CodePattern
   ): string {
     const { name, props = [] } = options;
 
@@ -320,8 +320,8 @@ export default function ${name}(${propsParam}) {
 `;
   }
 
-  private generateTestContent(options: ScaffoldComponentOptions, context: WorkflowContext): string {
-    const testFramework = context.testFramework || 'jest';
+  private generateTestContent(options: ScaffoldComponentOptions, _context: WorkflowContext): string {
+    // const testFramework = context.testFramework || 'jest';
 
     return `import React from 'react';
 import { render, screen } from '@testing-library/react';

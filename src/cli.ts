@@ -74,7 +74,7 @@ const getVersion = () => {
         : currentFilePath;
     const pkgPath = path.join(path.dirname(normalizedPath), '..', 'package.json');
     return JSON.parse(fs.readFileSync(pkgPath, 'utf-8')).version;
-  } catch (error) {
+  } catch {
     // Fallback: try to read from node_modules
     try {
       const pkgPath = path.join(__dirname, '..', 'package.json');

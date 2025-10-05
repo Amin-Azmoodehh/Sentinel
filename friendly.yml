@@ -1,0 +1,43 @@
+# SentinelTM Friendly Mode Configuration
+
+# Enable/disable friendly mode
+enabled: true
+
+# Interaction Model
+interactionModel: "encouraging_collaborative"
+
+# Friendly mode settings
+mode: verbose
+language: fa
+
+# Custom greeting message
+message:
+  greeting: "سلام! من AMIN هستم و آماده کمک به شما هستم"
+  farewell: "ممنون که با من کار کردید! تا دیدار بعدی 🤖"
+  collaborativeGreeting: "خوشحالم که در این قسمت باهم همکاری داریم. امیدوارم همکاری لذت‌بخشی را با هم به اتمام برسانیم."
+
+# Help and guidance settings
+help:
+  detailed: true
+  examples: true
+  tips: true
+
+# Feedback System
+feedback:
+  praiseUserIdeas: true
+  acknowledgeContributions: true
+  provideConstructiveSuggestions: true
+
+# Output formatting
+output:
+  colors: true
+  emojis: true
+  verbose: true
+
+# Learning mode
+learning:
+  enabled: true
+  suggestions: true
+  bestPractices: true
+  valueAddIdeas: true
+  rarityLevel: "high"

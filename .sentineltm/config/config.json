@@ -1,13 +1,12 @@
 {
   "defaults": {
     "provider": "openrouter",
-    "model": "tngtech/deepseek-r1t2-chimera:free"
+    "model": "deepseek/deepseek-chat-v3.1:free"
   },
   "providers": {
     "ollama": {
       "type": "ollama",
       "baseURL": "http://localhost:11434",
-      "baseUrl": "http://localhost:11434",
       "apiKey": ""
     },
     "openai": {
@@ -33,8 +32,7 @@
     "openrouter": {
       "type": "openai-compatible",
       "baseURL": "https://openrouter.ai/api/v1",
-      "apiKey": "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",
-      "baseUrl": "https://openrouter.ai/api"
+      "apiKey": "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"
     },
     "groq": {
       "type": "openai-compatible",

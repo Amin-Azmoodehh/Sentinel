@@ -4,6 +4,7 @@ import chalk from 'chalk';
 import { Provider, CompletionRequest, CompletionResponse } from '../providers/types.js';
 import { OllamaProvider } from '../providers/OllamaProvider.js';
 import { OpenAICompatibleProvider } from '../providers/OpenAICompatibleProvider.js';
+import { friendlyService } from './friendlyService.js';
 
 export interface ProviderInfo {
   name: string;
@@ -243,7 +244,22 @@ export const generateCompletion = async (
     throw new Error(`Provider '${providerName}' is not available.`);
   }
 
-  return provider.generateCompletion(request);
+  // Enhance prompt with friendly greeting if enabled
+  const enhancedRequest = {
+    ...request,
+    prompt: friendlyService.enhanceUserPrompt(request.prompt),
+  };
+
+  // Generate completion
+  const response = await provider.generateCompletion(enhancedRequest);
+
+  // Enhance response with friendly feedback if enabled
+  const enhancedResponse = {
+    ...response,
+    content: friendlyService.enhanceModelResponse(response.content, request.prompt),
+  };
+
+  return enhancedResponse;
 };
 
 export const getAllowedProviders = (): string[] => {

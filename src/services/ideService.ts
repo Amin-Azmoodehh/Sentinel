@@ -70,8 +70,8 @@ const resolveCliServeInvocation = (): CliInvocation => {
 const createMcpConfig = (providerName: string) => {
   const config = configService.load();
   const invocation = resolveCliServeInvocation();
-  const defaultsProvider = providerName || config.defaults.provider || 'ollama';
-  const defaultsModel = config.defaults.model || 'llama3';
+  const _defaultsProvider = providerName || config.defaults.provider || 'ollama';
+  const _defaultsModel = config.defaults.model || 'llama3';
 
   return {
     mcpServers: {

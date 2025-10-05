@@ -155,9 +155,9 @@ export class CompressionService {
    * Optimize prompt structure for better AI comprehension with fewer tokens
    */
   public static optimizePrompt(sections: { rules: string; code: string; task: string }): string {
-    const rulesTokens = this.estimateTokens(sections.rules);
-    const codeTokens = this.estimateTokens(sections.code);
-    // const totalTokens = rulesTokens + codeTokens + 200; // +200 for prompt structure
+    const _rulesTokens = this.estimateTokens(sections.rules);
+    const _codeTokens = this.estimateTokens(sections.code);
+    // const totalTokens = _rulesTokens + _codeTokens + 200; // +200 for prompt structure
 
     // Build compact prompt
     const prompt = [
