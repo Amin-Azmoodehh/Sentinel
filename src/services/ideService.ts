@@ -67,11 +67,8 @@ const resolveCliServeInvocation = (): CliInvocation => {
   };
 };
 
-const createMcpConfig = (providerName: string) => {
-  const config = configService.load();
+const createMcpConfig = (_providerName: string) => {
   const invocation = resolveCliServeInvocation();
-  const _defaultsProvider = providerName || config.defaults.provider || 'ollama';
-  const _defaultsModel = config.defaults.model || 'llama3';
 
   return {
     mcpServers: {
@@ -90,10 +87,8 @@ const createMcpConfig = (providerName: string) => {
 
 type MutableJson = Record<string, unknown>;
 
-const ensureMcpConfig = (targetPath: string, providerName: string): void => {
+const ensureMcpConfig = (targetPath: string): void => {
   const invocation = resolveCliServeInvocation();
-  const sentinelConfig = configService.load();
-  const desiredProvider = providerName || sentinelConfig.defaults.provider;
 
   let config: MutableJson = {};
   if (fs.existsSync(targetPath)) {
@@ -224,24 +219,15 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
     config.mcpServers = { [CLI_SERVER_NAME]: server };
   }
 
-  const defaults: MutableJson =
-    config.defaults && typeof config.defaults === 'object'
-      ? { ...(config.defaults as MutableJson) }
-      : {};
-
-  const currentProvider = typeof defaults.provider === 'string' ? defaults.provider : undefined;
-  if (desiredProvider && currentProvider !== desiredProvider) {
-    defaults.provider = desiredProvider;
+  // Remove deprecated defaults and providers from mcp.json (they belong in .sentineltm/config/config.json)
+  if (config.defaults !== undefined) {
+    delete config.defaults;
     updated = true;
   }
-
-  const currentModel = typeof defaults.model === 'string' ? defaults.model : undefined;
-  if (sentinelConfig.defaults.model && currentModel !== sentinelConfig.defaults.model) {
-    defaults.model = sentinelConfig.defaults.model;
+  if (config.providers !== undefined) {
+    delete config.providers;
     updated = true;
   }
-
-  config.defaults = defaults;
 
   if (updated) {
     writeJsonFile(targetPath, config);
@@ -381,7 +367,7 @@ const applyIdeProfile = (
   ensureDir(targetDir);
   const mcpTargetPath = path.join(targetDir, 'mcp.json');
   writeJsonFile(mcpTargetPath, createMcpConfig(providerName));
-  ensureMcpConfig(mcpTargetPath, providerName);
+  ensureMcpConfig(mcpTargetPath);
 
   // Copy or create rules.json
   const projectRulesPath = path.join(process.cwd(), 'rules.example.json');

@@ -8,6 +8,8 @@
 > **The World's Most Advanced AI Development Orchestrator**  
 > Enforce Zero Tolerance Quality Standards with Military-Grade Precision
 
+**Version 2.3.6** — Critical MCP workspace bug fixed! 🎉
+
 SentinelTM (`st`) is a revolutionary AI-powered development guardian that transforms how you build software. Combining enterprise-grade CLI tools with cutting-edge MCP (Model Context Protocol) capabilities, it enforces uncompromising quality standards while seamlessly integrating with 20+ AI providers and 23+ IDEs.
 
 ## ✨ What Makes SentinelTM Different?

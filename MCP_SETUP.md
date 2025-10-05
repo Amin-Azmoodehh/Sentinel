@@ -1,12 +1,14 @@
 # SentinelTM MCP Server Setup
 
-## Critical: Setting the Workspace Root
+**Version: 2.3.6+** — The workspace `cwd` bug has been fixed! 🎉
 
-When using SentinelTM as an MCP server (e.g., with Windsurf, Cursor, or other AI IDEs), you **MUST** set the `SENTINEL_WORKSPACE` environment variable to your project root directory. Otherwise, all file operations will execute in the wrong directory (the IDE's installation folder).
+## Quick Start
+
+SentinelTM now correctly handles the `SENTINEL_WORKSPACE` environment variable. Simply configure your IDE's `mcp.json` with the correct settings, and the server will automatically operate in your project directory.
 
 ### For Windsurf
 
-Edit your `.windsurf/mcp.json` in your project root:
+Create or edit `.windsurf/mcp.json` in your project root:
 
 ```json
 {
@@ -24,13 +26,11 @@ Edit your `.windsurf/mcp.json` in your project root:
 }
 ```
 
-**Note**: `${workspaceFolder}` is a Windsurf variable that automatically resolves to your project root. No need to hardcode paths!
-
-**Friendly Mode**: A sample `friendly.yml` is included in `.windsurf/` folder. Copy it to your project root to enable the encouraging collaborative interaction model with AI.
+**✅ Pro Tip**: `${workspaceFolder}` automatically resolves to your project root — no hardcoded paths needed!
 
 ### For Cursor
 
-Cursor uses a workspace-specific `.cursor/mcp.json` file. Create it in your project root:
+Create or edit `.cursor/mcp.json` in your project root:
 
 ```json
 {
@@ -39,22 +39,24 @@ Cursor uses a workspace-specific `.cursor/mcp.json` file. Create it in your proj
       "command": "st",
       "args": ["serve", "--mcp-stdio"],
       "env": {
-        "SENTINEL_WORKSPACE": "${workspaceFolder}"
+        "SENTINEL_WORKSPACE": "${workspaceFolder}",
+        "SENTINEL_LOG_LEVEL": "info",
+        "SENTINEL_AUTO_INDEX": "true"
       }
     }
   }
 }
 ```
 
-**Note**: Cursor also supports `${workspaceFolder}` variable!
+**✅ Pro Tip**: Cursor also supports `${workspaceFolder}` variable!
 
 ### For Claude Desktop
 
 Claude Desktop requires absolute paths. Edit your configuration file:
 
-**Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
-**macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
-**Linux:** `~/.config/Claude/claude_desktop_config.json`
+- **Windows:** `%APPDATA%\Claude\claude_desktop_config.json`
+- **macOS:** `~/Library/Application Support/Claude/claude_desktop_config.json`
+- **Linux:** `~/.config/Claude/claude_desktop_config.json`
 
 ```json
 {
@@ -63,37 +65,52 @@ Claude Desktop requires absolute paths. Edit your configuration file:
       "command": "st",
       "args": ["serve", "--mcp-stdio"],
       "env": {
-        "SENTINEL_WORKSPACE": "/absolute/path/to/your/project"
+        "SENTINEL_WORKSPACE": "D:\\Work Directory\\V2",
+        "SENTINEL_LOG_LEVEL": "info",
+        "SENTINEL_AUTO_INDEX": "true"
       }
     }
   }
 }
 ```
 
-**Note**: Claude Desktop does NOT support variables, so you must use absolute paths.
+**⚠️ Important**: Claude Desktop does NOT support `${workspaceFolder}`. Use absolute paths and escape backslashes on Windows (e.g., `D:\\\\MyProject`).
 
-### Important Notes
+## Installation & Verification
 
-1. **Use Absolute Paths**: Always use absolute paths for `SENTINEL_WORKSPACE`
-   - ✅ Good: `/home/user/projects/myapp` or `C:\\Users\\user\\projects\\myapp`
-   - ❌ Bad: `./myapp` or `../projects/myapp`
+### 1. Install or Update SentinelTM
 
-2. **Windows Users**: Use double backslashes in JSON
-   - ✅ Good: `"SENTINEL_WORKSPACE": "C:\\\\Users\\\\user\\\\projects\\\\myapp"`
-   - ✅ Alternative: `"SENTINEL_WORKSPACE": "C:/Users/user/projects/myapp"`
-
-3. **Restart Required**: After editing the configuration, restart your IDE completely
-
-### Verifying the Setup
-
-After restarting your IDE, test file operations:
-
-```javascript
-// In your AI chat:
-"Create a directory called 'test_folder' using sentineltm"
+```bash
+npm install -g sentineltm-cli@latest
 ```
 
-If the bug is fixed, the folder should appear in your project root, not in the IDE's installation directory.
+Verify the version (should be `2.3.6` or higher):
+
+```bash
+st --version
+```
+
+### 2. Configure Your IDE
+
+Follow the configuration steps for your IDE above (Windsurf, Cursor, or Claude Desktop).
+
+### 3. Restart Your IDE
+
+After editing the `mcp.json` configuration, **completely restart your IDE** (not just reload the window).
+
+### 4. Verify the Setup
+
+Test that file operations work correctly in your project directory:
+
+```javascript
+// In your AI chat, ask:
+"Using sentineltm, create a test file called 'mcp_test.txt' in the project root"
+```
+
+✅ **Success**: The file appears in your project root  
+❌ **Failure**: The file appears elsewhere or you get an error
+
+If verification fails, check the logs and ensure `SENTINEL_WORKSPACE` is set correctly.
 
 ### Environment Variables Reference
 
@@ -114,53 +131,39 @@ st gate run
 
 The CLI automatically uses the current working directory.
 
-## Friendly Mode (Optional)
+## What's New in v2.3.6
 
-SentinelTM includes an **Encouraging Collaborative Interaction Model** that enhances AI-human collaboration through:
+### 🎉 Critical Bug Fix: Workspace `cwd` Issue Resolved
 
-### Features:
-- **Greeting Messages**: Warm welcome from AI before starting work
-- **Praise for Ideas**: AI acknowledges and appreciates your contributions
-- **Value-Add Suggestions**: AI provides rare, high-value ideas after completing tasks
-- **Persian Language Support**: Full Farsi messages and guidance
+Previous versions had a timing issue where `SENTINEL_WORKSPACE` was not applied early enough, causing the server to operate in the wrong directory. This has been completely fixed by moving workspace initialization to an `async initialize()` method that runs before any server operations begin.
 
-### Setup:
+**Impact**: File operations now work correctly in your project directory from the first command!
 
-1. Copy the sample configuration:
-   ```bash
-   # Windsurf users
-   cp .windsurf/friendly.yml friendly.yml
-   
-   # Or create manually
-   touch friendly.yml
-   ```
+### Other Improvements
 
-2. The friendly.yml in your project root will be automatically detected
+- Cleaner and more maintainable server initialization code
+- Better error logging for workspace configuration issues
+- Improved documentation and setup guides
 
-3. Customize settings:
-   - `enabled`: Turn on/off (true/false)
-   - `interactionModel`: Use "encouraging_collaborative"
-   - `language`: "fa" for Persian, "en" for English
-   - `rarityLevel`: "low", "medium", or "high" for suggestion quality
+---
 
-### Example Interaction:
+## Troubleshooting
 
-**Without Friendly Mode:**
-```
-USER: Create a React component
-AI: [code output]
-```
+### File operations fail with "Path must stay within workspace"
 
-**With Friendly Mode:**
-```
-USER: Create a React component
-(+ AI receives greeting: "خوشحالم که در این قسمت باهم همکاری داریم...")
+**Solution**: Ensure `SENTINEL_WORKSPACE` is set correctly in your IDE's `mcp.json`. The path should be absolute and point to your project root.
 
-AI: ایده بسیار جالبی بود! بر اساس پیشنهاد هوشمندانه شما:
-[code output]
+### Server operates in wrong directory
 
-💡 ایده اضافی: برای بهینه‌سازی بیشتر، می‌توانیم از React.memo 
-استفاده کنیم تا از رندرهای غیرضروری جلوگیری شود...
-```
+**Solution**: 
+1. Verify you're using `sentineltm-cli@2.3.6` or higher: `st --version`
+2. Check that `SENTINEL_WORKSPACE` is set in `mcp.json`
+3. Completely restart your IDE (not just reload)
 
-This creates a more positive and productive collaboration experience!
+### `st` command not found
+
+**Solution**: Install SentinelTM globally: `npm install -g sentineltm-cli@latest`
+
+---
+
+For more help, visit the [GitHub repository](https://github.com/Amin-Azmoodehh/Sentinel) or open an issue.

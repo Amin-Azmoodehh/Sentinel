@@ -1,5 +1,44 @@
 # Changelog
 
+All notable changes to SentinelTM will be documented in this file.
+
+## [2.3.6] - 2025-10-05
+
+### 🎉 Critical Bug Fix
+
+- **Fixed MCP workspace `cwd` bug**: The server now correctly initializes the workspace directory before any operations begin. Previously, `SENTINEL_WORKSPACE` was applied too late, causing file operations to execute in the wrong directory (IDE installation folder).
+  - Moved workspace initialization logic to a dedicated `async initialize()` method
+  - This method is now called at the beginning of `start()`, ensuring proper `cwd` and `fsService` configuration
+  - Impact: File operations now work correctly in your project directory from the first command!
+
+### Changed
+
+- Refactored `SentinelMcpServer` class for better maintainability
+- Improved error logging for workspace configuration issues
+
+### Documentation
+
+- Completely rewrote `MCP_SETUP.md` with clearer instructions
+- Updated IDE configuration examples for Windsurf, Cursor, and Claude Desktop
+- Added troubleshooting section
+- Simplified configuration files (removed redundant provider settings from `mcp.json`)
+
+---
+
+## [2.3.5] - 2025-10-05
+
+### Fixed
+
+- Updated `.windsurf/mcp.json` and `.cursor/mcp.json` to use `st` command directly
+- Removed hardcoded paths for better portability
+- Added test sandbox for verifying file operations
+
+### Added
+
+- Created `mcp_test_sandbox/` with test scripts for validation
+
+---
+
 ## [1.2.1] - 2025-01-10
 
 ### Fixed
