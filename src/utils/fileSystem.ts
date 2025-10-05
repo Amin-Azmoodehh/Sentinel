@@ -33,9 +33,9 @@ export const touchFile = (filePath: string): void => {
   }
 };
 
-export const resolvePath = (inputPath: string): string => {
+export const resolvePath = (inputPath: string, basePath?: string): string => {
   if (path.isAbsolute(inputPath)) {
     return inputPath;
   }
-  return path.resolve(process.cwd(), inputPath);
+  return path.resolve(basePath || process.cwd(), inputPath);
 };

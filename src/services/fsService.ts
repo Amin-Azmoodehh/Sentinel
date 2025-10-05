@@ -59,7 +59,7 @@ const ensureWorkspacePath = (input: string): string => {
     throw new Error('Path traversal not allowed');
   }
 
-  const resolved = path.normalize(path.resolve(resolvePath(cleaned)));
+  const resolved = path.normalize(path.resolve(resolvePath(cleaned, getWorkspaceRoot())));
 
   // Ensure path is within workspace using path.relative (robust on Windows/Linux)
   const currentWorkspaceRoot = path.normalize(getWorkspaceRoot());
