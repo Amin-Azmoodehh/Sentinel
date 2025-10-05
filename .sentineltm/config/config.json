@@ -6,7 +6,9 @@
   "providers": {
     "ollama": {
       "type": "ollama",
-      "baseURL": "http://localhost:11434"
+      "baseURL": "http://localhost:11434",
+      "baseUrl": "http://localhost:11434",
+      "apiKey": ""
     },
     "openai": {
       "type": "openai-compatible",
@@ -184,12 +186,12 @@
   "meta": {
     "gate": {
       "lastRun": {
-        "timestamp": 1759610716924,
-        "score": 40,
-        "threshold": 1,
-        "success": true,
+        "timestamp": 1759638899966,
+        "score": 50,
+        "threshold": 95,
+        "success": false,
         "source": "internal",
-        "attempts": 1,
+        "attempts": 5,
         "fallback": false
       }
     }

@@ -43,7 +43,7 @@ export const registerIdeCommands = (program: Command): void => {
       const tempModel = tempConfig.defaults.model;
 
       const providerChoices = availableProviders.map((name) => {
-        const providerConfig = (tempConfig.providers as Record<string, any>)?.[name];
+        const providerConfig = tempConfig.providers[name];
         const type = providerConfig?.type || 'unknown';
         const isCurrent = name === tempProvider;
         const hasApiKey = providerConfig?.apiKey ? '🔑' : '🔓';
@@ -144,10 +144,10 @@ export const registerIdeCommands = (program: Command): void => {
         // Save the API key to config
         const currentConfig = configService.load();
         if (!currentConfig.providers) {
-          (currentConfig as any).providers = {};
+          currentConfig.providers = {} as any;
         }
-        const existingProvider = (currentConfig.providers as any)[providerName] || {};
-        (currentConfig.providers as any)[providerName] = {
+        const existingProvider = currentConfig.providers[providerName] || {};
+        currentConfig.providers[providerName] = {
           ...existingProvider,
           apiKey: apiKey,
         };
@@ -337,10 +337,10 @@ export const registerIdeCommands = (program: Command): void => {
         // Save the API key to config
         const config = configService.load();
         if (!config.providers) {
-          (config as any).providers = {};
+          config.providers = {} as any;
         }
-        const existingProvider = (config.providers as any)[providerName] || {};
-        (config.providers as any)[providerName] = {
+        const existingProvider = config.providers[providerName] || {};
+        config.providers[providerName] = {
           ...existingProvider,
           apiKey: apiKey,
         };

@@ -5,7 +5,9 @@ import { log } from '../utils/logger.js';
 import { renderTable } from '../utils/table.js';
 
 export const registerShellCommands = (program: Command): void => {
-  const shellCommand = program.command('shell').description('🖥️ Execute shell commands and named scripts');
+  const shellCommand = program
+    .command('shell')
+    .description('🖥️ Execute shell commands and named scripts');
   const shellService = ShellService.getInstance();
 
   shellCommand
@@ -63,7 +65,7 @@ export const registerShellCommands = (program: Command): void => {
         args: args,
         skipConfirmation: options.force,
       });
-      
+
       if (!success) {
         process.exit(1);
       }
@@ -74,16 +76,16 @@ export const registerShellCommands = (program: Command): void => {
     .description('List all available named scripts')
     .action(() => {
       const scripts = scriptsService.listScripts();
-      
+
       if (scripts.length === 0) {
         log.info('No scripts configured. Add scripts to .sentineltm/config/scripts.yml');
         return;
       }
 
-      const rows = scripts.map(name => {
+      const rows = scripts.map((name) => {
         const script = scriptsService.getScript(name);
-        const description = Array.isArray(script) 
-          ? `${script.length} commands` 
+        const description = Array.isArray(script)
+          ? `${script.length} commands`
           : script?.substring(0, 50) + (script && script.length > 50 ? '...' : '');
         return [name, description || ''];
       });

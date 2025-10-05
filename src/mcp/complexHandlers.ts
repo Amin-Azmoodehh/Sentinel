@@ -20,7 +20,6 @@ import * as indexService from '../services/indexService.js';
 import * as providerService from '../services/providerService.js';
 import { runGateViaCli, type CliGateResult } from '../services/gateService.js';
 import * as aiTaskService from '../services/aiTaskService.js';
-import { handleContextMonitor } from './toolHandlers/contextMonitorHandler.js';
 
 const TASK_ACTIONS = [
   'createTask',
@@ -534,18 +533,5 @@ export class ComplexHandlers {
     }
     const result: CliGateResult = await runGateViaCli(minScore);
     return successResponse(result);
-  }
-
-  async handleContextMonitorTool(args: Record<string, unknown>): Promise<McpResponse> {
-    const action = ensureString(args.action, 'action');
-    const payload = args.payload ? ensureObject(args.payload, 'payload') : {};
-
-    const result = await handleContextMonitor(action, payload);
-
-    if (!result.success) {
-      throw new McpError(result.error || 'Context monitor operation failed');
-    }
-
-    return successResponse(result.data);
   }
 }

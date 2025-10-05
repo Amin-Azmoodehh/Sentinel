@@ -41,7 +41,7 @@ export const estimateTaskComplexity = async (
   `;
 
   const result = await shellService.executeCommand(
-    `"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`,
+    `"${provider.path}" -p "${prompt.replace(/"/g, '\\"')}"`,
     {
       isProviderCommand: true,
     }
@@ -78,7 +78,7 @@ export const suggestNextActions = async (): Promise<string[]> => {
   `;
 
   const result = await shellService.executeCommand(
-    `"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`,
+    `"${provider.path}" -p "${prompt.replace(/"/g, '\\"')}"`,
     {
       isProviderCommand: true,
     }
@@ -105,7 +105,7 @@ export const parsePrdToTasks = async (prdContent: string): Promise<taskService.T
 
   const prompt = buildPrdPrompt(prdContent);
   const result = await shellService.executeCommand(
-    `"${provider.path}" -p "${prompt.replace(/"/g, '\"')}"`,
+    `"${provider.path}" -p "${prompt.replace(/"/g, '\\"')}"`,
     {
       isProviderCommand: true,
     }

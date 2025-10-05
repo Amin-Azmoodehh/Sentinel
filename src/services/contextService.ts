@@ -282,8 +282,8 @@ export class ContextService {
           });
         }
       }
-    } catch (error) {
-      log.warn(`Could not analyze dependencies: ${error}`);
+    } catch {
+      log.warn('Could not analyze dependencies');
     }
 
     return dependencies;
@@ -364,7 +364,7 @@ export class ContextService {
           );
         }
       }
-    } catch (error) {
+    } catch {
       // Skip if can't analyze imports
     }
 

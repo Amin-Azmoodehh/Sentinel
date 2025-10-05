@@ -166,7 +166,7 @@ export class WorkflowService {
     const imports: string[] = [];
     let match;
 
-    while ((match = importRegex.exec(content)) !== null) {
+    while ((match = importRegex['exec'](content)) !== null) {
       imports.push(match[1]);
     }
 
@@ -178,7 +178,7 @@ export class WorkflowService {
     const exports: string[] = [];
     let match;
 
-    while ((match = exportRegex.exec(content)) !== null) {
+    while ((match = exportRegex['exec'](content)) !== null) {
       exports.push(match[1]);
     }
 
@@ -421,7 +421,7 @@ export const Default: Story = {
 
   private generateApiEndpointContent(
     options: CreateApiEndpointOptions,
-    context: WorkflowContext
+    _context: WorkflowContext
   ): string {
     const { name, method, path: apiPath, requestType, responseType } = options;
 

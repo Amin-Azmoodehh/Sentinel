@@ -33,15 +33,15 @@ export const registerIndexCommands = (program: Command): void => {
       // Get both old and new index status
       const oldStatus = indexStatus();
       const newStatus = indexingService.getIndexStatus();
-      
+
       const oldTimestamp = oldStatus.lastRun
         ? dayjs(oldStatus.lastRun).format('YYYY-MM-DD HH:mm:ss')
         : 'never';
-      
+
       const newTimestamp = newStatus.lastUpdated
         ? dayjs(newStatus.lastUpdated).format('YYYY-MM-DD HH:mm:ss')
         : 'never';
-      
+
       const table = renderTable({
         head: ['Index Type', 'Files', 'Last Updated'],
         rows: [
@@ -51,7 +51,7 @@ export const registerIndexCommands = (program: Command): void => {
       });
       log.raw('\n📊 Index Status');
       log.raw(table);
-      
+
       if (newStatus.files === 0) {
         log.warn('\n⚠️ No files in project index. Run `st index build` to build it.');
       } else {
@@ -68,30 +68,30 @@ export const registerIndexCommands = (program: Command): void => {
       if (options.files) {
         // Search in file names using new indexing service
         const allFiles = indexingService.getFiles();
-        const matchingFiles = allFiles.filter(file => 
+        const matchingFiles = allFiles.filter((file) =>
           file.toLowerCase().includes(query.toLowerCase())
         );
-        
+
         if (matchingFiles.length === 0) {
           log.info('No files found matching query.');
           return;
         }
-        
+
         const limit = options.limit ? Number(options.limit) : 20;
         const limitedFiles = matchingFiles.slice(0, limit);
-        
+
         const table = renderTable({
           head: ['File Path'],
-          rows: limitedFiles.map(file => [file]),
+          rows: limitedFiles.map((file) => [file]),
         });
         log.raw(table);
-        
+
         if (matchingFiles.length > limit) {
           log.info(`Showing ${limit} of ${matchingFiles.length} results. Use --limit to see more.`);
         }
         return;
       }
-      
+
       // Search in file content (legacy)
       const results = searchIndex(query);
       if (results.length === 0) {
@@ -106,7 +106,7 @@ export const registerIndexCommands = (program: Command): void => {
     });
 
   // Add standalone search command
-  const searchCommand = program
+  program
     .command('search <query>')
     .description('🔍 Search files and content')
     .option('--limit <n>', 'Limit results', '20')
@@ -115,30 +115,30 @@ export const registerIndexCommands = (program: Command): void => {
       if (options.files) {
         // Search in file names using new indexing service
         const allFiles = indexingService.getFiles();
-        const matchingFiles = allFiles.filter(file => 
+        const matchingFiles = allFiles.filter((file) =>
           file.toLowerCase().includes(query.toLowerCase())
         );
-        
+
         if (matchingFiles.length === 0) {
           log.info('No files found matching query.');
           return;
         }
-        
+
         const limit = options.limit ? Number(options.limit) : 20;
         const limitedFiles = matchingFiles.slice(0, limit);
-        
+
         const table = renderTable({
           head: ['File Path'],
-          rows: limitedFiles.map(file => [file]),
+          rows: limitedFiles.map((file) => [file]),
         });
         log.raw(table);
-        
+
         if (matchingFiles.length > limit) {
           log.info(`Showing ${limit} of ${matchingFiles.length} results. Use --limit to see more.`);
         }
         return;
       }
-      
+
       // Search in file content (legacy)
       const results = searchIndex(query);
       if (results.length === 0) {

@@ -25,7 +25,6 @@ import {
   buildSecurityToolDefinition,
   buildDashboardToolDefinition,
   buildCICDToolDefinition,
-  buildContextMonitorToolDefinition,
 } from '../toolDefinitions.js';
 import {
   handleSecurityTool,
@@ -70,7 +69,6 @@ export class ToolRegistry {
       handleIndexTool: complexHandlers.handleIndexTool.bind(complexHandlers),
       handleProviderTool: complexHandlers.handleProviderTool.bind(complexHandlers),
       handleGateTool: complexHandlers.handleGateTool.bind(complexHandlers),
-      handleContextMonitorTool: complexHandlers.handleContextMonitorTool.bind(complexHandlers),
 
       // Simple handlers
       handleTaskCreateTool: simpleHandlers.handleTaskCreateTool.bind(simpleHandlers),
@@ -134,11 +132,6 @@ export class ToolRegistry {
         definition: buildCICDToolDefinition(),
         handler: handleCICDTool,
         aliases: ['sentinel.cicd'],
-      },
-      {
-        definition: buildContextMonitorToolDefinition(),
-        handler: boundHandlers.handleContextMonitorTool,
-        aliases: ['sentinel.context_monitor', 'sentinel.monitor'],
       },
       { definition: buildTaskCreateToolDefinition(), handler: boundHandlers.handleTaskCreateTool },
       { definition: buildTaskListToolDefinition(), handler: boundHandlers.handleTaskListTool },

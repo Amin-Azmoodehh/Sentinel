@@ -1,17 +1,20 @@
 import axios, { AxiosInstance } from 'axios';
 import { Provider, Model, CompletionRequest, CompletionResponse } from './types.js';
-import { contextMonitorService } from '../services/contextMonitorService.js';
+// import { contextMonitorService } from '../services/contextMonitorService.js';
 
 export class OpenAICompatibleProvider implements Provider {
   private client: AxiosInstance;
 
-  constructor(private readonly baseURL: string, private readonly apiKey: string) {
+  constructor(
+    private readonly baseURL: string,
+    private readonly apiKey: string
+  ) {
     // Clean up baseURL and ensure it doesn't end with /v1
     let cleanBaseURL = this.baseURL.replace(/\/$/, '');
     if (cleanBaseURL.endsWith('/v1')) {
       cleanBaseURL = cleanBaseURL.slice(0, -3);
     }
-    
+
     this.client = axios.create({
       baseURL: cleanBaseURL,
       headers: {
@@ -41,9 +44,6 @@ export class OpenAICompatibleProvider implements Provider {
   }
 
   async generateCompletion(req: CompletionRequest): Promise<CompletionResponse> {
-    // Count input tokens
-    const inputTokens = contextMonitorService.countTokens(req.prompt, req.model);
-    
     // Prefer chat/completions if available
     try {
       const chat = await this.client.post('/v1/chat/completions', {
@@ -54,18 +54,16 @@ export class OpenAICompatibleProvider implements Provider {
         stream: false,
       });
       const content = chat.data?.choices?.[0]?.message?.content ?? '';
-      
-      // Count output tokens and record usage
-      const outputTokens = contextMonitorService.countTokens(content, req.model);
-      contextMonitorService.recordTokenUsage(inputTokens, outputTokens, `openai_chat_completion_${req.model}`);
-      
+
       return { content: String(content) };
     } catch (error: any) {
       // Handle 405 Method Not Allowed
       if (error.response?.status === 405) {
-        throw new Error(`Provider ${this.baseURL} returned 405 Method Not Allowed. This usually means the API endpoint or HTTP method is incorrect. Please check the provider's API documentation.`);
+        throw new Error(
+          `Provider ${this.baseURL} returned 405 Method Not Allowed. This usually means the API endpoint or HTTP method is incorrect. Please check the provider's API documentation.`
+        );
       }
-      
+
       // Try fallback to legacy completions
       try {
         const comp = await this.client.post('/v1/completions', {
@@ -76,15 +74,13 @@ export class OpenAICompatibleProvider implements Provider {
           stream: false,
         });
         const content = comp.data?.choices?.[0]?.text ?? '';
-        
-        // Count output tokens and record usage
-        const outputTokens = contextMonitorService.countTokens(content, req.model);
-        contextMonitorService.recordTokenUsage(inputTokens, outputTokens, `openai_completion_${req.model}`);
-        
+
         return { content: String(content) };
       } catch (fallbackError: any) {
         // If both fail, throw the original error with more context
-        throw new Error(`Both /v1/chat/completions and /v1/completions failed. Original error: ${error.message}. Fallback error: ${fallbackError.message}`);
+        throw new Error(
+          `Both /v1/chat/completions and /v1/completions failed. Original error: ${error.message}. Fallback error: ${fallbackError.message}`
+        );
       }
     }
   }

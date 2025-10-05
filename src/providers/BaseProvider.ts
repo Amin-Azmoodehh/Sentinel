@@ -8,8 +8,8 @@ export abstract class BaseProvider {
   constructor(providerName: string, baseURL: string) {
     const config = configService.load();
     // Assuming API keys are stored in config under provider name
-    const providers = config.providers as Record<string, any> | undefined;
-    this.apiKey = providers?.[providerName]?.apiKey || '';
+    const providers = config.providers;
+    this.apiKey = providers[providerName]?.apiKey || '';
 
     if (!this.apiKey) {
       throw new Error(`API key for ${providerName} not found.`);

@@ -323,23 +323,5 @@
     "community": "Discord Server"
   },
   "legalNotice": "These rules constitute a binding quality contract. Compliance is mandatory for all code contributions across ALL supported IDEs and programming languages.",
-  "enforcement_notice": "Powered by SentinelTM Quality Gates - Zero Tolerance, Military-Grade Standards.",
-  "ai_interaction_rules": {
-    "token_usage_display": {
-      "mandatory": true,
-      "description": "AI models MUST display token usage statistics after every response",
-      "format": "Show input tokens, output tokens, total tokens, and context window percentage",
-      "tools": {
-        "monitor": "st monitor stats",
-        "count": "st monitor count <text>",
-        "mcp": "sentinel_context_monitor with action getStats"
-      }
-    },
-    "context_awareness": {
-      "check_usage": "Before each response, check current token usage",
-      "warn_threshold": 85,
-      "critical_threshold": 95,
-      "action_at_critical": "Suggest summarization or session reset"
-    }
-  }
+  "enforcement_notice": "Powered by SentinelTM Quality Gates - Zero Tolerance, Military-Grade Standards."
 }

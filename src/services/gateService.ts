@@ -5,7 +5,7 @@ import { configService } from './configService.js';
 import { log, type SummaryRow } from '../utils/logger.js';
 import { ShellService } from './shellService.js';
 import { indexingService } from './indexingService.js';
-import { CompressionService } from './compressionService.js';
+// import { CompressionService } from './compressionService.js';
 import { contextService } from './contextService.js';
 
 interface GateCheck {
@@ -170,7 +170,7 @@ const aiRuleCheck: GateCheck = {
 
     try {
       log.info('🧠 Enriching context for AI analysis...');
-      
+
       // Use context service for intelligent analysis
       const context = await contextService.enrichContext({
         intent: 'code quality review and analysis',
@@ -183,9 +183,9 @@ const aiRuleCheck: GateCheck = {
       let gitDiff = '';
       try {
         const { spawnSync } = await import('node:child_process');
-        const result = spawnSync('git', ['diff', '--cached', 'HEAD~1..HEAD'], { 
+        const result = spawnSync('git', ['diff', '--cached', 'HEAD~1..HEAD'], {
           encoding: 'utf-8',
-          cwd: process.cwd()
+          cwd: process.cwd(),
         });
         if (result.stdout) {
           gitDiff = result.stdout.slice(0, 1500); // Limit diff size
@@ -197,7 +197,7 @@ const aiRuleCheck: GateCheck = {
       // If no git diff, use context-enriched analysis
       if (!gitDiff.trim()) {
         gitDiff = context.relevantFiles
-          .map(file => `=== ${file.path} (${file.type}) ===\n${file.content.slice(0, 800)}`)
+          .map((file) => `=== ${file.path} (${file.type}) ===\n${file.content.slice(0, 800)}`)
           .join('\n\n');
       }
 
@@ -210,7 +210,7 @@ const aiRuleCheck: GateCheck = {
         context.projectRules,
         '',
         '## ESTABLISHED PATTERNS TO FOLLOW:',
-        ...context.patterns.map(pattern => `**${pattern.type}**: ${pattern.usage}`),
+        ...context.patterns.map((pattern) => `**${pattern.type}**: ${pattern.usage}`),
         '',
         '## PROJECT CONVENTIONS:',
         `Naming: ${context.conventions.naming.join(', ')}`,
@@ -218,7 +218,9 @@ const aiRuleCheck: GateCheck = {
         `Imports: ${context.conventions.imports.join(', ')}`,
         '',
         '## DEPENDENCIES IN USE:',
-        ...context.dependencies.map(dep => `- ${dep.name} (${dep.version}): ${dep.usage.slice(0, 2).join(', ')}`),
+        ...context.dependencies.map(
+          (dep) => `- ${dep.name} (${dep.version}): ${dep.usage.slice(0, 2).join(', ')}`
+        ),
         '',
         '## CODE TO REVIEW:',
         gitDiff || 'No code changes to analyze.',
@@ -246,7 +248,7 @@ const aiRuleCheck: GateCheck = {
       ].join('\n');
 
       log.info(`Sending contextual request to ${providerName} (${model})...`);
-      
+
       // Use the new API-based provider service
       const { generateCompletion } = await import('./providerService.js');
       const response = await generateCompletion({
@@ -257,33 +259,37 @@ const aiRuleCheck: GateCheck = {
       });
 
       const output = response.content.trim();
-      
+
       // Try to parse JSON response
       try {
         const jsonMatch = output.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           const feedback = JSON.parse(jsonMatch[0]);
           const score = feedback.score || 0;
-          
+
           log.info(`✅ AI Analysis Complete - Score: ${score}/100`);
-          
+
           // Display detailed feedback
           if (feedback.summary) {
             log.info(`📋 Summary: ${feedback.summary}`);
           }
-          
+
           if (feedback.suggestions && feedback.suggestions.length > 0) {
             log.info('💡 Suggestions:');
-            feedback.suggestions.forEach((suggestion: any, index: number) => {
-              const icon = suggestion.severity === 'critical' ? '🔴' : 
-                          suggestion.severity === 'major' ? '🟡' : '🔵';
+            feedback.suggestions.forEach((suggestion: any) => {
+              const icon =
+                suggestion.severity === 'critical'
+                  ? '🔴'
+                  : suggestion.severity === 'major'
+                    ? '🟡'
+                    : '🔵';
               log.info(`   ${icon} [${suggestion.category}] ${suggestion.comment}`);
             });
           }
-          
+
           return score >= 85; // More reasonable threshold
         }
-      } catch (parseError) {
+      } catch (_parseError) {
         log.warn('⚠️ Could not parse structured feedback, falling back to simple scoring');
       }
 
@@ -303,11 +309,11 @@ const aiRuleCheck: GateCheck = {
       return false;
     } catch (error) {
       log.error('❌ Error during AI Rule Check!');
-      
+
       // Enhanced error messaging
       if (error instanceof Error) {
         const errorMsg = error.message.toLowerCase();
-        
+
         if (errorMsg.includes('500') || errorMsg.includes('internal server error')) {
           log.error('🔴 AI Server Error (500): The AI model server encountered an internal error.');
           log.warn('Possible causes:');
@@ -325,13 +331,13 @@ const aiRuleCheck: GateCheck = {
           log.error(`Error: ${error.message}`);
         }
       }
-      
+
       log.warn('\nTroubleshooting:');
       log.warn('  1. Check provider is configured: st provider status');
       log.warn('  2. Verify model exists: ollama list (for Ollama)');
       log.warn('  3. Check network connectivity');
       log.warn('  4. Try a different model: st set provider');
-      
+
       return false;
     }
   },

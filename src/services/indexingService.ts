@@ -84,10 +84,8 @@ class IndexingService {
         log.warn('No indexing configuration found in config! Using defaults.');
       }
 
-      const include = (config.indexing as any)?.include || [
-        '**/*.{ts,tsx,js,jsx,json,md,yml,yaml}',
-      ];
-      const ignore = (config.indexing as any)?.ignore || [
+      const include = config.indexing?.include || ['**/*.{ts,tsx,js,jsx,json,md,yml,yaml}'];
+      const ignore = config.indexing?.ignore || [
         'node_modules/**',
         'dist/**',
         'build/**',

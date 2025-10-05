@@ -8,7 +8,7 @@ export class CompressionService {
   /**
    * Compress code by removing comments, excessive whitespace, and empty lines
    */
-  public static compressCode(code: string, language: string = 'typescript'): string {
+  public static compressCode(code: string, _language: string = 'typescript'): string {
     let compressed = code;
 
     // Remove single-line comments
@@ -157,7 +157,7 @@ export class CompressionService {
   public static optimizePrompt(sections: { rules: string; code: string; task: string }): string {
     const rulesTokens = this.estimateTokens(sections.rules);
     const codeTokens = this.estimateTokens(sections.code);
-    const totalTokens = rulesTokens + codeTokens + 200; // +200 for prompt structure
+    // const totalTokens = rulesTokens + codeTokens + 200; // +200 for prompt structure
 
     // Build compact prompt
     const prompt = [

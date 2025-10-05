@@ -1,4 +1,6 @@
-export const defaultConfig = {
+import type { ConfigType } from '../types/config.js';
+
+export const defaultConfig: ConfigType = {
   // Default selection for API-based providers (v1.6+)
   defaults: {
     provider: 'ollama',

@@ -21,13 +21,13 @@ const findWithExtensions = (basePath: string): string | null => {
 
 const locateCommand = (provider: string): string | null => {
   let providers = loadProvidersFromCache();
-  let match = providers.find((item) => item.name === provider && item.path);
+  let match = providers.find((item: any) => item.name === provider && item.path);
   if (!match) {
     providers = detectProviders().providers;
-    match = providers.find((item) => item.name === provider && item.path);
+    match = providers.find((item: any) => item.name === provider && item.path);
   }
-  if (match && match.path) {
-    return match.path;
+  if (match && (match as any).path) {
+    return (match as any).path;
   }
   const shimCmd = findWithExtensions(path.join(paths.shimsDir(), provider));
   if (shimCmd) {

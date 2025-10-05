@@ -85,7 +85,9 @@ export class SentinelMcpServer {
     log.info('MCP Server connected and ready.');
   }
 
-  public async handleHttpRequest(request: any): Promise<any> {
+  public async handleHttpRequest(request: {
+    params?: { name?: string; arguments?: any };
+  }): Promise<any> {
     const { name, arguments: args } = request.params || {};
     if (!name) {
       return { error: 'Missing tool name in request' };

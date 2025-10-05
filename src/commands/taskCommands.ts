@@ -116,12 +116,12 @@ export const registerTaskCommands = (program: Command): void => {
     .option('--tags <ops>', 'Tag updates, e.g. +feat,-bug')
     .action((id: string, options: TaskUpdateOptions) => {
       const tagChanges = parseTagChanges(options.tags);
-      
+
       // Debug logging
       if (options.status) {
         log.info(`Updating task ${id} status to: "${options.status}"`);
       }
-      
+
       const record = updateTask({
         id: Number(id),
         title: options.title,
@@ -135,12 +135,12 @@ export const registerTaskCommands = (program: Command): void => {
         log.warn('Task not found: ' + id);
         return;
       }
-      
+
       // Show updated status
       if (options.status && record.status) {
         log.info(`Task status updated to: "${record.status}"`);
       }
-      
+
       log.success('Task updated.');
     });
 
@@ -151,7 +151,7 @@ export const registerTaskCommands = (program: Command): void => {
     .action((id: string, options: { force?: boolean }) => {
       const taskId = Number(id);
       const task = getTask(taskId);
-      
+
       if (!task) {
         log.warn('Task not found: ' + id);
         return;

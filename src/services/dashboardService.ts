@@ -128,10 +128,10 @@ export class DashboardService {
       const allTasks = taskService.listTasks();
       return {
         total: allTasks.length,
-        pending: allTasks.filter((t: any) => t.status === 'open').length,
-        inProgress: allTasks.filter((t: any) => t.status === 'in-progress').length,
-        completed: allTasks.filter((t: any) => t.status === 'done').length,
-        blocked: allTasks.filter((t: any) => t.status === 'blocked').length,
+        pending: allTasks.filter((t) => t.status === 'open').length,
+        inProgress: allTasks.filter((t) => t.status === 'in-progress').length,
+        completed: allTasks.filter((t) => t.status === 'done').length,
+        blocked: allTasks.filter((t) => t.status === 'blocked').length,
       };
     } catch {
       return { total: 0, pending: 0, inProgress: 0, completed: 0, blocked: 0 };

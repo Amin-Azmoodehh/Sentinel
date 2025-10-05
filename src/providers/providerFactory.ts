@@ -6,10 +6,10 @@ import { Provider } from './types.js';
 
 const getProviderConfig = (name: string) => {
   const config = configService.load();
-  const userProviderConfig = (config.providers as Record<string, any>)?.[name];
+  const userProviderConfig = config.providers[name];
 
   // Get preconfigured defaults
-  const preconfig = (preconfiguredProviders as Record<string, any>)[name];
+  const preconfig = (preconfiguredProviders as any)[name];
   if (!preconfig) {
     throw new Error(`Provider '${name}' not found in preconfigured providers.`);
   }

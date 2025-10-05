@@ -2,8 +2,9 @@ import fs from 'node:fs';
 import { defaultConfig } from '../constants/defaults.js';
 import { paths } from '../constants/paths.js';
 import { readJsonFile, writeJsonFile } from '../utils/fileSystem.js';
+import type { ConfigType } from '../types/config.js';
 
-export type Config = typeof defaultConfig & Record<string, unknown>;
+export type Config = ConfigType & Record<string, unknown>;
 
 const ensureConfigDirs = (): void => {
   paths.ensureDir(paths.configDir());
