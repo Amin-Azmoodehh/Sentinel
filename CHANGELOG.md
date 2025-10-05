@@ -1,3 +1,15 @@
+## [2.3.11] - 2025-10-05
+
+### Fixed
+
+- **Critical**: `sentinel_shell` timeout issue resolved
+  - Added real timeout guard with process kill after timeout expires
+  - Fixed Windows shell execution (PowerShell/CMD) with proper args and `shell: false`
+  - Shell commands (e.g., `python --version`, `echo test`) now execute immediately
+- **Task API**: `createSubtask` and `listSubtasks` now accept both `payload.taskId` and `payload.parent` (compatibility fix)
+
+---
+
 ## [2.3.10] - 2025-10-05
 
 ### Added
