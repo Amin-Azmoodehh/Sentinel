@@ -79,6 +79,7 @@ const createMcpConfig = (providerName: string) => {
         command: invocation.command,
         args: invocation.args,
         env: {
+          SENTINEL_WORKSPACE: '${workspaceFolder}',
           SENTINEL_LOG_LEVEL: 'info',
           SENTINEL_AUTO_INDEX: 'true',
         },
@@ -126,6 +127,22 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
         server.env = {};
         updated = true;
       }
+      
+      // Ensure SENTINEL_WORKSPACE is set
+      const serverEnv = server.env as MutableJson;
+      if (serverEnv.SENTINEL_WORKSPACE !== '${workspaceFolder}') {
+        serverEnv.SENTINEL_WORKSPACE = '${workspaceFolder}';
+        updated = true;
+      }
+      if (serverEnv.SENTINEL_LOG_LEVEL !== 'info') {
+        serverEnv.SENTINEL_LOG_LEVEL = 'info';
+        updated = true;
+      }
+      if (serverEnv.SENTINEL_AUTO_INDEX !== 'true') {
+        serverEnv.SENTINEL_AUTO_INDEX = 'true';
+        updated = true;
+      }
+      
       // Remove deprecated fields if they exist
       if (server.transport !== undefined) {
         delete server.transport;
@@ -167,6 +184,22 @@ const ensureMcpConfig = (targetPath: string, providerName: string): void => {
       server.env = {};
       updated = true;
     }
+    
+    // Ensure SENTINEL_WORKSPACE is set
+    const serverEnv = server.env as MutableJson;
+    if (serverEnv.SENTINEL_WORKSPACE !== '${workspaceFolder}') {
+      serverEnv.SENTINEL_WORKSPACE = '${workspaceFolder}';
+      updated = true;
+    }
+    if (serverEnv.SENTINEL_LOG_LEVEL !== 'info') {
+      serverEnv.SENTINEL_LOG_LEVEL = 'info';
+      updated = true;
+    }
+    if (serverEnv.SENTINEL_AUTO_INDEX !== 'true') {
+      serverEnv.SENTINEL_AUTO_INDEX = 'true';
+      updated = true;
+    }
+    
     // Remove deprecated fields if they exist
     if (server.transport !== undefined) {
       delete server.transport;
