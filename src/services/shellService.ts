@@ -127,7 +127,7 @@ export class ShellService {
         } else {
           // cmd.exe
           shellCommand = shell;
-          shellArgs = ['/d', '/s', '/c', command];
+          shellArgs = ['/c', command];
         }
       } else {
         shellCommand = shell;
