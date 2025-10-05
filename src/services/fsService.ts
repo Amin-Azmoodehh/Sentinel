@@ -84,7 +84,7 @@ const uniqueStrings = (items: string[]): string[] => {
 };
 
 export const listFiles = async (pattern?: string, targetPath?: string): Promise<string[]> => {
-  const cwd = process.cwd();
+  const cwd = getWorkspaceRoot();
   
   // If targetPath specified, list that directory
   if (targetPath) {

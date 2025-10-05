@@ -27,8 +27,8 @@ export class IndexHandler {
       case 'search': {
         const query = ensureString(payload.query, 'payload.query');
         const limit = this.asOptionalNumber(payload.limit, 'payload.limit');
-        const results = indexService.searchIndexedFiles(query, limit);
-        return successResponse(results);
+        const results = indexService.searchFileContents(query, limit);
+        return successResponse({ results });
       }
       case 'symbols': {
         const options: indexService.SymbolQueryOptions = {};
