@@ -69,6 +69,7 @@ const resolveCliServeInvocation = (): CliInvocation => {
 
 const createMcpConfig = (_providerName: string) => {
   const invocation = resolveCliServeInvocation();
+  const workspacePath = process.cwd();
 
   return {
     mcpServers: {
@@ -76,7 +77,7 @@ const createMcpConfig = (_providerName: string) => {
         command: invocation.command,
         args: invocation.args,
         env: {
-          SENTINEL_WORKSPACE: '${workspaceFolder}',
+          SENTINEL_WORKSPACE: workspacePath,
           SENTINEL_LOG_LEVEL: 'info',
           SENTINEL_AUTO_INDEX: 'true',
         },
@@ -123,10 +124,14 @@ const ensureMcpConfig = (targetPath: string): void => {
         updated = true;
       }
       
-      // Ensure SENTINEL_WORKSPACE is set
+      // Ensure SENTINEL_WORKSPACE is set to absolute path
       const serverEnv = server.env as MutableJson;
-      if (serverEnv.SENTINEL_WORKSPACE !== '${workspaceFolder}') {
-        serverEnv.SENTINEL_WORKSPACE = '${workspaceFolder}';
+      const currentWorkspace = typeof serverEnv.SENTINEL_WORKSPACE === 'string' ? serverEnv.SENTINEL_WORKSPACE : '';
+      const workspacePath = process.cwd();
+      
+      // If workspace is not set or is a variable, update it to absolute path
+      if (!currentWorkspace || currentWorkspace.includes('${') || !path.isAbsolute(currentWorkspace)) {
+        serverEnv.SENTINEL_WORKSPACE = workspacePath;
         updated = true;
       }
       if (serverEnv.SENTINEL_LOG_LEVEL !== 'info') {
@@ -180,10 +185,14 @@ const ensureMcpConfig = (targetPath: string): void => {
       updated = true;
     }
     
-    // Ensure SENTINEL_WORKSPACE is set
+    // Ensure SENTINEL_WORKSPACE is set to absolute path
     const serverEnv = server.env as MutableJson;
-    if (serverEnv.SENTINEL_WORKSPACE !== '${workspaceFolder}') {
-      serverEnv.SENTINEL_WORKSPACE = '${workspaceFolder}';
+    const currentWorkspace = typeof serverEnv.SENTINEL_WORKSPACE === 'string' ? serverEnv.SENTINEL_WORKSPACE : '';
+    const workspacePath = process.cwd();
+    
+    // If workspace is not set or is a variable, update it to absolute path
+    if (!currentWorkspace || currentWorkspace.includes('${') || !path.isAbsolute(currentWorkspace)) {
+      serverEnv.SENTINEL_WORKSPACE = workspacePath;
       updated = true;
     }
     if (serverEnv.SENTINEL_LOG_LEVEL !== 'info') {

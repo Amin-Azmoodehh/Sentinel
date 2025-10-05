@@ -4,7 +4,7 @@
       "command": "st",
       "args": ["serve", "--mcp-stdio"],
       "env": {
-        "SENTINEL_WORKSPACE": "${workspaceFolder}",
+        "SENTINEL_WORKSPACE": "D:\\Sentinel",
         "SENTINEL_LOG_LEVEL": "info",
         "SENTINEL_AUTO_INDEX": "true"
       }

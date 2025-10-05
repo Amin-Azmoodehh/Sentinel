@@ -8,7 +8,15 @@ SentinelTM now correctly handles the `SENTINEL_WORKSPACE` environment variable. 
 
 ### For Windsurf
 
-Create or edit `.windsurf/mcp.json` in your project root:
+**Recommended**: Use `st ide set` command to automatically generate the correct configuration:
+
+```bash
+cd /path/to/your/project
+st ide set
+# Select Windsurf from the list
+```
+
+Or manually create/edit `.windsurf/mcp.json` in your project root:
 
 ```json
 {
@@ -17,7 +25,7 @@ Create or edit `.windsurf/mcp.json` in your project root:
       "command": "st",
       "args": ["serve", "--mcp-stdio"],
       "env": {
-        "SENTINEL_WORKSPACE": "${workspaceFolder}",
+        "SENTINEL_WORKSPACE": "D:\\YourProject",
         "SENTINEL_LOG_LEVEL": "info",
         "SENTINEL_AUTO_INDEX": "true"
       }
@@ -26,11 +34,19 @@ Create or edit `.windsurf/mcp.json` in your project root:
 }
 ```
 
-**✅ Pro Tip**: `${workspaceFolder}` automatically resolves to your project root — no hardcoded paths needed!
+**⚠️ Important**: Use **absolute paths** for `SENTINEL_WORKSPACE`. Some IDEs don't expand `${workspaceFolder}` correctly, so use the full project path (e.g., `D:\\MyProject` on Windows or `/home/user/MyProject` on Linux/Mac).
 
 ### For Cursor
 
-Create or edit `.cursor/mcp.json` in your project root:
+**Recommended**: Use `st ide set` command:
+
+```bash
+cd /path/to/your/project
+st ide set
+# Select Cursor from the list
+```
+
+Or manually create/edit `.cursor/mcp.json`:
 
 ```json
 {
@@ -39,7 +55,7 @@ Create or edit `.cursor/mcp.json` in your project root:
       "command": "st",
       "args": ["serve", "--mcp-stdio"],
       "env": {
-        "SENTINEL_WORKSPACE": "${workspaceFolder}",
+        "SENTINEL_WORKSPACE": "D:\\YourProject",
         "SENTINEL_LOG_LEVEL": "info",
         "SENTINEL_AUTO_INDEX": "true"
       }
@@ -48,7 +64,7 @@ Create or edit `.cursor/mcp.json` in your project root:
 }
 ```
 
-**✅ Pro Tip**: Cursor also supports `${workspaceFolder}` variable!
+**⚠️ Important**: Use **absolute paths** for reliability.
 
 ### For Claude Desktop
 

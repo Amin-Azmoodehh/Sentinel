@@ -14,7 +14,13 @@ export const registerServeCommand = (program: Command): void => {
     .option('-t, --transport <type>', 'Specify the transport type (stdio, http, sse)', 'stdio')
     .option('--mcp-stdio', 'Use stdio transport (alias for --transport stdio)')
     .option('-p, --port <port>', 'Specify the port for http/sse transports', '8008')
-    .action(async (options: ServeOptions & { mcpStdio?: boolean }) => {
+    .option('--workspace <path>', 'Set workspace directory (overrides SENTINEL_WORKSPACE)')
+    .action(async (options: ServeOptions & { mcpStdio?: boolean; workspace?: string }) => {
+      // If --workspace is provided, set it as environment variable
+      if (options.workspace) {
+        process.env.SENTINEL_WORKSPACE = options.workspace;
+      }
+      
       // If --mcp-stdio is used, override transport to stdio
       if (options.mcpStdio) {
         options.transport = 'stdio';
